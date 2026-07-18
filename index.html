@@ -150,6 +150,25 @@
                 </div>
             </div>
 
+            <!-- Prioridade (confiança) e estilo (day/swing) — guardados no log -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Prioridade / Confiança</label>
+                    <div id="prioritySelector" class="grid grid-cols-3 gap-2">
+                        <button type="button" class="seg-btn" data-priority="1" title="Mais prioritária / mais confiança">P1</button>
+                        <button type="button" class="seg-btn" data-priority="2">P2</button>
+                        <button type="button" class="seg-btn" data-priority="3" title="Menos prioritária / menos confiança">P3</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Estilo</label>
+                    <div id="styleSelector" class="grid grid-cols-2 gap-2">
+                        <button type="button" class="seg-btn" data-style="day">Day</button>
+                        <button type="button" class="seg-btn" data-style="swing">Swing</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label for="accountBalance" class="block text-sm font-medium text-gray-700 mb-1">Carteira ($)</label>
@@ -388,6 +407,8 @@
         // Estado da UI
         let currentAssetType = 'forex';
         let trancheCount = 3;
+        let currentPriority = 2;      // 1 = +prioritária/+confiança … 3 = -prioritária
+        let currentStyle = 'day';     // 'day' | 'swing'
 
         // Percentagens por defeito do lote total, por nº de tranches.
         const DEFAULT_PCTS = { 1: [100], 2: [50, 50], 3: [40, 30, 30] };
@@ -518,6 +539,20 @@
                 inp.value = i < count ? defs[i] : '';
             }
             calculateTradeSummary();
+        }
+
+        function applyPriority(p) {
+            currentPriority = p;
+            document.querySelectorAll('#prioritySelector .seg-btn').forEach(b => {
+                b.classList.toggle('active', parseInt(b.dataset.priority) === p);
+            });
+        }
+
+        function applyStyle(s) {
+            currentStyle = s;
+            document.querySelectorAll('#styleSelector .seg-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.style === s);
+            });
         }
 
         /* --------------------- Cálculo principal do risco -------------------- */
@@ -773,11 +808,42 @@
             localStorage.setItem(JOURNAL_STORAGE_KEY, JSON.stringify(arr));
         }
 
-        // Data legível a partir de um timestamp (ex. "18/07 14:30").
+        // Data legível a partir de um timestamp (ex. "18/07/2026 14:30").
         function fmtDate(ts) {
             const d = new Date(ts);
             const p = n => String(n).padStart(2, '0');
-            return `${p(d.getDate())}/${p(d.getMonth() + 1)} ${p(d.getHours())}:${p(d.getMinutes())}`;
+            return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+        }
+
+        // Interpreta uma data escrita à mão. Aceita "DD/MM/AAAA HH:MM" ou "AAAA-MM-DD HH:MM".
+        // Rejeita datas impossíveis (ex. 32/13) verificando que não houve rollover.
+        function makeTs(y, mo, d, h, mi) {
+            if (mo < 1 || mo > 12 || d < 1 || d > 31 || h > 23 || mi > 59) return null;
+            const dt = new Date(y, mo - 1, d, h, mi);
+            if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+            return dt.getTime();
+        }
+        function parseDateInput(str) {
+            str = str.trim();
+            let m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/);
+            if (m) return makeTs(+m[3], +m[2], +m[1], +(m[4] || 0), +(m[5] || 0));
+            m = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2}))?$/);
+            if (m) return makeTs(+m[1], +m[2], +m[3], +(m[4] || 0), +(m[5] || 0));
+            return null;
+        }
+
+        // Editar a data de execução de uma trade (backfill de trades registadas mais tarde).
+        function editDate(id) {
+            const journal = getJournal();
+            const t = journal.find(x => x.id === id);
+            if (!t) return;
+            const raw = prompt("Data de execução (DD/MM/AAAA HH:MM):", fmtDate(t.ts));
+            if (raw === null) return;
+            const ts = parseDateInput(raw);
+            if (ts === null || isNaN(ts)) { alert("Data inválida. Usa o formato DD/MM/AAAA HH:MM."); return; }
+            t.ts = ts;
+            saveJournal(journal.sort((a, b) => (b.ts || b.id || 0) - (a.ts || a.id || 0)));
+            renderJournal();
         }
 
         // Regista o cálculo ATUAL como uma nova trade (estado "aberto").
@@ -804,6 +870,8 @@
                 plannedGain: lastCalc.plannedGain,
                 rr: lastCalc.rr,
                 riskPct: lastCalc.riskPct,
+                priority: currentPriority,   // 1..3 (confiança)
+                style: currentStyle,         // 'day' | 'swing'
                 status: 'aberto',       // aberto | ganho | perdido | nulo
                 resultUSD: null,        // P&L realizado (preenchido ao fechar)
                 notes: ''
@@ -920,6 +988,25 @@
             return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:${fg};background:${bg}">${txt}</span>`;
         }
 
+        // Badge de prioridade (P1 verde/forte … P3 cinza/fraca).
+        function priorityBadge(t) {
+            if (!t.priority) return '';
+            const map = {
+                1: ['#065f46', '#d1fae5'],   // P1 — mais confiança
+                2: ['#92400e', '#fef3c7'],   // P2
+                3: ['#374151', '#e5e7eb'],   // P3 — menos confiança
+            };
+            const [fg, bg] = map[t.priority] || map[2];
+            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:${fg};background:${bg}">P${t.priority}</span>`;
+        }
+
+        // Badge de estilo (Day / Swing).
+        function styleBadge(t) {
+            if (!t.style) return '';
+            const txt = t.style === 'swing' ? 'SWING' : 'DAY';
+            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:#1e40af;background:#dbeafe">${txt}</span>`;
+        }
+
         function renderJournal() {
             const journal = getJournal();
             const filter = document.getElementById('journalFilter').value;
@@ -957,13 +1044,15 @@
                 return `<div class="p-3 rounded-lg border border-gray-200 bg-white">
                     <div class="flex items-center justify-between gap-2 mb-1">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-xs text-gray-400">${fmtDate(t.ts)}</span>
                             <span class="font-bold text-gray-800">${t.symbol}</span>
                             <span class="text-[10px] font-bold" style="color:${dirColor}">${t.direction}</span>
                             ${statusBadge(t)}
+                            ${priorityBadge(t)}
+                            ${styleBadge(t)}
                         </div>
                         ${resTxt}
                     </div>
+                    <div class="text-xs text-gray-400 mb-1">📅 ${fmtDate(t.ts)}</div>
                     <div class="text-xs text-gray-600 flex flex-wrap gap-x-3">
                         <span>Méd ${formatPrice(t.avgEntry)}</span>
                         <span>SL ${formatPrice(t.sl)}</span>
@@ -976,6 +1065,7 @@
                     <div class="flex gap-2 mt-2">
                         <button onclick="closeTrade(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100">💰 Resultado</button>
                         ${t.status !== 'aberto' ? `<button onclick="reopenTrade(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-100">↩︎ Reabrir</button>` : ''}
+                        <button onclick="editDate(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-100">📅 Data</button>
                         <button onclick="editNotes(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-100">📝 Notas</button>
                         <button onclick="deleteTrade(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-red-300 text-red-600 bg-white hover:bg-red-50 ml-auto">🗑️</button>
                     </div>
@@ -993,11 +1083,13 @@
         function exportJournalCSV() {
             const journal = getJournal();
             if (!journal.length) { alert("Log vazio."); return; }
-            const cols = ['data', 'simbolo', 'tipo', 'direcao', 'entradas', 'pcts', 'preco_medio',
+            const cols = ['data', 'simbolo', 'tipo', 'direcao', 'prioridade', 'estilo',
+                'entradas', 'pcts', 'preco_medio',
                 'stop', 'take_profit', 'lote_total', 'risco_plan', 'ganho_plan', 'rr', 'risco_pct',
                 'estado', 'resultado_usd', 'notas'];
             const rows = journal.map(t => [
                 fmtDate(t.ts), t.symbol, t.assetType, t.direction,
+                t.priority ? 'P' + t.priority : '', t.style || '',
                 t.entries.join(' '), t.pcts.join(' '), t.avgEntry,
                 t.sl, t.tp, t.totalLot, t.plannedRisk.toFixed(2), t.plannedGain.toFixed(2),
                 t.rr.toFixed(2), t.riskPct.toFixed(2), t.status,
@@ -1071,6 +1163,10 @@
                 .forEach(b => b.addEventListener('click', () => applyAssetType(b.dataset.asset)));
             document.querySelectorAll('#trancheCountSelector .seg-btn')
                 .forEach(b => b.addEventListener('click', () => applyTrancheCount(parseInt(b.dataset.count))));
+            document.querySelectorAll('#prioritySelector .seg-btn')
+                .forEach(b => b.addEventListener('click', () => applyPriority(parseInt(b.dataset.priority))));
+            document.querySelectorAll('#styleSelector .seg-btn')
+                .forEach(b => b.addEventListener('click', () => applyStyle(b.dataset.style)));
 
             // Recalcula em tempo real ao escrever (risco acumulado ao vivo).
             document.getElementById('inputs').addEventListener('input', calculateTradeSummary);
@@ -1080,6 +1176,8 @@
             loadSymbolHistory();
             setupListeners();
             applyAssetType('forex');
+            applyPriority(2);
+            applyStyle('day');
             applyTrancheCount(3);
             saveSymbolToHistory(document.getElementById('assetSymbol').value.trim() || '');
             calculateTradeSummary();
