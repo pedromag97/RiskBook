@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiskBook — Sizing & Diário de Trading</title>
+
+    <!-- Metadados do PWA (Manifest) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="RiskBook">
+
+    <link rel="icon" href="https://placehold.co/192x192/3b82f6/ffffff?text=RB">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/3b82f6/ffffff?text=RB">
+
+    <!-- Incluindo Tailwind CSS e html2canvas para exportação -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .app-container {
+            max-width: 480px;
+            min-height: 100vh;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .input-field {
+            border: 1px solid #d1d5db;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+            background-color: #f9fafb;
+        }
+        .input-field:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+            outline: none;
+            background-color: white;
+        }
+        .input-field:disabled {
+            background-color: #e5e7eb;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+        .calculate-button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+        .export-button {
+            background-color: #4b5563;
+            color: white;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .check-icon { font-size: 1.5rem; line-height: 1; }
+        .check-pass { color: var(--success-color); }
+        .check-fail { color: var(--danger-color); }
+
+        .badge-buy { background-color: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .badge-sell { background-color: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+
+        /* Botões de segmento (tipo de ativo / nº de tranches) */
+        .seg-btn {
+            border: 1px solid #d1d5db;
+            background-color: #f9fafb;
+            color: #4b5563;
+            border-radius: 8px;
+            padding: 8px 4px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.15s;
+        }
+        .seg-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Banner de alerta grande (lote anómalo / risco acima do teto) */
+        .alert-banner {
+            display: none;
+            background-color: #dc2626;
+            color: white;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 18px;
+            line-height: 1.3;
+            box-shadow: 0 6px 12px -2px rgba(220, 38, 38, 0.5);
+            animation: pulseAlert 1s ease-in-out infinite;
+        }
+        .alert-banner.show { display: block; }
+        @keyframes pulseAlert {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+
+        @media all and (display-mode: standalone) {
+            .app-container { min-height: 100%; }
+        }
+    </style>
+</head>
+<body class="flex justify-center p-4 sm:p-6 md:p-8">
+
+    <div class="app-container w-full p-6 rounded-xl">
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">RiskBook</h1>
+            <p class="text-gray-500">Sizing · Diário · Estatísticas</p>
+        </header>
+
+        <!-- Secção de Inputs -->
+        <section id="inputs" class="space-y-4 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h2 class="text-xl font-semibold mb-1 text-blue-700">Dados da Trade</h2>
+
+            <div>
+                <label for="assetSymbol" class="block text-sm font-medium text-gray-700 mb-1">Símbolo (Ex: BTC, AAPL, SP500) *</label>
+                <input type="text" id="assetSymbol" list="symbolHistory" value="EURUSD" class="input-field w-full uppercase" placeholder="EURUSD" autocomplete="off">
+                <datalist id="symbolHistory"></datalist>
+            </div>
+
+            <!-- Tipo de ativo: preenche o valor do contrato / lot step por defeito -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Ativo</label>
+                <div id="assetTypeSelector" class="grid grid-cols-5 gap-2">
+                    <button type="button" class="seg-btn" data-asset="forex">Forex</button>
+                    <button type="button" class="seg-btn" data-asset="indices">Índices</button>
+                    <button type="button" class="seg-btn" data-asset="cripto">Cripto</button>
+                    <button type="button" class="seg-btn" data-asset="acoes">Ações</button>
+                    <button type="button" class="seg-btn" data-asset="comodities">Comod.</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="accountBalance" class="block text-sm font-medium text-gray-700 mb-1">Carteira ($)</label>
+                    <input type="number" id="accountBalance" value="10000" min="1" step="any" class="input-field w-full">
+                </div>
+                <div>
+                    <label for="maxLossAmount" class="block text-sm font-medium text-gray-700 mb-1">Perda Máx ($)</label>
+                    <input type="number" id="maxLossAmount" value="250" min="0.01" step="any" class="input-field w-full">
+                </div>
+            </div>
+
+            <div>
+                <label for="contractSize" class="block text-sm font-medium text-gray-700 mb-1">
+                    Valor do Contrato (por 1.0 de preço, por lote)
+                    <span class="text-xs text-gray-400 font-normal">— preenchido pelo tipo de ativo, editável</span>
+                </label>
+                <input type="number" id="contractSize" value="1" min="0.0000001" step="any" class="input-field w-full">
+            </div>
+
+            <!-- Número de tranches (entradas parceladas) -->
+            <div class="pt-4 border-t border-blue-200">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Entradas Parceladas (Tranches)</label>
+                <div id="trancheCountSelector" class="grid grid-cols-3 gap-2">
+                    <button type="button" class="seg-btn" data-count="1">1 Entrada</button>
+                    <button type="button" class="seg-btn" data-count="2">2 Entradas</button>
+                    <button type="button" class="seg-btn" data-count="3">3 Entradas</button>
+                </div>
+            </div>
+
+            <!-- Preços de entrada + % da quantidade por tranche -->
+            <p class="text-xs text-gray-400 -mb-1">
+                Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados
+                para que o risco total (preço médio → stop) bata na Perda Máx.
+                <span id="pctSumHint" class="font-semibold"></span>
+            </p>
+            <div class="space-y-2">
+                <div class="tranche-row grid grid-cols-12 gap-2 items-end" data-idx="0">
+                    <div class="col-span-6">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Entrada 1</label>
+                        <input type="number" id="entry1" value="1.0800" min="0" step="any" class="input-field w-full text-sm tranche-input">
+                    </div>
+                    <div class="col-span-6">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">% do Lote 1</label>
+                        <input type="number" id="pct1" value="40" min="0" step="any" class="input-field w-full text-sm tranche-input">
+                    </div>
+                </div>
+                <div class="tranche-row grid grid-cols-12 gap-2 items-end hidden" data-idx="1">
+                    <div class="col-span-6">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Entrada 2</label>
+                        <input type="number" id="entry2" value="1.0790" min="0" step="any" class="input-field w-full text-sm tranche-input">
+                    </div>
+                    <div class="col-span-6">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">% do Lote 2</label>
+                        <input type="number" id="pct2" value="30" min="0" step="any" class="input-field w-full text-sm tranche-input">
+                    </div>
+                </div>
+                <div class="tranche-row grid grid-cols-12 gap-2 items-end hidden" data-idx="2">
+                    <div class="col-span-6">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Entrada 3</label>
+                        <input type="number" id="entry3" value="1.0780" min="0" step="any" class="input-field w-full text-sm tranche-input">
+                    </div>
+                    <div class="col-span-6">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">% do Lote 3</label>
+                        <input type="number" id="pct3" value="30" min="0" step="any" class="input-field w-full text-sm tranche-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stop / Take Profit partilhados por todas as tranches -->
+            <div class="grid grid-cols-2 gap-2 pt-2">
+                <div>
+                    <label for="stopLossPrice" class="block text-xs font-bold text-gray-600 mb-1 uppercase">Stop Loss (único)</label>
+                    <input type="number" id="stopLossPrice" value="1.0750" min="0" step="any" class="input-field w-full text-sm">
+                </div>
+                <div>
+                    <label for="takeProfitPrice" class="block text-xs font-bold text-gray-600 mb-1 uppercase">Take Profit (único)</label>
+                    <input type="number" id="takeProfitPrice" value="1.0950" min="0" step="any" class="input-field w-full text-sm">
+                </div>
+            </div>
+
+            <button onclick="calculateTradeSummary()" class="calculate-button w-full mt-4 flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M12 16h.01"/><path d="M16 16h.01"/><path d="M8 16h.01"/><path d="M12 20h.01"/><path d="M16 20h.01"/><path d="M8 20h.01"/></svg>
+                <span>Calcular Resumo</span>
+            </button>
+        </section>
+
+        <!-- Alertas grandes (fora da área de captura para não sujar o export) -->
+        <div id="zeroLotAlert" class="alert-banner mb-4"></div>
+        <div id="lotAnomalyAlert" class="alert-banner mb-4"></div>
+        <div id="overCapAlert" class="alert-banner mb-4"></div>
+
+        <!-- Secção de Resultados -->
+        <section id="captureArea">
+            <div id="resultsSection" class="p-5 bg-emerald-50 rounded-lg border border-emerald-300">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-emerald-700">Resumo: <span id="resSymbolDisplay" class="text-gray-800">--</span></h2>
+                    <span id="tradeTypeBadge" class="text-xs font-bold uppercase px-3 py-1 rounded-full border">--</span>
+                </div>
+
+                <!-- Níveis de Preço -->
+                <div class="grid grid-cols-3 gap-2 mb-4 p-2 bg-white rounded border border-emerald-100 text-center">
+                    <div>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold">Preço Médio</p>
+                        <p id="resEntry" class="font-bold text-gray-800 text-sm">--</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold text-red-400">Stop Loss</p>
+                        <p id="resSL" class="font-bold text-red-600 text-sm">--</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold text-emerald-400">Take Profit</p>
+                        <p id="resTP" class="font-bold text-emerald-600 text-sm">--</p>
+                    </div>
+                </div>
+
+                <!-- Detalhe das tranches + risco acumulado -->
+                <div id="trancheBreakdown" class="mb-4 p-3 bg-white rounded border border-emerald-100">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold mb-2">Entradas & Risco Acumulado</p>
+                    <div id="trancheLines" class="space-y-1 text-sm"></div>
+                    <div id="cumRiskLine" class="mt-2 pt-2 border-t border-gray-100 text-sm font-semibold text-gray-700"></div>
+                </div>
+
+                <div id="results" class="space-y-3">
+                    <div class="flex flex-col p-3 bg-emerald-200 rounded-lg border-2 border-emerald-500">
+                        <span class="font-bold text-emerald-800 text-xs mb-1 uppercase">Lote Total a Negociar:</span>
+                        <span id="quantityToTrade" class="font-extrabold text-2xl text-emerald-900 break-all leading-tight">0.0000</span>
+                    </div>
+
+                    <div class="flex justify-between p-2">
+                        <span class="font-medium text-gray-700">Tamanho Nominal:</span>
+                        <span id="nominalPositionSize" class="font-bold text-gray-800">$ 0.00</span>
+                    </div>
+
+                    <div class="flex justify-between p-2 bg-red-100 rounded-md">
+                        <span class="font-medium text-gray-700">Risco Real Total ($):</span>
+                        <span id="realMonetaryRisk" class="font-bold text-red-600">$ 0.00</span>
+                    </div>
+
+                    <div class="flex justify-between p-2 bg-emerald-100 rounded-md">
+                        <span class="font-medium text-gray-700">Lucro Alvo ($):</span>
+                        <span id="potentialGain" class="font-bold text-emerald-600">$ 0.00</span>
+                    </div>
+
+                    <div class="flex justify-between p-2 border-t border-gray-200">
+                        <span class="font-medium text-gray-700">Rácio R:R:</span>
+                        <span id="rrRatio" class="font-bold text-gray-800">0.0 : 1</span>
+                    </div>
+
+                    <div class="flex justify-between p-2">
+                        <span class="font-medium text-gray-700">% Risco:</span>
+                        <span id="riskPercentage" class="font-bold text-red-600">0.00%</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-emerald-200 space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-semibold text-gray-600">Objetivo R:R (1:2)</span>
+                        <span id="checkRR" class="check-icon">❌</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="font-semibold text-gray-600">Risco Carteira (< 1.5%)</span>
+                        <span id="checkRisk" class="check-icon">❌</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Botões de Ação -->
+        <div class="space-y-3">
+            <button onclick="registerTrade()" class="w-full flex items-center justify-center space-x-2 shadow-md rounded-lg py-3 font-bold text-white transition" style="background-color:#3b82f6;" onmouseover="this.style.backgroundColor='#2563eb'" onmouseout="this.style.backgroundColor='#3b82f6'">
+                <span>📓</span><span>Registar Trade no Log</span>
+            </button>
+            <button onclick="exportAsImage()" class="export-button flex items-center justify-center space-x-2 shadow-md hover:bg-gray-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Guardar Resumo (Imagem)</span>
+            </button>
+        </div>
+
+        <p id="error-message" class="text-red-500 mt-4 text-center font-semibold hidden">⚠️ Dados inválidos. Verifique os preços e o símbolo.</p>
+
+        <!-- ============================ LOG DE TRADES ============================ -->
+        <section id="journalSection" class="mt-8 pt-6 border-t-2 border-gray-200">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-xl font-extrabold text-gray-800">📓 Log de Trades</h2>
+                <button id="journalToggle" onclick="toggleJournal()" class="text-sm font-semibold text-blue-600 hover:underline">Ver / Ocultar</button>
+            </div>
+
+            <div id="journalBody">
+                <!-- Estatísticas -->
+                <div id="journalStats" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4"></div>
+
+                <!-- Filtro + exportação -->
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                    <select id="journalFilter" onchange="renderJournal()" class="input-field text-sm py-1 px-2 flex-1">
+                        <option value="todos">Todas</option>
+                        <option value="aberto">Abertas</option>
+                        <option value="fechado">Fechadas</option>
+                        <option value="ganho">Ganhas</option>
+                        <option value="perdido">Perdidas</option>
+                    </select>
+                    <button onclick="exportJournalCSV()" class="text-sm font-semibold px-3 py-1 rounded-lg border border-gray-300 bg-white hover:bg-gray-100">⬇️ CSV</button>
+                    <button onclick="exportJournalJSON()" class="text-sm font-semibold px-3 py-1 rounded-lg border border-blue-300 text-blue-700 bg-white hover:bg-blue-50" title="Backup completo (JSON)">⬇️ Backup</button>
+                    <label class="text-sm font-semibold px-3 py-1 rounded-lg border border-blue-300 text-blue-700 bg-white hover:bg-blue-50 cursor-pointer" title="Restaurar de um backup JSON">⬆️ Restaurar
+                        <input type="file" id="importJsonInput" accept=".json,application/json" class="hidden" onchange="importJournalJSON(event)">
+                    </label>
+                    <button onclick="clearJournal()" class="text-sm font-semibold px-3 py-1 rounded-lg border border-red-300 text-red-600 bg-white hover:bg-red-50">🗑️ Limpar</button>
+                </div>
+
+                <!-- Lista de trades -->
+                <div id="journalList" class="space-y-2"></div>
+                <p id="journalEmpty" class="text-center text-gray-400 text-sm py-6">Sem trades registadas ainda. Calcula uma trade e carrega em "Registar Trade no Log".</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const CURRENCY_SYMBOL = "$";
+        const SYMBOL_STORAGE_KEY = "riskcalc_symbols";
+        const LOTS_STORAGE_PREFIX = "riskcalc_lots_";   // + tipo de ativo
+        const ANOMALY_FACTOR = 2.5;                      // lote >= 2.5x a mediana => alerta
+        const ANOMALY_HISTORY_MAX = 20;                  // guarda os últimos 20 lotes por tipo
+
+        // Presets por tipo de ativo. contractValue = valor em $ de um movimento de 1.0
+        // no preço, por 1 lote. step = incremento mínimo do lote. lotDecimals = casas
+        // a mostrar no lote.
+        // CFDs: todas as classes negoceiam em frações de 0.01 lote (2 casas decimais),
+        // nunca contratos inteiros.
+        const ASSET_PRESETS = {
+            forex:      { contractValue: 100000, step: 0.01, lotDecimals: 2 },
+            indices:    { contractValue: 1,      step: 0.01, lotDecimals: 2 },
+            cripto:     { contractValue: 1,      step: 0.01, lotDecimals: 2 },
+            acoes:      { contractValue: 1,      step: 0.01, lotDecimals: 2 },
+            comodities: { contractValue: 100,    step: 0.01, lotDecimals: 2 }, // default tipo Ouro (100 oz/lote)
+        };
+
+        // Estado da UI
+        let currentAssetType = 'forex';
+        let trancheCount = 3;
+
+        // Percentagens por defeito do lote total, por nº de tranches.
+        const DEFAULT_PCTS = { 1: [100], 2: [50, 50], 3: [40, 30, 30] };
+
+        // Snapshot do último cálculo VÁLIDO (usado pelo "Registar Trade no Log").
+        let lastCalc = null;
+        const JOURNAL_STORAGE_KEY = "riskcalc_journal";
+
+        function formatCurrency(v) {
+            return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'USD' }).format(Math.abs(v));
+        }
+
+        // Formata preços de forma sensata consoante a magnitude (forex 5 casas, índices/ações menos)
+        function formatPrice(p) {
+            if (!isFinite(p)) return '--';
+            const abs = Math.abs(p);
+            let dec = abs >= 1000 ? 2 : abs >= 100 ? 2 : abs >= 1 ? 4 : 5;
+            return p.toFixed(dec);
+        }
+
+        function currentStep() { return ASSET_PRESETS[currentAssetType].step; }
+        function currentLotDecimals() { return ASSET_PRESETS[currentAssetType].lotDecimals; }
+
+        // Arredonda o lote PARA BAIXO ao incremento do ativo (nunca arredonda para cima
+        // para não exceder o risco máximo por causa do arredondamento).
+        function floorToStep(qty, step) {
+            if (step <= 0) return qty;
+            return Math.floor(qty / step + 1e-9) * step;
+        }
+
+        // Lote TRADEABLE (arredondado ao step do ativo, ex. Forex 2 casas).
+        function formatLot(qty) {
+            return qty.toFixed(currentLotDecimals());
+        }
+        // Lote EXATO calculado, sempre a 4 casas (o valor teórico antes de arredondar).
+        function formatLotExact(qty) {
+            return qty.toFixed(4);
+        }
+
+        /* ----------------------- Histórico de símbolos ----------------------- */
+        function loadSymbolHistory() {
+            const history = JSON.parse(localStorage.getItem(SYMBOL_STORAGE_KEY) || "[]");
+            const datalist = document.getElementById('symbolHistory');
+            datalist.innerHTML = "";
+            history.forEach(sym => {
+                const option = document.createElement('option');
+                option.value = sym;
+                datalist.appendChild(option);
+            });
+        }
+
+        function saveSymbolToHistory(symbol) {
+            if (!symbol) return;
+            const sym = symbol.toUpperCase().trim();
+            let history = JSON.parse(localStorage.getItem(SYMBOL_STORAGE_KEY) || "[]");
+            history = history.filter(s => s !== sym);
+            history.unshift(sym);
+            if (history.length > 15) history = history.slice(0, 15);
+            localStorage.setItem(SYMBOL_STORAGE_KEY, JSON.stringify(history));
+            loadSymbolHistory();
+        }
+
+        /* ------------------- Histórico de lotes (anomalias) ------------------ */
+        // Guardamos os lotes por TIPO de ativo, porque um lote "normal" de forex (0.5)
+        // não é comparável a um de índices (2) ou cripto (0.01).
+        function getLotHistory(assetType) {
+            return JSON.parse(localStorage.getItem(LOTS_STORAGE_PREFIX + assetType) || "[]");
+        }
+        function saveLotToHistory(assetType, qty) {
+            if (!qty || qty <= 0) return;
+            let hist = getLotHistory(assetType);
+            hist.unshift(qty);
+            if (hist.length > ANOMALY_HISTORY_MAX) hist = hist.slice(0, ANOMALY_HISTORY_MAX);
+            localStorage.setItem(LOTS_STORAGE_PREFIX + assetType, JSON.stringify(hist));
+        }
+        function median(arr) {
+            if (!arr.length) return null;
+            const s = [...arr].sort((a, b) => a - b);
+            const mid = Math.floor(s.length / 2);
+            return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+        }
+
+        /* --------------------------- Exportação ------------------------------ */
+        async function exportAsImage() {
+            const area = document.getElementById('captureArea');
+            const symbol = document.getElementById('assetSymbol').value || 'Trade';
+
+            // Ao guardar o resumo consideramos a trade "assumida": registamos o lote total
+            // no histórico deste tipo de ativo para alimentar o detetor de anomalias.
+            const lastQty = parseFloat(area.dataset.totalQty || "0");
+            if (lastQty > 0) saveLotToHistory(currentAssetType, lastQty);
+
+            try {
+                const canvas = await html2canvas(area, { backgroundColor: "#f3f4f6", scale: 3 });
+                const link = document.createElement('a');
+                link.download = `RiskBook-${symbol.toUpperCase()}-${new Date().getTime()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (e) {
+                console.error("Falha ao gerar imagem", e);
+            }
+        }
+
+        /* ----------------------------- UI helpers ---------------------------- */
+        function applyAssetType(type) {
+            currentAssetType = type;
+            document.querySelectorAll('#assetTypeSelector .seg-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.asset === type);
+            });
+            // Preenche o valor do contrato por defeito (mantém override manual possível).
+            document.getElementById('contractSize').value = ASSET_PRESETS[type].contractValue;
+            calculateTradeSummary();
+        }
+
+        function applyTrancheCount(count) {
+            trancheCount = count;
+            document.querySelectorAll('#trancheCountSelector .seg-btn').forEach(b => {
+                b.classList.toggle('active', parseInt(b.dataset.count) === count);
+            });
+            document.querySelectorAll('.tranche-row').forEach(row => {
+                const idx = parseInt(row.dataset.idx);
+                row.classList.toggle('hidden', idx >= count);
+            });
+            // Repõe as percentagens por defeito para este nº de tranches.
+            const defs = DEFAULT_PCTS[count] || [];
+            for (let i = 0; i < 3; i++) {
+                const inp = document.getElementById('pct' + (i + 1));
+                inp.value = i < count ? defs[i] : '';
+            }
+            calculateTradeSummary();
+        }
+
+        /* --------------------- Cálculo principal do risco -------------------- */
+        function calculateTradeSummary() {
+            const symbol = document.getElementById('assetSymbol').value.trim();
+            const balance = parseFloat(document.getElementById('accountBalance').value);
+            const maxLoss = parseFloat(document.getElementById('maxLossAmount').value);
+            const cValue = parseFloat(document.getElementById('contractSize').value); // valor por 1.0 de preço, por lote
+            const sl = parseFloat(document.getElementById('stopLossPrice').value);
+            const tp = parseFloat(document.getElementById('takeProfitPrice').value);
+
+            const error = document.getElementById('error-message');
+            const overCapAlert = document.getElementById('overCapAlert');
+            const anomalyAlert = document.getElementById('lotAnomalyAlert');
+            const zeroLotAlert = document.getElementById('zeroLotAlert');
+            lastCalc = null; // invalida até o cálculo chegar ao fim com dados válidos
+
+            // Recolhe as entradas ativas (1 a 3) e valida.
+            const entries = [];
+            for (let i = 0; i < trancheCount; i++) {
+                const e = parseFloat(document.getElementById('entry' + (i + 1)).value);
+                entries.push(e);
+            }
+
+            const baseInvalid = !symbol || isNaN(balance) || isNaN(maxLoss) || isNaN(sl) || isNaN(tp)
+                || entries.some(e => isNaN(e));
+            if (baseInvalid) { error.classList.remove('hidden'); return; }
+
+            // Todas as entradas têm de estar do MESMO lado do stop, senão o "risco médio"
+            // não faz sentido (haveria entradas já do lado errado do stop).
+            const allAbove = entries.every(e => e > sl);
+            const allBelow = entries.every(e => e < sl);
+            if (!allAbove && !allBelow) { error.classList.remove('hidden'); return; }
+            error.classList.add('hidden');
+
+            const isBuy = allAbove; // entradas acima do stop => COMPRA
+
+            // Distância de cada entrada ao stop (em unidades de preço). Sempre > 0 aqui.
+            const riskPoints = entries.map(e => Math.abs(e - sl));
+
+            // -------------------------------------------------------------------
+            // DISTRIBUIÇÃO DOS LOTES
+            //
+            // Objetivo: o risco TOTAL da posição (soma de todas as tranches, do preço
+            // médio ponderado até ao stop) tem de ser EXATAMENTE a Perda Máx — NÃO a
+            // Perda Máx por tranche.
+            //
+            // Modo AUTOMÁTICO (lote igual em cada entrada):
+            //   Seja q o lote (igual) em cada tranche. O risco de cada tranche é
+            //       riscoᵢ = q · cValue · |Eᵢ - SL|
+            //   O risco total é a soma:
+            //       riscoTotal = q · cValue · Σ|Eᵢ - SL|
+            //   Queremos riscoTotal = maxLoss, logo:
+            //       q = maxLoss / ( cValue · Σ|Eᵢ - SL| )
+            //   É por isto que 3 entradas NÃO dão 3× o risco: o teto é repartido pelas
+            //   distâncias, não multiplicado por elas.
+            //
+            // Modo MANUAL: usamos os lotes que o utilizador escreveu e apenas verificamos
+            // se o risco total ultrapassa o teto (aviso vermelho).
+            // -------------------------------------------------------------------
+            // -------------------------------------------------------------------
+            // DISTRIBUIÇÃO POR PERCENTAGEM DO LOTE TOTAL
+            //
+            // Não escreves lotes: escreves a % do lote total em cada entrada (ex. 40/30/30).
+            // Tratamos as % como PESOS relativos — não precisam de somar 100, normalizamos
+            // pela soma: wᵢ = pctᵢ / Σpct.
+            //
+            // Seja P o lote TOTAL. Cada tranche fica com qᵢ = P · wᵢ.
+            // Risco total = Σ qᵢ·cValue·|Eᵢ−SL| = P · cValue · Σ( wᵢ·|Eᵢ−SL| ).
+            // Impondo risco total = maxLoss:
+            //     P = maxLoss / ( cValue · Σ( wᵢ·|Eᵢ−SL| ) )
+            // => o teto é sempre respeitado, seja qual for a repartição (40/30/30, 50/50…).
+            // -------------------------------------------------------------------
+            const pcts = [];
+            for (let i = 0; i < trancheCount; i++) {
+                const p = parseFloat(document.getElementById('pct' + (i + 1)).value);
+                pcts.push(isNaN(p) || p < 0 ? 0 : p);
+            }
+            const sumPct = pcts.reduce((a, b) => a + b, 0);
+
+            // Dica da soma das % (verde se ~100%, laranja caso contrário — funciona à mesma).
+            const hint = document.getElementById('pctSumHint');
+            if (trancheCount > 1) {
+                hint.textContent = `Soma: ${sumPct.toFixed(0)}%`;
+                hint.style.color = Math.abs(sumPct - 100) < 0.01 ? '#059669' : '#d97706';
+            } else {
+                hint.textContent = '';
+            }
+            if (sumPct <= 0) { error.classList.remove('hidden'); return; }
+
+            const weights = pcts.map(p => p / sumPct);              // pesos normalizados
+            const weightedRP = weights.reduce((s, w, i) => s + w * riskPoints[i], 0);
+            const totalRaw = maxLoss / (cValue * weightedRP);      // lote total teórico
+            // Lote EXATO por tranche (valor teórico, 4 casas) e lote TRADEABLE
+            // (arredondado para baixo ao step do ativo — ex. Forex 0.01, 2 casas).
+            const lotsExact = weights.map(w => totalRaw * w);
+            const lots = lotsExact.map(q => floorToStep(q, currentStep()));
+            const totalQty = lots.reduce((a, b) => a + b, 0);
+            const totalExact = lotsExact.reduce((a, b) => a + b, 0);
+
+            // -------------------------------------------------------------------
+            // PREÇO MÉDIO PONDERADO pelos lotes:
+            //     médio = Σ(qᵢ · Eᵢ) / Σqᵢ
+            //
+            // Identidade-chave (porque o risco do médio == soma dos riscos por tranche):
+            //     Σ qᵢ·(Eᵢ - SL) = Σ qᵢ·Eᵢ - SL·Σqᵢ
+            //                    = totalQty·médio - SL·totalQty
+            //                    = totalQty·(médio - SL)
+            //   Ou seja, medir o risco "do preço médio ao stop com o lote total" dá
+            //   exatamente o mesmo que somar tranche a tranche. Não há dupla contagem.
+            // -------------------------------------------------------------------
+            const avgEntry = totalQty > 0
+                ? lots.reduce((sum, q, i) => sum + q * entries[i], 0) / totalQty
+                : entries[0];
+
+            const avgRiskPoints = Math.abs(avgEntry - sl);
+            const rewardPoints = Math.abs(tp - avgEntry);
+
+            // Risco por tranche + risco acumulado (para mostrar a soma a crescer).
+            const trancheRisks = lots.map((q, i) => q * riskPoints[i] * cValue);
+            const cumulative = [];
+            trancheRisks.reduce((acc, r) => { const s = acc + r; cumulative.push(s); return s; }, 0);
+
+            const realRisk = totalQty * avgRiskPoints * cValue; // == soma de trancheRisks
+            const gain = totalQty * rewardPoints * cValue;
+            const rr = avgRiskPoints > 0 ? rewardPoints / avgRiskPoints : 0;
+            const riskPct = (realRisk / balance) * 100;
+            const nominal = totalQty * cValue * avgEntry;
+
+            /* ------------------------- Atualização da UI ---------------------- */
+            const badge = document.getElementById('tradeTypeBadge');
+            badge.textContent = isBuy ? 'COMPRA' : 'VENDA';
+            badge.className = `text-xs font-bold uppercase px-3 py-1 rounded-full border ${isBuy ? 'badge-buy' : 'badge-sell'}`;
+
+            document.getElementById('resSymbolDisplay').textContent = symbol.toUpperCase();
+            document.getElementById('resEntry').textContent = formatPrice(avgEntry);
+            document.getElementById('resSL').textContent = formatPrice(sl);
+            document.getElementById('resTP').textContent = formatPrice(tp);
+
+            // Linhas por tranche
+            const linesEl = document.getElementById('trancheLines');
+            linesEl.innerHTML = '';
+            for (let i = 0; i < trancheCount; i++) {
+                const row = document.createElement('div');
+                row.className = 'flex justify-between';
+                const pctTxt = trancheCount > 1 ? ` · ${(weights[i] * 100).toFixed(0)}%` : '';
+                // Lote tradeable (2 casas) + valor exato calculado (4 casas) entre parênteses.
+                const lotTxt = `${formatLot(lots[i])} <span class="text-gray-400">(${formatLotExact(lotsExact[i])})</span> lote`;
+                row.innerHTML = `<span class="text-gray-600">Entrada ${i + 1} @ ${formatPrice(entries[i])}${pctTxt} · ${lotTxt}</span>`
+                    + `<span class="font-semibold text-red-600">${formatCurrency(trancheRisks[i])}</span>`;
+                linesEl.appendChild(row);
+            }
+
+            // Risco acumulado: "1ª: $104 | +2ª: $188 | +3ª: $250"
+            const labels = ['1ª', '2ª', '3ª'];
+            const cumStr = cumulative.map((c, i) =>
+                (i === 0 ? '' : '+') + labels[i] + ': ' + formatCurrency(c)
+            ).join('  |  ');
+            document.getElementById('cumRiskLine').innerHTML =
+                `Risco acumulado &nbsp; <span class="text-gray-900">${cumStr}</span>`;
+
+            // Número grande = lote TRADEABLE (2 casas). Linha pequena = valor EXATO (4 casas).
+            document.getElementById('quantityToTrade').innerHTML =
+                formatLot(totalQty)
+                + (trancheCount > 1 ? `  <span class="text-base font-semibold text-emerald-700">(${lots.map(formatLot).join(' + ')})</span>` : '')
+                + `<span class="block text-xs font-medium text-emerald-700 mt-1">exato: ${formatLotExact(totalExact)}`
+                + (trancheCount > 1 ? ` (${lotsExact.map(formatLotExact).join(' + ')})` : '')
+                + `</span>`;
+
+            document.getElementById('nominalPositionSize').textContent = formatCurrency(nominal);
+            document.getElementById('realMonetaryRisk').textContent = formatCurrency(realRisk);
+            document.getElementById('potentialGain').textContent = formatCurrency(gain);
+            document.getElementById('rrRatio').textContent = `${rr.toFixed(2)} : 1`;
+            document.getElementById('riskPercentage').textContent = `${riskPct.toFixed(2)}%`;
+
+            // Guarda o lote total para o export registar no histórico.
+            document.getElementById('captureArea').dataset.totalQty = totalQty;
+
+            // Snapshot para o Log de Trades (só dados, sem tocar no localStorage aqui).
+            lastCalc = {
+                symbol: symbol.toUpperCase(),
+                assetType: currentAssetType,
+                direction: isBuy ? 'COMPRA' : 'VENDA',
+                entries: entries.slice(),
+                pcts: pcts.slice(),
+                avgEntry, sl, tp,
+                lots: lots.slice(),
+                totalLot: totalQty,
+                plannedRisk: realRisk,
+                plannedGain: gain,
+                rr, riskPct
+            };
+
+            /* ----------------------------- Checks ----------------------------- */
+            const cRR = document.getElementById('checkRR');
+            const cRisk = document.getElementById('checkRisk');
+            if (rr >= 2) { cRR.textContent = '✅'; cRR.className = 'check-icon check-pass'; }
+            else { cRR.textContent = '❌'; cRR.className = 'check-icon check-fail'; }
+            if (riskPct < 1.5) { cRisk.textContent = '✅'; cRisk.className = 'check-icon check-pass'; }
+            else { cRisk.textContent = '❌'; cRisk.className = 'check-icon check-fail'; }
+
+            /* ------- Alerta: lote arredonda para ZERO (trade não cabe / step grosso) ------- */
+            // Acontece quando o incremento mínimo do ativo (ex. Índices/Ações = 1 contrato)
+            // é maior do que o lote exato calculado — ou seja, nem o mínimo cabe no teto.
+            const step = currentStep();
+            const minLotRisk = step * avgRiskPoints * cValue;  // risco de negociar o incremento mínimo
+            const someTrancheZero = lots.some((q, i) => q <= 0 && lotsExact[i] > 0);
+            if (totalQty <= 0) {
+                zeroLotAlert.classList.add('show');
+                zeroLotAlert.innerHTML =
+                    `⚠️ LOTE = 0 · O TRADE NÃO CABE NA PERDA MÁX<br>` +
+                    `<span class="text-sm font-semibold">O lote mínimo deste ativo (${formatLotExact(step)}) arriscaria ` +
+                    `${formatCurrency(minLotRisk)} &gt; ${formatCurrency(maxLoss)}. ` +
+                    `Aproxima o stop, aumenta a Perda Máx, ou usa um ativo/step com lote fracionado.</span>`;
+            } else if (someTrancheZero) {
+                zeroLotAlert.classList.add('show');
+                zeroLotAlert.innerHTML =
+                    `⚠️ UMA ENTRADA ARREDONDOU PARA 0 LOTE<br>` +
+                    `<span class="text-sm font-semibold">A % dessa entrada é pequena demais para o incremento mínimo ` +
+                    `(${formatLotExact(step)}) deste ativo.</span>`;
+            } else {
+                zeroLotAlert.classList.remove('show');
+            }
+
+            /* --------------------- Alerta: risco acima do teto ---------------- */
+            // Em modo manual (ou se a Perda Máx for baixada) o risco pode passar o teto.
+            if (realRisk > maxLoss + 1e-6) {
+                overCapAlert.classList.add('show');
+                overCapAlert.innerHTML =
+                    `🚨 RISCO ${formatCurrency(realRisk)} ACIMA DA PERDA MÁX ${formatCurrency(maxLoss)}<br>REDUZ OS LOTES`;
+            } else {
+                overCapAlert.classList.remove('show');
+            }
+
+            /* ------------------- Alerta: lote anómalo (Nx normal) ------------- */
+            const med = median(getLotHistory(currentAssetType));
+            if (med && totalQty >= med * ANOMALY_FACTOR) {
+                const ratio = totalQty / med;
+                anomalyAlert.classList.add('show');
+                anomalyAlert.innerHTML =
+                    `⚠️ ESTE LOTE É ${ratio.toFixed(1)}x O TEU NORMAL<br>CONFIRMA A QUANTIDADE`;
+            } else {
+                anomalyAlert.classList.remove('show');
+            }
+        }
+
+        /* ============================ LOG DE TRADES =========================== */
+        // Persistência
+        function getJournal() {
+            return JSON.parse(localStorage.getItem(JOURNAL_STORAGE_KEY) || "[]");
+        }
+        function saveJournal(arr) {
+            localStorage.setItem(JOURNAL_STORAGE_KEY, JSON.stringify(arr));
+        }
+
+        // Data legível a partir de um timestamp (ex. "18/07 14:30").
+        function fmtDate(ts) {
+            const d = new Date(ts);
+            const p = n => String(n).padStart(2, '0');
+            return `${p(d.getDate())}/${p(d.getMonth() + 1)} ${p(d.getHours())}:${p(d.getMinutes())}`;
+        }
+
+        // Regista o cálculo ATUAL como uma nova trade (estado "aberto").
+        function registerTrade() {
+            if (!lastCalc) {
+                alert("Calcula uma trade válida antes de registar (verifica símbolo e preços).");
+                return;
+            }
+            const journal = getJournal();
+            journal.unshift({
+                id: Date.now(),
+                ts: Date.now(),
+                symbol: lastCalc.symbol,
+                assetType: lastCalc.assetType,
+                direction: lastCalc.direction,
+                entries: lastCalc.entries,
+                pcts: lastCalc.pcts,
+                lots: lastCalc.lots,
+                avgEntry: lastCalc.avgEntry,
+                sl: lastCalc.sl,
+                tp: lastCalc.tp,
+                totalLot: lastCalc.totalLot,
+                plannedRisk: lastCalc.plannedRisk,
+                plannedGain: lastCalc.plannedGain,
+                rr: lastCalc.rr,
+                riskPct: lastCalc.riskPct,
+                status: 'aberto',       // aberto | ganho | perdido | nulo
+                resultUSD: null,        // P&L realizado (preenchido ao fechar)
+                notes: ''
+            });
+            saveJournal(journal);
+            renderJournal();
+            // Feedback visual rápido no botão de registo.
+            document.getElementById('journalBody').classList.remove('hidden');
+            document.getElementById('journalSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Fecha (ou reeditar) uma trade: pede o P&L realizado em $. O estado deriva do sinal.
+        function closeTrade(id) {
+            const journal = getJournal();
+            const t = journal.find(x => x.id === id);
+            if (!t) return;
+            const suggested = t.resultUSD != null ? t.resultUSD
+                : (t.direction ? '' : '');
+            const raw = prompt(
+                `Resultado REALIZADO da trade ${t.symbol} (em $).\n` +
+                `Positivo = ganho, negativo = perda, 0 = nulo (breakeven).\n\n` +
+                `Plano: alvo +${formatCurrency(t.plannedGain)} / risco -${formatCurrency(t.plannedRisk)}`,
+                suggested === '' ? '' : String(suggested)
+            );
+            if (raw === null) return;                 // cancelou
+            const val = parseFloat(String(raw).replace(',', '.'));
+            if (isNaN(val)) { alert("Valor inválido."); return; }
+            t.resultUSD = val;
+            t.status = val > 0 ? 'ganho' : val < 0 ? 'perdido' : 'nulo';
+            saveJournal(journal);
+            renderJournal();
+        }
+
+        // Reabre uma trade fechada (volta a "aberto", apaga o resultado).
+        function reopenTrade(id) {
+            const journal = getJournal();
+            const t = journal.find(x => x.id === id);
+            if (!t) return;
+            t.status = 'aberto';
+            t.resultUSD = null;
+            saveJournal(journal);
+            renderJournal();
+        }
+
+        // Editar notas da trade.
+        function editNotes(id) {
+            const journal = getJournal();
+            const t = journal.find(x => x.id === id);
+            if (!t) return;
+            const raw = prompt(`Notas da trade ${t.symbol}:`, t.notes || '');
+            if (raw === null) return;
+            t.notes = raw.trim();
+            saveJournal(journal);
+            renderJournal();
+        }
+
+        // Apagar uma trade.
+        function deleteTrade(id) {
+            if (!confirm("Apagar esta trade do log?")) return;
+            saveJournal(getJournal().filter(x => x.id !== id));
+            renderJournal();
+        }
+
+        // Limpar todo o log.
+        function clearJournal() {
+            if (!getJournal().length) return;
+            if (!confirm("Apagar TODAS as trades do log? Esta ação não se desfaz.")) return;
+            saveJournal([]);
+            renderJournal();
+        }
+
+        function toggleJournal() {
+            document.getElementById('journalBody').classList.toggle('hidden');
+        }
+
+        // Estatísticas agregadas das trades FECHADAS.
+        function computeStats(journal) {
+            const closed = journal.filter(t => t.resultUSD != null);
+            const wins = closed.filter(t => t.resultUSD > 0);
+            const losses = closed.filter(t => t.resultUSD < 0);
+            const grossWin = wins.reduce((s, t) => s + t.resultUSD, 0);
+            const grossLoss = Math.abs(losses.reduce((s, t) => s + t.resultUSD, 0));
+            const pnl = closed.reduce((s, t) => s + t.resultUSD, 0);
+            const decided = wins.length + losses.length;          // exclui breakeven da taxa de acerto
+            return {
+                total: journal.length,
+                open: journal.filter(t => t.status === 'aberto').length,
+                closed: closed.length,
+                winRate: decided ? (wins.length / decided) * 100 : 0,
+                pnl,
+                profitFactor: grossLoss > 0 ? grossWin / grossLoss : (grossWin > 0 ? Infinity : 0),
+                avgWin: wins.length ? grossWin / wins.length : 0,
+                avgLoss: losses.length ? grossLoss / losses.length : 0,
+                expectancy: closed.length ? pnl / closed.length : 0
+            };
+        }
+
+        function statTile(label, value, color) {
+            return `<div class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-center">
+                        <p class="text-[10px] text-gray-400 uppercase font-bold">${label}</p>
+                        <p class="font-extrabold text-sm" style="color:${color || '#1f2937'}">${value}</p>
+                    </div>`;
+        }
+
+        // Badge de estado.
+        function statusBadge(t) {
+            const map = {
+                aberto:  ['ABERTA', '#374151', '#e5e7eb'],
+                ganho:   ['GANHO',  '#065f46', '#d1fae5'],
+                perdido: ['PERDA',  '#991b1b', '#fee2e2'],
+                nulo:    ['NULO',   '#92400e', '#fef3c7'],
+            };
+            const [txt, fg, bg] = map[t.status] || map.aberto;
+            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:${fg};background:${bg}">${txt}</span>`;
+        }
+
+        function renderJournal() {
+            const journal = getJournal();
+            const filter = document.getElementById('journalFilter').value;
+            const listEl = document.getElementById('journalList');
+            const emptyEl = document.getElementById('journalEmpty');
+            const statsEl = document.getElementById('journalStats');
+
+            // Estatísticas
+            const s = computeStats(journal);
+            const pf = s.profitFactor === Infinity ? '∞' : s.profitFactor.toFixed(2);
+            const pnlColor = s.pnl > 0 ? '#059669' : s.pnl < 0 ? '#dc2626' : '#1f2937';
+            statsEl.innerHTML =
+                statTile('Trades', s.total) +
+                statTile('Abertas', s.open) +
+                statTile('Taxa Acerto', s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
+                statTile('P&L Total', formatSigned(s.pnl), pnlColor) +
+                statTile('Profit Factor', pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
+                statTile('Expectância', formatSigned(s.expectancy), s.expectancy >= 0 ? '#059669' : '#dc2626');
+
+            // Lista filtrada
+            const shown = journal.filter(t => {
+                if (filter === 'todos') return true;
+                if (filter === 'fechado') return t.resultUSD != null;
+                if (filter === 'aberto') return t.status === 'aberto';
+                return t.status === filter;
+            });
+
+            emptyEl.style.display = journal.length ? 'none' : 'block';
+            listEl.innerHTML = shown.map(t => {
+                const dirColor = t.direction === 'COMPRA' ? '#065f46' : '#991b1b';
+                const resTxt = t.resultUSD != null
+                    ? `<span class="font-bold" style="color:${t.resultUSD >= 0 ? '#059669' : '#dc2626'}">${formatSigned(t.resultUSD)}</span>`
+                    : `<span class="text-gray-400">—</span>`;
+                const notes = t.notes ? `<p class="text-xs text-gray-500 mt-1 italic">📝 ${t.notes}</p>` : '';
+                return `<div class="p-3 rounded-lg border border-gray-200 bg-white">
+                    <div class="flex items-center justify-between gap-2 mb-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs text-gray-400">${fmtDate(t.ts)}</span>
+                            <span class="font-bold text-gray-800">${t.symbol}</span>
+                            <span class="text-[10px] font-bold" style="color:${dirColor}">${t.direction}</span>
+                            ${statusBadge(t)}
+                        </div>
+                        ${resTxt}
+                    </div>
+                    <div class="text-xs text-gray-600 flex flex-wrap gap-x-3">
+                        <span>Méd ${formatPrice(t.avgEntry)}</span>
+                        <span>SL ${formatPrice(t.sl)}</span>
+                        <span>TP ${formatPrice(t.tp)}</span>
+                        <span>${t.totalLot.toFixed(2)} lote</span>
+                        <span>Risco ${formatCurrency(t.plannedRisk)}</span>
+                        <span>R:R ${t.rr.toFixed(2)}</span>
+                    </div>
+                    ${notes}
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="closeTrade(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100">💰 Resultado</button>
+                        ${t.status !== 'aberto' ? `<button onclick="reopenTrade(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-100">↩︎ Reabrir</button>` : ''}
+                        <button onclick="editNotes(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-100">📝 Notas</button>
+                        <button onclick="deleteTrade(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-red-300 text-red-600 bg-white hover:bg-red-50 ml-auto">🗑️</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // Formata $ com sinal (+/−) para P&L.
+        function formatSigned(v) {
+            const sign = v > 0 ? '+' : v < 0 ? '−' : '';
+            return sign + formatCurrency(v);
+        }
+
+        // Exporta o log para CSV.
+        function exportJournalCSV() {
+            const journal = getJournal();
+            if (!journal.length) { alert("Log vazio."); return; }
+            const cols = ['data', 'simbolo', 'tipo', 'direcao', 'entradas', 'pcts', 'preco_medio',
+                'stop', 'take_profit', 'lote_total', 'risco_plan', 'ganho_plan', 'rr', 'risco_pct',
+                'estado', 'resultado_usd', 'notas'];
+            const rows = journal.map(t => [
+                fmtDate(t.ts), t.symbol, t.assetType, t.direction,
+                t.entries.join(' '), t.pcts.join(' '), t.avgEntry,
+                t.sl, t.tp, t.totalLot, t.plannedRisk.toFixed(2), t.plannedGain.toFixed(2),
+                t.rr.toFixed(2), t.riskPct.toFixed(2), t.status,
+                t.resultUSD != null ? t.resultUSD : '', (t.notes || '').replace(/[\n;]/g, ' ')
+            ]);
+            const csv = [cols.join(';'), ...rows.map(r => r.join(';'))].join('\n');
+            const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `RiskBook-Log-${new Date().getTime()}.csv`;
+            link.click();
+        }
+
+        // Backup COMPLETO do log em JSON (restaura tal e qual noutro browser/PC).
+        function exportJournalJSON() {
+            const journal = getJournal();
+            if (!journal.length) { alert("Log vazio — nada para guardar."); return; }
+            const payload = {
+                app: 'RiskBook',
+                type: 'journal-backup',
+                version: 1,
+                exportedAt: new Date().toISOString(),
+                trades: journal
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `RiskBook-Backup-${new Date().getTime()}.json`;
+            link.click();
+        }
+
+        // Restaura de um backup JSON. JUNTA ao log atual sem duplicar (dedupe por id).
+        function importJournalJSON(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    // Aceita o formato de backup {trades:[...]} ou um array simples de trades.
+                    const incoming = Array.isArray(data) ? data : data.trades;
+                    if (!Array.isArray(incoming)) throw new Error('formato');
+
+                    const current = getJournal();
+                    const byId = new Map(current.map(t => [t.id, t]));
+                    let added = 0;
+                    incoming.forEach(t => {
+                        if (t && t.id != null && !byId.has(t.id)) {
+                            byId.set(t.id, t);
+                            added++;
+                        }
+                    });
+                    // Ordena por timestamp descendente (mais recente primeiro).
+                    const merged = Array.from(byId.values())
+                        .sort((a, b) => (b.ts || b.id || 0) - (a.ts || a.id || 0));
+                    saveJournal(merged);
+                    renderJournal();
+                    alert(`Restauro concluído.\n${added} trade(s) adicionada(s), ${incoming.length - added} já existiam.\nTotal no log: ${merged.length}.`);
+                } catch (err) {
+                    alert("Ficheiro inválido — não é um backup do RiskBook.");
+                } finally {
+                    event.target.value = ''; // permite reimportar o mesmo ficheiro
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        /* ------------------------------ Listeners ---------------------------- */
+        function setupListeners() {
+            document.querySelectorAll('#assetTypeSelector .seg-btn')
+                .forEach(b => b.addEventListener('click', () => applyAssetType(b.dataset.asset)));
+            document.querySelectorAll('#trancheCountSelector .seg-btn')
+                .forEach(b => b.addEventListener('click', () => applyTrancheCount(parseInt(b.dataset.count))));
+
+            // Recalcula em tempo real ao escrever (risco acumulado ao vivo).
+            document.getElementById('inputs').addEventListener('input', calculateTradeSummary);
+        }
+
+        window.onload = () => {
+            loadSymbolHistory();
+            setupListeners();
+            applyAssetType('forex');
+            applyTrancheCount(3);
+            saveSymbolToHistory(document.getElementById('assetSymbol').value.trim() || '');
+            calculateTradeSummary();
+            renderJournal();
+        };
+    </script>
+</body>
+</html>
