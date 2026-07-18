@@ -360,6 +360,9 @@
                 <!-- Estatísticas -->
                 <div id="journalStats" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4"></div>
 
+                <!-- Breakdown por prioridade / estilo -->
+                <div id="journalBreakdown" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4"></div>
+
                 <!-- Filtro + exportação -->
                 <div class="flex flex-wrap items-center gap-2 mb-3">
                     <select id="journalFilter" onchange="renderJournal()" class="input-field text-sm py-1 px-2 flex-1">
@@ -1007,6 +1010,42 @@
             return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:#1e40af;background:#dbeafe">${txt}</span>`;
         }
 
+        // Mini-tabela de estatísticas por grupo (prioridade ou estilo).
+        // N = trades registadas no grupo; Acerto/P&L só das fechadas desse grupo.
+        function groupStatsTable(title, groups) {
+            const rows = groups.filter(g => g.subset.length).map(g => {
+                const s = computeStats(g.subset);
+                const wrColor = s.closed === 0 ? '#9ca3af' : (s.winRate >= 50 ? '#059669' : '#dc2626');
+                const pnlColor = s.pnl > 0 ? '#059669' : s.pnl < 0 ? '#dc2626' : '#6b7280';
+                return `<tr>
+                    <td class="py-0.5 pr-2 font-semibold text-gray-700">${g.label}</td>
+                    <td class="py-0.5 px-1 text-right text-gray-500">${g.subset.length}</td>
+                    <td class="py-0.5 px-1 text-right" style="color:${wrColor}">${s.closed ? s.winRate.toFixed(0) + '%' : '—'}</td>
+                    <td class="py-0.5 pl-1 text-right font-semibold" style="color:${pnlColor}">${s.closed ? formatSigned(s.pnl) : '—'}</td>
+                </tr>`;
+            }).join('');
+            if (!rows) return '';
+            return `<div class="p-2 bg-gray-50 rounded-lg border border-gray-200">
+                <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">${title}</p>
+                <table class="w-full text-xs">
+                    <thead><tr class="text-[9px] text-gray-400 uppercase">
+                        <th class="text-left font-bold">Grupo</th>
+                        <th class="text-right font-bold">N</th>
+                        <th class="text-right font-bold">Acerto</th>
+                        <th class="text-right font-bold">P&amp;L</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>`;
+        }
+
+        function renderBreakdown(journal) {
+            const byPriority = [1, 2, 3].map(p => ({ label: 'P' + p, subset: journal.filter(t => t.priority === p) }));
+            const byStyle = [['day', 'Day'], ['swing', 'Swing']].map(([k, l]) => ({ label: l, subset: journal.filter(t => t.style === k) }));
+            document.getElementById('journalBreakdown').innerHTML =
+                groupStatsTable('Por Prioridade', byPriority) + groupStatsTable('Por Estilo', byStyle);
+        }
+
         function renderJournal() {
             const journal = getJournal();
             const filter = document.getElementById('journalFilter').value;
@@ -1025,6 +1064,8 @@
                 statTile('P&L Total', formatSigned(s.pnl), pnlColor) +
                 statTile('Profit Factor', pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
                 statTile('Expectância', formatSigned(s.expectancy), s.expectancy >= 0 ? '#059669' : '#dc2626');
+
+            renderBreakdown(journal);
 
             // Lista filtrada
             const shown = journal.filter(t => {
