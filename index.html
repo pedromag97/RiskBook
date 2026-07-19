@@ -161,7 +161,7 @@
 
     <div class="app-container w-full p-6 rounded-xl">
         <header class="mb-6 text-center pb-4 border-b border-gray-200 relative">
-            <h1 class="text-3xl font-extrabold text-gray-800 mb-1">RiskBook</h1>
+            <h1 id="appTitle" onclick="editOwner()" class="text-3xl font-extrabold text-gray-800 mb-1 cursor-pointer inline-block">RiskBook</h1>
             <p class="text-gray-500" data-i18n="tagline">Sizing · Diário · Estatísticas</p>
             <div id="langSelector" class="flex justify-center gap-1 mt-3">
                 <button type="button" class="seg-btn px-3 py-1" data-lang="en">EN</button>
@@ -500,6 +500,7 @@
         const RRGOAL_KEY = "riskcalc_rrgoal";
         const WALLETRISK_KEY = "riskcalc_walletrisk";
         const GOALS_LOCK_KEY = "riskcalc_goals_locked";
+        const OWNER_KEY = "riskbook_owner";
         const LOTS_STORAGE_PREFIX = "riskcalc_lots_";   // + tipo de ativo
         const ANOMALY_FACTOR = 2.5;                      // lote >= 2.5x a mediana => alerta
         const ANOMALY_HISTORY_MAX = 20;                  // guarda os últimos 20 lotes por tipo
@@ -542,6 +543,7 @@
                 goal_rr: 'R:R Goal (1:{goal})', wallet_risk: 'Account Risk (< {max}%)', save_image: 'Save Summary (Image)',
                 rrgoal_label: 'R:R Goal (1:x)', walletrisk_label: 'Max Account Risk (%)',
                 metas_label: 'Targets', metas_lock_title: 'Lock targets', goals_unlock_confirm: 'Unlock the targets to change them?',
+                owner_title: 'Personalize', owner_prompt: 'Your name (optional)', owned_by: 'by {name}',
                 err_invalid: '⚠️ Invalid data. Check prices and symbol.',
                 journal_title: '📓 Trade Log', toggle: 'Show / Hide', month_summary_btn: 'Month Summary', year_summary_btn: 'Year Summary',
                 st_trades: 'Trades', st_open: 'Open', st_notexec: 'Not Taken', st_winrate: 'Win Rate', st_pnl: 'Total P&L', st_pf: 'Profit Factor', st_expect: 'Expectancy',
@@ -600,6 +602,7 @@
                 goal_rr: 'Objectif R:R (1:{goal})', wallet_risk: 'Risque Compte (< {max}%)', save_image: 'Enregistrer le Résumé (Image)',
                 rrgoal_label: 'Objectif R:R (1:x)', walletrisk_label: 'Risque compte max (%)',
                 metas_label: 'Objectifs', metas_lock_title: 'Verrouiller les objectifs', goals_unlock_confirm: 'Déverrouiller les objectifs pour les modifier ?',
+                owner_title: 'Personnaliser', owner_prompt: 'Ton nom (optionnel)', owned_by: 'de {name}',
                 err_invalid: '⚠️ Données invalides. Vérifie les prix et le symbole.',
                 journal_title: '📓 Journal de Trades', toggle: 'Afficher / Masquer', month_summary_btn: 'Résumé du Mois', year_summary_btn: 'Résumé Annuel',
                 st_trades: 'Trades', st_open: 'Ouverts', st_notexec: 'Non pris', st_winrate: 'Taux Réussite', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Espérance',
@@ -658,6 +661,7 @@
                 goal_rr: 'Objetivo R:R (1:{goal})', wallet_risk: 'Riesgo Cuenta (< {max}%)', save_image: 'Guardar Resumen (Imagen)',
                 rrgoal_label: 'Objetivo R:R (1:x)', walletrisk_label: 'Riesgo cuenta máx (%)',
                 metas_label: 'Metas', metas_lock_title: 'Bloquear las metas', goals_unlock_confirm: '¿Desbloquear las metas para cambiarlas?',
+                owner_title: 'Personalizar', owner_prompt: 'Tu nombre (opcional)', owned_by: 'de {name}',
                 err_invalid: '⚠️ Datos inválidos. Revisa los precios y el símbolo.',
                 journal_title: '📓 Registro de Trades', toggle: 'Ver / Ocultar', month_summary_btn: 'Resumen del Mes', year_summary_btn: 'Resumen Anual',
                 st_trades: 'Trades', st_open: 'Abiertos', st_notexec: 'No ejec.', st_winrate: 'Aciertos', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Esperanza',
@@ -716,6 +720,7 @@
                 goal_rr: 'Objetivo R:R (1:{goal})', wallet_risk: 'Risco Carteira (< {max}%)', save_image: 'Guardar Resumo (Imagem)',
                 rrgoal_label: 'Objetivo R:R (1:x)', walletrisk_label: 'Risco máx carteira (%)',
                 metas_label: 'Metas', metas_lock_title: 'Trancar as metas', goals_unlock_confirm: 'Destrancar as metas para poder alterá-las?',
+                owner_title: 'Personalizar', owner_prompt: 'O teu nome (opcional)', owned_by: 'de {name}',
                 err_invalid: '⚠️ Dados inválidos. Verifique os preços e o símbolo.',
                 journal_title: '📓 Log de Trades', toggle: 'Ver / Ocultar', month_summary_btn: 'Resumo do Mês', year_summary_btn: 'Resumo Anual',
                 st_trades: 'Trades', st_open: 'Abertas', st_notexec: 'Não Exec.', st_winrate: 'Taxa Acerto', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Expectância',
@@ -771,6 +776,7 @@
             localStorage.setItem(LANG_KEY, l);
             document.querySelectorAll('#langSelector .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
             applyStaticTranslations();
+            applyOwner();
             calculateTradeSummary();
             renderJournal();
         }
@@ -873,6 +879,35 @@
         // Aviso bonito (um só botão).
         function showAlert(message, title) {
             return showModal({ title: title || '', subtitle: message, fields: [], okText: tr('m_ok'), cancelText: '' }).then(() => { });
+        }
+
+        /* --------------------- Dono do RiskBook (título) -------------------- */
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        }
+        // Mostra "RiskBook de {nome}" (ou só "RiskBook") + lápis de editar.
+        function applyOwner() {
+            const owner = (localStorage.getItem(OWNER_KEY) || '').trim();
+            const el = document.getElementById('appTitle');
+            const suffix = owner ? ` <span class="text-gray-400 font-normal">${tr('owned_by', { name: escapeHtml(owner) })}</span>` : '';
+            el.innerHTML = `RiskBook${suffix} <span class="text-gray-300 text-base align-middle">✏️</span>`;
+            el.title = tr('owner_title');
+        }
+        // Texto do dono para os relatórios em imagem ("RiskBook" ou "RiskBook de X").
+        function ownerReportTitle() {
+            const owner = (localStorage.getItem(OWNER_KEY) || '').trim();
+            return owner ? `RiskBook ${tr('owned_by', { name: owner })}` : 'RiskBook';
+        }
+        async function editOwner() {
+            const cur = localStorage.getItem(OWNER_KEY) || '';
+            const res = await showModal({
+                title: tr('owner_title'), okText: tr('m_save'),
+                fields: [{ key: 'name', type: 'text', label: tr('owner_prompt'), value: cur }]
+            });
+            if (!res) return;
+            const name = res.name.trim();
+            if (name) localStorage.setItem(OWNER_KEY, name); else localStorage.removeItem(OWNER_KEY);
+            applyOwner();
         }
 
         // Presets por tipo de ativo. contractValue = valor em $ de um movimento de 1.0
@@ -1912,7 +1947,7 @@
             const rows = trades.map(reportRowHTML).join('');
             return `
                 <div style="border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline">
-                    <span style="font-size:22px;font-weight:800;color:#1f2937">RiskBook</span>
+                    <span style="font-size:22px;font-weight:800;color:#1f2937">${ownerReportTitle()}</span>
                     <span style="font-size:15px;font-weight:700;color:#3b82f6">${fmtMonth(selectedMonth)}</span>
                 </div>
                 ${statsHTML}
@@ -2019,7 +2054,7 @@
             }).join('');
             return `
                 <div style="border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline">
-                    <span style="font-size:22px;font-weight:800;color:#1f2937">RiskBook</span>
+                    <span style="font-size:22px;font-weight:800;color:#1f2937">${ownerReportTitle()}</span>
                     <span style="font-size:15px;font-weight:700;color:#6366f1">${tr('year_word')} ${year}</span>
                 </div>
                 ${statsHTML}
@@ -2148,6 +2183,7 @@
             LANG = LANGS.includes(saved) ? saved : (LANGS.includes(nav) ? nav : 'en');
             document.querySelectorAll('#langSelector .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
             applyStaticTranslations();
+            applyOwner();
 
             loadSymbolHistory();
             setupListeners();
