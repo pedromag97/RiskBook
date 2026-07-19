@@ -229,6 +229,18 @@
                 </div>
             </div>
 
+            <!-- Metas editáveis (objetivo R:R e risco máx da carteira) -->
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="rrGoal" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="rrgoal_label">Objetivo R:R (1:x)</label>
+                    <input type="number" id="rrGoal" value="2" min="0.1" step="any" class="input-field w-full">
+                </div>
+                <div>
+                    <label for="walletRiskMax" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="walletrisk_label">Risco máx carteira (%)</label>
+                    <input type="number" id="walletRiskMax" value="1.5" min="0.01" step="any" class="input-field w-full">
+                </div>
+            </div>
+
             <div>
                 <label for="contractSize" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="contract_label">Valor do Contrato (por 1.0 de preço, por lote)</label>
                 <input type="number" id="contractSize" value="1" min="0.0000001" step="any" class="input-field w-full">
@@ -379,11 +391,11 @@
 
                 <div class="mt-4 pt-3 border-t border-emerald-200 space-y-2">
                     <div class="flex justify-between items-center text-xs">
-                        <span class="font-semibold text-gray-600" data-i18n="goal_rr">Objetivo R:R (1:2)</span>
+                        <span id="checkRRLabel" class="font-semibold text-gray-600">Objetivo R:R</span>
                         <span id="checkRR" class="check-icon">❌</span>
                     </div>
                     <div class="flex justify-between items-center text-xs">
-                        <span class="font-semibold text-gray-600" data-i18n="wallet_risk">Risco Carteira (< 1.5%)</span>
+                        <span id="checkRiskLabel" class="font-semibold text-gray-600">Risco Carteira</span>
                         <span id="checkRisk" class="check-icon">❌</span>
                     </div>
                 </div>
@@ -479,6 +491,8 @@
         const SYMBOL_STORAGE_KEY = "riskcalc_symbols";
         const BALANCE_KEY = "riskcalc_balance";
         const BALANCE_LOCK_KEY = "riskcalc_balance_locked";
+        const RRGOAL_KEY = "riskcalc_rrgoal";
+        const WALLETRISK_KEY = "riskcalc_walletrisk";
         const LOTS_STORAGE_PREFIX = "riskcalc_lots_";   // + tipo de ativo
         const ANOMALY_FACTOR = 2.5;                      // lote >= 2.5x a mediana => alerta
         const ANOMALY_HISTORY_MAX = 20;                  // guarda os últimos 20 lotes por tipo
@@ -518,7 +532,8 @@
                 res_summary: 'Summary:', mean_price: 'Avg Price', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entries & Cumulative Risk', total_lot: 'Total Lot to Trade:', nominal: 'Nominal Size:',
                 real_risk: 'Total Real Risk ($):', target_profit: 'Target Profit ($):', rr_ratio: 'R:R Ratio:', risk_pct: 'Risk %:',
-                goal_rr: 'R:R Goal (1:2)', wallet_risk: 'Account Risk (< 1.5%)', save_image: 'Save Summary (Image)',
+                goal_rr: 'R:R Goal (1:{goal})', wallet_risk: 'Account Risk (< {max}%)', save_image: 'Save Summary (Image)',
+                rrgoal_label: 'R:R Goal (1:x)', walletrisk_label: 'Max Account Risk (%)',
                 err_invalid: '⚠️ Invalid data. Check prices and symbol.',
                 journal_title: '📓 Trade Log', toggle: 'Show / Hide', month_summary_btn: 'Month Summary', year_summary_btn: 'Year Summary',
                 st_trades: 'Trades', st_open: 'Open', st_notexec: 'Not Taken', st_winrate: 'Win Rate', st_pnl: 'Total P&L', st_pf: 'Profit Factor', st_expect: 'Expectancy',
@@ -574,7 +589,8 @@
                 res_summary: 'Résumé :', mean_price: 'Prix Moyen', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entrées & Risque Cumulé', total_lot: 'Lot Total à Trader :', nominal: 'Taille Nominale :',
                 real_risk: 'Risque Réel Total ($) :', target_profit: 'Gain Cible ($) :', rr_ratio: 'Ratio R:R :', risk_pct: 'Risque % :',
-                goal_rr: 'Objectif R:R (1:2)', wallet_risk: 'Risque Compte (< 1,5%)', save_image: 'Enregistrer le Résumé (Image)',
+                goal_rr: 'Objectif R:R (1:{goal})', wallet_risk: 'Risque Compte (< {max}%)', save_image: 'Enregistrer le Résumé (Image)',
+                rrgoal_label: 'Objectif R:R (1:x)', walletrisk_label: 'Risque compte max (%)',
                 err_invalid: '⚠️ Données invalides. Vérifie les prix et le symbole.',
                 journal_title: '📓 Journal de Trades', toggle: 'Afficher / Masquer', month_summary_btn: 'Résumé du Mois', year_summary_btn: 'Résumé Annuel',
                 st_trades: 'Trades', st_open: 'Ouverts', st_notexec: 'Non pris', st_winrate: 'Taux Réussite', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Espérance',
@@ -630,7 +646,8 @@
                 res_summary: 'Resumen:', mean_price: 'Precio Medio', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entradas y Riesgo Acumulado', total_lot: 'Lote Total a Operar:', nominal: 'Tamaño Nominal:',
                 real_risk: 'Riesgo Real Total ($):', target_profit: 'Ganancia Objetivo ($):', rr_ratio: 'Ratio R:R:', risk_pct: 'Riesgo %:',
-                goal_rr: 'Objetivo R:R (1:2)', wallet_risk: 'Riesgo Cuenta (< 1,5%)', save_image: 'Guardar Resumen (Imagen)',
+                goal_rr: 'Objetivo R:R (1:{goal})', wallet_risk: 'Riesgo Cuenta (< {max}%)', save_image: 'Guardar Resumen (Imagen)',
+                rrgoal_label: 'Objetivo R:R (1:x)', walletrisk_label: 'Riesgo cuenta máx (%)',
                 err_invalid: '⚠️ Datos inválidos. Revisa los precios y el símbolo.',
                 journal_title: '📓 Registro de Trades', toggle: 'Ver / Ocultar', month_summary_btn: 'Resumen del Mes', year_summary_btn: 'Resumen Anual',
                 st_trades: 'Trades', st_open: 'Abiertos', st_notexec: 'No ejec.', st_winrate: 'Aciertos', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Esperanza',
@@ -686,7 +703,8 @@
                 res_summary: 'Resumo:', mean_price: 'Preço Médio', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entradas & Risco Acumulado', total_lot: 'Lote Total a Negociar:', nominal: 'Tamanho Nominal:',
                 real_risk: 'Risco Real Total ($):', target_profit: 'Lucro Alvo ($):', rr_ratio: 'Rácio R:R:', risk_pct: '% Risco:',
-                goal_rr: 'Objetivo R:R (1:2)', wallet_risk: 'Risco Carteira (< 1.5%)', save_image: 'Guardar Resumo (Imagem)',
+                goal_rr: 'Objetivo R:R (1:{goal})', wallet_risk: 'Risco Carteira (< {max}%)', save_image: 'Guardar Resumo (Imagem)',
+                rrgoal_label: 'Objetivo R:R (1:x)', walletrisk_label: 'Risco máx carteira (%)',
                 err_invalid: '⚠️ Dados inválidos. Verifique os preços e o símbolo.',
                 journal_title: '📓 Log de Trades', toggle: 'Ver / Ocultar', month_summary_btn: 'Resumo do Mês', year_summary_btn: 'Resumo Anual',
                 st_trades: 'Trades', st_open: 'Abertas', st_notexec: 'Não Exec.', st_winrate: 'Taxa Acerto', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Expectância',
@@ -1011,6 +1029,18 @@
             });
         }
 
+        /* ---------------- Metas: objetivo R:R e risco máx carteira ---------- */
+        function setupGoals() {
+            const rr = document.getElementById('rrGoal');
+            const wr = document.getElementById('walletRiskMax');
+            const savedRR = localStorage.getItem(RRGOAL_KEY);
+            const savedWR = localStorage.getItem(WALLETRISK_KEY);
+            if (savedRR !== null) rr.value = savedRR;
+            if (savedWR !== null) wr.value = savedWR;
+            rr.addEventListener('input', () => localStorage.setItem(RRGOAL_KEY, rr.value));
+            wr.addEventListener('input', () => localStorage.setItem(WALLETRISK_KEY, wr.value));
+        }
+
         /* ------------------------- Data da trade ---------------------------- */
         // Converte timestamp -> valor de <input type=datetime-local> (hora local).
         function toDatetimeLocalValue(ts) {
@@ -1260,11 +1290,19 @@
             };
 
             /* ----------------------------- Checks ----------------------------- */
+            // Metas editáveis (com fallback para os defaults se em branco).
+            const rrGoal = parseFloat(document.getElementById('rrGoal').value) || 2;
+            const walletRiskMax = parseFloat(document.getElementById('walletRiskMax').value) || 1.5;
+            // Etiquetas dinâmicas com o valor atual (número formatado sem zeros supérfluos).
+            const fmtNum = n => Number(n).toString();
+            document.getElementById('checkRRLabel').textContent = t('goal_rr', { goal: fmtNum(rrGoal) });
+            document.getElementById('checkRiskLabel').textContent = t('wallet_risk', { max: fmtNum(walletRiskMax) });
+
             const cRR = document.getElementById('checkRR');
             const cRisk = document.getElementById('checkRisk');
-            if (rr >= 2) { cRR.textContent = '✅'; cRR.className = 'check-icon check-pass'; }
+            if (rr >= rrGoal) { cRR.textContent = '✅'; cRR.className = 'check-icon check-pass'; }
             else { cRR.textContent = '❌'; cRR.className = 'check-icon check-fail'; }
-            if (riskPct < 1.5) { cRisk.textContent = '✅'; cRisk.className = 'check-icon check-pass'; }
+            if (riskPct < walletRiskMax) { cRisk.textContent = '✅'; cRisk.className = 'check-icon check-pass'; }
             else { cRisk.textContent = '❌'; cRisk.className = 'check-icon check-fail'; }
 
             /* ------- Alerta: lote arredonda para ZERO (trade não cabe / step grosso) ------- */
@@ -2081,6 +2119,7 @@
             loadSymbolHistory();
             setupListeners();
             setupBalanceLock();
+            setupGoals();
             document.getElementById('tradeDate').value = toDatetimeLocalValue(Date.now());
             applyAssetType('forex');
             applyPriority(2);
