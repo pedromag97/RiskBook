@@ -437,6 +437,7 @@
         const LOTS_STORAGE_PREFIX = "riskcalc_lots_";   // + tipo de ativo
         const ANOMALY_FACTOR = 2.5;                      // lote >= 2.5x a mediana => alerta
         const ANOMALY_HISTORY_MAX = 20;                  // guarda os últimos 20 lotes por tipo
+        const DUP_WINDOW_MS = 5 * 60 * 1000;             // janela p/ detetar registo duplicado (5 min)
 
         // Presets por tipo de ativo. contractValue = valor em $ de um movimento de 1.0
         // no preço, por 1 lote. step = incremento mínimo do lote. lotDecimals = casas
@@ -1028,6 +1029,14 @@
             document.getElementById('journalSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
+        // Assinatura de uma trade (para detetar registos duplicados).
+        function tradeSignature(t) {
+            const n = x => (typeof x === 'number' ? x.toFixed(4) : x);
+            return [t.symbol, t.direction, t.assetType,
+                (t.entries || []).map(n).join(','), n(t.sl), n(t.tp),
+                n(t.totalLot), t.priority, t.style].join('|');
+        }
+
         // Calcula E regista: cada cálculo entra no log como trade "aberta".
         // A decisão de executar (resultado) ou "não executei" é feita depois, no log.
         function calculateAndRegister() {
@@ -1035,6 +1044,15 @@
             if (!lastCalc) return;        // dados inválidos — erro já mostrado
             const t = baseTradeFromCalc();
             t.status = 'aberto';          // aberto | ganho | perdido | nulo | nao_exec
+
+            // Proteção contra duplicados: trade idêntica registada nos últimos minutos?
+            // Usa o id (timestamp real do registo), não a data da trade (pode ser backfill).
+            const sig = tradeSignature(t);
+            const dup = getJournal().find(x =>
+                (Date.now() - (x.id || 0)) < DUP_WINDOW_MS && tradeSignature(x) === sig);
+            if (dup) {
+                if (!confirm("Já registaste uma trade idêntica há pouco.\nRegistar na mesma?")) return;
+            }
             addTradeToJournal(t);
         }
 
