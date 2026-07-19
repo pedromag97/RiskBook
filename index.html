@@ -717,6 +717,8 @@
 
         // Mês selecionado no journal ('all' = todos, ou 'AAAA-MM').
         let selectedMonth = 'all';
+        // Trades expandidas no diário (por defeito minimizadas).
+        const expandedTrades = new Set();
 
         function formatCurrency(v) {
             return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(v));
@@ -1400,6 +1402,16 @@
             document.getElementById('journalBody').classList.toggle('hidden');
         }
 
+        // Expande/minimiza os detalhes de uma trade (sem re-render; estado no Set).
+        function toggleTradeDetails(id, headerEl) {
+            const details = document.getElementById('td-' + id);
+            if (!details) return;
+            const nowOpen = !details.classList.toggle('hidden');
+            if (nowOpen) expandedTrades.add(id); else expandedTrades.delete(id);
+            const chev = headerEl.querySelector('.chev');
+            if (chev) chev.style.transform = nowOpen ? 'rotate(90deg)' : '';
+        }
+
         // Estatísticas agregadas das trades FECHADAS.
         function computeStats(journal) {
             const closed = journal.filter(t => t.resultUSD != null);
@@ -1562,9 +1574,11 @@
                 actions.push(btn('editDate', tr('btn_date'), 'border-gray-300 bg-white hover:bg-gray-100'));
                 actions.push(btn('editNotes', tr('btn_notes'), 'border-gray-300 bg-white hover:bg-gray-100'));
                 actions.push(`<span class="ml-auto"></span>` + btn('deleteTrade', '🗑️', 'border-red-300 text-red-600 bg-white hover:bg-red-50'));
-                return `<div class="p-3 rounded-lg border border-gray-200 bg-white">
-                    <div class="flex items-center justify-between gap-2 mb-1">
-                        <div class="flex items-center gap-2 flex-wrap">
+                const open = expandedTrades.has(t.id);
+                return `<div class="rounded-lg border border-gray-200 bg-white">
+                    <div onclick="toggleTradeDetails(${t.id}, this)" class="p-3 flex items-center justify-between gap-2 cursor-pointer select-none">
+                        <div class="flex items-center gap-2 flex-wrap min-w-0">
+                            <span class="chev text-gray-400 text-xs transition-transform" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>
                             <span class="font-bold text-gray-800">${t.symbol}</span>
                             <span class="text-[10px] font-bold" style="color:${dirColor}">${dirLabel(t.direction)}</span>
                             ${statusBadge(t)}
@@ -1573,19 +1587,21 @@
                         </div>
                         ${resTxt}
                     </div>
-                    <div class="text-xs text-gray-400 mb-1">📅 ${fmtDate(t.ts)}</div>
-                    <div class="text-xs text-gray-600 flex flex-wrap gap-x-3">
-                        <span>${tr('r_mean')} ${formatPrice(t.avgEntry)}</span>
-                        <span>${tr('r_sl')} ${formatPrice(t.sl)}</span>
-                        <span>${tr('r_tp')} ${formatPrice(t.tp)}</span>
-                        <span>${t.totalLot.toFixed(2)} ${tr('r_lot')}</span>
-                        <span>${tr('r_risk')} ${formatCurrency(t.plannedRisk)}</span>
-                        <span>${tr('r_rr')} ${t.rr.toFixed(2)}</span>
+                    <div id="td-${t.id}" class="px-3 pb-3 ${open ? '' : 'hidden'}">
+                        <div class="text-xs text-gray-400 mb-1">📅 ${fmtDate(t.ts)}</div>
+                        <div class="text-xs text-gray-600 flex flex-wrap gap-x-3">
+                            <span>${tr('r_mean')} ${formatPrice(t.avgEntry)}</span>
+                            <span>${tr('r_sl')} ${formatPrice(t.sl)}</span>
+                            <span>${tr('r_tp')} ${formatPrice(t.tp)}</span>
+                            <span>${t.totalLot.toFixed(2)} ${tr('r_lot')}</span>
+                            <span>${tr('r_risk')} ${formatCurrency(t.plannedRisk)}</span>
+                            <span>${tr('r_rr')} ${t.rr.toFixed(2)}</span>
+                        </div>
+                        ${notes}
+                        ${reviewLine}
+                        ${reasonLine}
+                        <div class="flex gap-2 mt-2 flex-wrap items-center">${actions.join('')}</div>
                     </div>
-                    ${notes}
-                    ${reviewLine}
-                    ${reasonLine}
-                    <div class="flex gap-2 mt-2 flex-wrap items-center">${actions.join('')}</div>
                 </div>`;
             }).join('');
         }
