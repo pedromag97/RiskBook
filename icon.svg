@@ -1,4 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
-  <rect width="192" height="192" rx="38" fill="#3b82f6"/>
-  <text x="96" y="130" font-family="Inter, Arial, sans-serif" font-size="92" font-weight="800" fill="#ffffff" text-anchor="middle">RB</text>
+  <rect width="192" height="192" rx="42" fill="#2563eb"></rect>
+  <path fill="#ffffff" fill-rule="evenodd" d="M66 38h60c8.8 0 16 7.2 16 16v96c0 3.3-3.7 5.2-6.4 3.2L96 125.5 56.4 153.2c-2.7 1.9-6.4 0-6.4-3.2V54c0-8.8 7.2-16 16-16zM74 70h44c5 0 9 4 9 9s-4 9-9 9H74c-5 0-9-4-9-9s4-9 9-9z"></path>
 </svg>
