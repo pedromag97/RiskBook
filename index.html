@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RiskBook — Sizing & Diário de Trading</title>
+    <title>RiskBook — Position Size Calculator & Trade Journal</title>
 
     <!-- Metadados do PWA (Manifest) -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -130,9 +130,15 @@
 <body class="flex justify-center p-4 sm:p-6 md:p-8">
 
     <div class="app-container w-full p-6 rounded-xl">
-        <header class="mb-6 text-center pb-4 border-b border-gray-200">
+        <header class="mb-6 text-center pb-4 border-b border-gray-200 relative">
             <h1 class="text-3xl font-extrabold text-gray-800 mb-1">RiskBook</h1>
-            <p class="text-gray-500">Sizing · Diário · Estatísticas</p>
+            <p class="text-gray-500" data-i18n="tagline">Sizing · Diário · Estatísticas</p>
+            <div id="langSelector" class="flex justify-center gap-1 mt-3">
+                <button type="button" class="seg-btn px-3 py-1" data-lang="en">EN</button>
+                <button type="button" class="seg-btn px-3 py-1" data-lang="fr">FR</button>
+                <button type="button" class="seg-btn px-3 py-1" data-lang="es">ES</button>
+                <button type="button" class="seg-btn px-3 py-1" data-lang="pt">PT</button>
+            </div>
         </header>
 
         <!-- Layout de 3 colunas (empilha no telemóvel) -->
@@ -140,111 +146,107 @@
 
         <!-- COLUNA 1 — Inputs -->
         <section id="inputs" class="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <h2 class="text-xl font-semibold mb-1 text-blue-700">Dados da Trade</h2>
+            <h2 class="text-xl font-semibold mb-1 text-blue-700" data-i18n="inp_title">Dados da Trade</h2>
 
             <div>
-                <label for="assetSymbol" class="block text-sm font-medium text-gray-700 mb-1">Símbolo (Ex: BTC, AAPL, SP500) *</label>
+                <label for="assetSymbol" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="symbol_label">Símbolo (Ex: BTC, AAPL, SP500) *</label>
                 <input type="text" id="assetSymbol" list="symbolHistory" value="EURUSD" class="input-field w-full uppercase" placeholder="EURUSD" autocomplete="off">
                 <datalist id="symbolHistory"></datalist>
             </div>
 
             <!-- Tipo de ativo: preenche o valor do contrato / lot step por defeito -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Ativo</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="asset_type">Tipo de Ativo</label>
                 <div id="assetTypeSelector" class="grid grid-cols-5 gap-2">
-                    <button type="button" class="seg-btn" data-asset="forex">Forex</button>
-                    <button type="button" class="seg-btn" data-asset="indices">Índices</button>
-                    <button type="button" class="seg-btn" data-asset="cripto">Cripto</button>
-                    <button type="button" class="seg-btn" data-asset="acoes">Ações</button>
-                    <button type="button" class="seg-btn" data-asset="comodities">Comod.</button>
+                    <button type="button" class="seg-btn" data-asset="forex" data-i18n="a_forex">Forex</button>
+                    <button type="button" class="seg-btn" data-asset="indices" data-i18n="a_indices">Índices</button>
+                    <button type="button" class="seg-btn" data-asset="cripto" data-i18n="a_crypto">Cripto</button>
+                    <button type="button" class="seg-btn" data-asset="acoes" data-i18n="a_stocks">Ações</button>
+                    <button type="button" class="seg-btn" data-asset="comodities" data-i18n="a_commod">Comod.</button>
                 </div>
             </div>
 
             <!-- Prioridade (confiança) e estilo (day/swing) — guardados no log -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Prioridade / Confiança</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="priority_label">Prioridade / Confiança</label>
                     <div id="prioritySelector" class="grid grid-cols-3 gap-2">
-                        <button type="button" class="seg-btn" data-priority="1" title="Mais prioritária / mais confiança">P1</button>
+                        <button type="button" class="seg-btn" data-priority="1">P1</button>
                         <button type="button" class="seg-btn" data-priority="2">P2</button>
-                        <button type="button" class="seg-btn" data-priority="3" title="Menos prioritária / menos confiança">P3</button>
+                        <button type="button" class="seg-btn" data-priority="3">P3</button>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Estilo</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="style_label">Estilo</label>
                     <div id="styleSelector" class="grid grid-cols-2 gap-2">
-                        <button type="button" class="seg-btn" data-style="day">Day</button>
-                        <button type="button" class="seg-btn" data-style="swing">Swing</button>
+                        <button type="button" class="seg-btn" data-style="day" data-i18n="s_day">Day</button>
+                        <button type="button" class="seg-btn" data-style="swing" data-i18n="s_swing">Swing</button>
                     </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label for="accountBalance" class="block text-sm font-medium text-gray-700 mb-1">Carteira ($)</label>
+                    <label for="accountBalance" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="wallet_label">Carteira ($)</label>
                     <div class="flex gap-2">
                         <input type="number" id="accountBalance" value="10000" min="1" step="any" class="input-field w-full">
-                        <button type="button" id="lockBalance" title="Trancar a carteira" class="shrink-0 px-3 rounded-lg border border-gray-300 bg-white text-lg hover:bg-gray-100">🔓</button>
+                        <button type="button" id="lockBalance" data-i18n-title="wallet_lock_title" class="shrink-0 px-3 rounded-lg border border-gray-300 bg-white text-lg hover:bg-gray-100">🔓</button>
                     </div>
                 </div>
                 <div>
-                    <label for="maxLossAmount" class="block text-sm font-medium text-gray-700 mb-1">Perda Máx ($)</label>
+                    <label for="maxLossAmount" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="maxloss_label">Perda Máx ($)</label>
                     <input type="number" id="maxLossAmount" value="250" min="0.01" step="any" class="input-field w-full">
                 </div>
             </div>
 
             <div>
-                <label for="contractSize" class="block text-sm font-medium text-gray-700 mb-1">
-                    Valor do Contrato (por 1.0 de preço, por lote)
-                    <span class="text-xs text-gray-400 font-normal">— preenchido pelo tipo de ativo, editável</span>
-                </label>
+                <label for="contractSize" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="contract_label">Valor do Contrato (por 1.0 de preço, por lote)</label>
                 <input type="number" id="contractSize" value="1" min="0.0000001" step="any" class="input-field w-full">
             </div>
 
             <!-- Número de tranches (entradas parceladas) -->
             <div class="pt-4 border-t border-blue-200">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Entradas Parceladas (Tranches)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="tranches_label">Entradas Parceladas (Tranches)</label>
                 <div id="trancheCountSelector" class="grid grid-cols-3 gap-2">
-                    <button type="button" class="seg-btn" data-count="1">1 Entrada</button>
-                    <button type="button" class="seg-btn" data-count="2">2 Entradas</button>
-                    <button type="button" class="seg-btn" data-count="3">3 Entradas</button>
+                    <button type="button" class="seg-btn" data-count="1" data-i18n="tc_1">1 Entrada</button>
+                    <button type="button" class="seg-btn" data-count="2" data-i18n="tc_2">2 Entradas</button>
+                    <button type="button" class="seg-btn" data-count="3" data-i18n="tc_3">3 Entradas</button>
                 </div>
             </div>
 
             <!-- Preços de entrada + % da quantidade por tranche -->
             <p class="text-xs text-gray-400 -mb-1">
-                Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados
-                para que o risco total (preço médio → stop) bata na Perda Máx.
+                <span data-i18n="pct_help">Defines a <b>% do lote total</b> em cada entrada.</span>
                 <span id="pctSumHint" class="font-semibold"></span>
             </p>
             <div class="space-y-2">
                 <div class="tranche-row grid grid-cols-12 gap-2 items-end" data-idx="0">
                     <div class="col-span-6">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Entrada 1</label>
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="e1">Entrada 1</label>
                         <input type="number" id="entry1" value="1.0800" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                     <div class="col-span-6">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">% do Lote 1</label>
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pl1">% do Lote 1</label>
                         <input type="number" id="pct1" value="40" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                 </div>
                 <div class="tranche-row grid grid-cols-12 gap-2 items-end hidden" data-idx="1">
                     <div class="col-span-6">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Entrada 2</label>
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="e2">Entrada 2</label>
                         <input type="number" id="entry2" value="1.0790" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                     <div class="col-span-6">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">% do Lote 2</label>
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pl2">% do Lote 2</label>
                         <input type="number" id="pct2" value="30" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                 </div>
                 <div class="tranche-row grid grid-cols-12 gap-2 items-end hidden" data-idx="2">
                     <div class="col-span-6">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">Entrada 3</label>
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="e3">Entrada 3</label>
                         <input type="number" id="entry3" value="1.0780" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                     <div class="col-span-6">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase">% do Lote 3</label>
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pl3">% do Lote 3</label>
                         <input type="number" id="pct3" value="30" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                 </div>
@@ -253,25 +255,25 @@
             <!-- Stop / Take Profit partilhados por todas as tranches -->
             <div class="grid grid-cols-2 gap-2 pt-2">
                 <div>
-                    <label for="stopLossPrice" class="block text-xs font-bold text-gray-600 mb-1 uppercase">Stop Loss (único)</label>
+                    <label for="stopLossPrice" class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="sl_label">Stop Loss (único)</label>
                     <input type="number" id="stopLossPrice" value="1.0750" min="0" step="any" class="input-field w-full text-sm">
                 </div>
                 <div>
-                    <label for="takeProfitPrice" class="block text-xs font-bold text-gray-600 mb-1 uppercase">Take Profit (único)</label>
+                    <label for="takeProfitPrice" class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="tp_label">Take Profit (único)</label>
                     <input type="number" id="takeProfitPrice" value="1.0950" min="0" step="any" class="input-field w-full text-sm">
                 </div>
             </div>
 
             <div class="pt-2">
-                <label for="tradeDate" class="block text-xs font-bold text-gray-600 mb-1 uppercase">Data da Trade (para o log)</label>
+                <label for="tradeDate" class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="tradedate_label">Data da Trade (para o log)</label>
                 <input type="datetime-local" id="tradeDate" class="input-field w-full text-sm">
             </div>
 
             <button onclick="calculateAndRegister()" class="calculate-button w-full mt-2 flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M12 16h.01"/><path d="M16 16h.01"/><path d="M8 16h.01"/><path d="M12 20h.01"/><path d="M16 20h.01"/><path d="M8 20h.01"/></svg>
-                <span>Calcular e Registar no Log</span>
+                <span data-i18n="calc_btn">Calcular e Registar no Log</span>
             </button>
-            <p class="text-xs text-gray-400 text-center mt-1">Cada cálculo entra no log como trade aberta. Marca o resultado ou "não executei" no diário.</p>
+            <p class="text-xs text-gray-400 text-center mt-1" data-i18n="calc_hint">Cada cálculo entra no log como trade aberta.</p>
         </section>
 
         <!-- COLUNA 2 — Resultado + ações -->
@@ -286,72 +288,72 @@
         <section id="captureArea">
             <div id="resultsSection" class="p-5 bg-emerald-50 rounded-lg border border-emerald-300">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold text-emerald-700">Resumo: <span id="resSymbolDisplay" class="text-gray-800">--</span></h2>
+                    <h2 class="text-xl font-bold text-emerald-700"><span data-i18n="res_summary">Resumo:</span> <span id="resSymbolDisplay" class="text-gray-800">--</span></h2>
                     <span id="tradeTypeBadge" class="text-xs font-bold uppercase px-3 py-1 rounded-full border">--</span>
                 </div>
 
                 <!-- Níveis de Preço -->
                 <div class="grid grid-cols-3 gap-2 mb-4 p-2 bg-white rounded border border-emerald-100 text-center">
                     <div>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold">Preço Médio</p>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold" data-i18n="mean_price">Preço Médio</p>
                         <p id="resEntry" class="font-bold text-gray-800 text-sm">--</p>
                     </div>
                     <div>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold text-red-400">Stop Loss</p>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold text-red-400" data-i18n="stop_loss">Stop Loss</p>
                         <p id="resSL" class="font-bold text-red-600 text-sm">--</p>
                     </div>
                     <div>
-                        <p class="text-[10px] text-gray-400 uppercase font-bold text-emerald-400">Take Profit</p>
+                        <p class="text-[10px] text-gray-400 uppercase font-bold text-emerald-400" data-i18n="take_profit">Take Profit</p>
                         <p id="resTP" class="font-bold text-emerald-600 text-sm">--</p>
                     </div>
                 </div>
 
                 <!-- Detalhe das tranches + risco acumulado -->
                 <div id="trancheBreakdown" class="mb-4 p-3 bg-white rounded border border-emerald-100">
-                    <p class="text-[10px] text-gray-400 uppercase font-bold mb-2">Entradas & Risco Acumulado</p>
+                    <p class="text-[10px] text-gray-400 uppercase font-bold mb-2" data-i18n="entries_cumrisk">Entradas & Risco Acumulado</p>
                     <div id="trancheLines" class="space-y-1 text-sm"></div>
                     <div id="cumRiskLine" class="mt-2 pt-2 border-t border-gray-100 text-sm font-semibold text-gray-700"></div>
                 </div>
 
                 <div id="results" class="space-y-3">
                     <div class="flex flex-col p-3 bg-emerald-200 rounded-lg border-2 border-emerald-500">
-                        <span class="font-bold text-emerald-800 text-xs mb-1 uppercase">Lote Total a Negociar:</span>
+                        <span class="font-bold text-emerald-800 text-xs mb-1 uppercase" data-i18n="total_lot">Lote Total a Negociar:</span>
                         <span id="quantityToTrade" class="font-extrabold text-2xl text-emerald-900 break-all leading-tight">0.0000</span>
                     </div>
 
                     <div class="flex justify-between p-2">
-                        <span class="font-medium text-gray-700">Tamanho Nominal:</span>
+                        <span class="font-medium text-gray-700" data-i18n="nominal">Tamanho Nominal:</span>
                         <span id="nominalPositionSize" class="font-bold text-gray-800">$ 0.00</span>
                     </div>
 
                     <div class="flex justify-between p-2 bg-red-100 rounded-md">
-                        <span class="font-medium text-gray-700">Risco Real Total ($):</span>
+                        <span class="font-medium text-gray-700" data-i18n="real_risk">Risco Real Total ($):</span>
                         <span id="realMonetaryRisk" class="font-bold text-red-600">$ 0.00</span>
                     </div>
 
                     <div class="flex justify-between p-2 bg-emerald-100 rounded-md">
-                        <span class="font-medium text-gray-700">Lucro Alvo ($):</span>
+                        <span class="font-medium text-gray-700" data-i18n="target_profit">Lucro Alvo ($):</span>
                         <span id="potentialGain" class="font-bold text-emerald-600">$ 0.00</span>
                     </div>
 
                     <div class="flex justify-between p-2 border-t border-gray-200">
-                        <span class="font-medium text-gray-700">Rácio R:R:</span>
+                        <span class="font-medium text-gray-700" data-i18n="rr_ratio">Rácio R:R:</span>
                         <span id="rrRatio" class="font-bold text-gray-800">0.0 : 1</span>
                     </div>
 
                     <div class="flex justify-between p-2">
-                        <span class="font-medium text-gray-700">% Risco:</span>
+                        <span class="font-medium text-gray-700" data-i18n="risk_pct">% Risco:</span>
                         <span id="riskPercentage" class="font-bold text-red-600">0.00%</span>
                     </div>
                 </div>
 
                 <div class="mt-4 pt-3 border-t border-emerald-200 space-y-2">
                     <div class="flex justify-between items-center text-xs">
-                        <span class="font-semibold text-gray-600">Objetivo R:R (1:2)</span>
+                        <span class="font-semibold text-gray-600" data-i18n="goal_rr">Objetivo R:R (1:2)</span>
                         <span id="checkRR" class="check-icon">❌</span>
                     </div>
                     <div class="flex justify-between items-center text-xs">
-                        <span class="font-semibold text-gray-600">Risco Carteira (< 1.5%)</span>
+                        <span class="font-semibold text-gray-600" data-i18n="wallet_risk">Risco Carteira (< 1.5%)</span>
                         <span id="checkRisk" class="check-icon">❌</span>
                     </div>
                 </div>
@@ -362,19 +364,19 @@
         <div class="space-y-3">
             <button onclick="exportAsImage()" class="export-button flex items-center justify-center space-x-2 shadow-md hover:bg-gray-700 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>Guardar Resumo (Imagem)</span>
+                <span data-i18n="save_image">Guardar Resumo (Imagem)</span>
             </button>
         </div>
 
-        <p id="error-message" class="text-red-500 mt-4 text-center font-semibold hidden">⚠️ Dados inválidos. Verifique os preços e o símbolo.</p>
+        <p id="error-message" class="text-red-500 mt-4 text-center font-semibold hidden" data-i18n="err_invalid">⚠️ Dados inválidos. Verifique os preços e o símbolo.</p>
 
         </div><!-- /COLUNA 2 -->
 
         <!-- COLUNA 3 — Diário de Trades -->
         <section id="journalSection" class="col-card">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="text-xl font-extrabold text-gray-800">📓 Log de Trades</h2>
-                <button id="journalToggle" onclick="toggleJournal()" class="text-sm font-semibold text-blue-600 hover:underline">Ver / Ocultar</button>
+                <h2 class="text-xl font-extrabold text-gray-800" data-i18n="journal_title">📓 Log de Trades</h2>
+                <button id="journalToggle" onclick="toggleJournal()" class="text-sm font-semibold text-blue-600 hover:underline" data-i18n="toggle">Ver / Ocultar</button>
             </div>
 
             <div id="journalBody">
@@ -386,10 +388,10 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <button onclick="exportMonthSummary()" class="flex items-center justify-center gap-2 text-sm font-bold text-white rounded-lg py-2 shadow-md transition" style="background-color:#10b981;" onmouseover="this.style.backgroundColor='#059669'" onmouseout="this.style.backgroundColor='#10b981'">
-                        <span>🖼️</span><span>Resumo do Mês</span>
+                        <span>🖼️</span><span data-i18n="month_summary_btn">Resumo do Mês</span>
                     </button>
                     <button onclick="exportYearSummary()" class="flex items-center justify-center gap-2 text-sm font-bold text-white rounded-lg py-2 shadow-md transition" style="background-color:#6366f1;" onmouseover="this.style.backgroundColor='#4f46e5'" onmouseout="this.style.backgroundColor='#6366f1'">
-                        <span>📊</span><span>Resumo Anual</span>
+                        <span>📊</span><span data-i18n="year_summary_btn">Resumo Anual</span>
                     </button>
                 </div>
 
@@ -402,24 +404,24 @@
                 <!-- Filtro + exportação -->
                 <div class="flex flex-wrap items-center gap-2 mb-3">
                     <select id="journalFilter" onchange="renderJournal()" class="input-field text-sm py-1 px-2 flex-1">
-                        <option value="todos">Todas</option>
-                        <option value="aberto">Abertas</option>
-                        <option value="fechado">Fechadas</option>
-                        <option value="ganho">Ganhas</option>
-                        <option value="perdido">Perdidas</option>
-                        <option value="nao_exec">Não executadas</option>
+                        <option value="todos" data-i18n="f_all">Todas</option>
+                        <option value="aberto" data-i18n="f_open">Abertas</option>
+                        <option value="fechado" data-i18n="f_closed">Fechadas</option>
+                        <option value="ganho" data-i18n="f_won">Ganhas</option>
+                        <option value="perdido" data-i18n="f_lost">Perdidas</option>
+                        <option value="nao_exec" data-i18n="f_notexec">Não executadas</option>
                     </select>
-                    <button onclick="exportJournalCSV()" title="Exporta o mês selecionado (CSV)" class="text-sm font-semibold px-3 py-1 rounded-lg border border-gray-300 bg-white hover:bg-gray-100">⬇️ CSV mês</button>
-                    <button onclick="exportJournalJSON()" class="text-sm font-semibold px-3 py-1 rounded-lg border border-blue-300 text-blue-700 bg-white hover:bg-blue-50" title="Backup completo de TODO o log (JSON)">⬇️ Backup</button>
-                    <label class="text-sm font-semibold px-3 py-1 rounded-lg border border-blue-300 text-blue-700 bg-white hover:bg-blue-50 cursor-pointer" title="Restaurar de um backup JSON">⬆️ Restaurar
+                    <button onclick="exportJournalCSV()" data-i18n-title="csv_title" class="text-sm font-semibold px-3 py-1 rounded-lg border border-gray-300 bg-white hover:bg-gray-100" data-i18n="csv_btn">⬇️ CSV mês</button>
+                    <button onclick="exportJournalJSON()" class="text-sm font-semibold px-3 py-1 rounded-lg border border-blue-300 text-blue-700 bg-white hover:bg-blue-50" data-i18n-title="backup_title" data-i18n="backup_btn">⬇️ Backup</button>
+                    <label class="text-sm font-semibold px-3 py-1 rounded-lg border border-blue-300 text-blue-700 bg-white hover:bg-blue-50 cursor-pointer" data-i18n-title="restore_title"><span data-i18n="restore_btn">⬆️ Restaurar</span>
                         <input type="file" id="importJsonInput" accept=".json,application/json" class="hidden" onchange="importJournalJSON(event)">
                     </label>
-                    <button onclick="clearJournal()" class="text-sm font-semibold px-3 py-1 rounded-lg border border-red-300 text-red-600 bg-white hover:bg-red-50">🗑️ Limpar</button>
+                    <button onclick="clearJournal()" class="text-sm font-semibold px-3 py-1 rounded-lg border border-red-300 text-red-600 bg-white hover:bg-red-50" data-i18n="clear_btn">🗑️ Limpar</button>
                 </div>
 
                 <!-- Lista de trades -->
                 <div id="journalList" class="space-y-2"></div>
-                <p id="journalEmpty" class="text-center text-gray-400 text-sm py-6">Sem trades registadas ainda. Calcula uma trade e carrega em "Registar Trade no Log".</p>
+                <p id="journalEmpty" class="text-center text-gray-400 text-sm py-6" data-i18n="empty_none">Sem trades registadas ainda.</p>
             </div>
         </section>
 
@@ -438,6 +440,248 @@
         const ANOMALY_FACTOR = 2.5;                      // lote >= 2.5x a mediana => alerta
         const ANOMALY_HISTORY_MAX = 20;                  // guarda os últimos 20 lotes por tipo
         const DUP_WINDOW_MS = 5 * 60 * 1000;             // janela p/ detetar registo duplicado (5 min)
+
+        /* =============================== i18n =============================== */
+        const LANG_KEY = 'riskbook_lang';
+        const LANGS = ['en', 'fr', 'es', 'pt'];
+        let LANG = 'en';
+
+        const MONTHS_I18N = {
+            en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            fr: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+            es: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            pt: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+        };
+        function monthsArr() { return MONTHS_I18N[LANG] || MONTHS_I18N.en; }
+
+        const I18N = {
+            en: {
+                tagline: 'Sizing · Journal · Stats',
+                inp_title: 'Trade Data', symbol_label: 'Symbol (e.g. BTC, AAPL, SP500) *',
+                asset_type: 'Asset Type', a_forex: 'Forex', a_indices: 'Indices', a_crypto: 'Crypto', a_stocks: 'Stocks', a_commod: 'Commod.',
+                priority_label: 'Priority / Conviction', style_label: 'Style', s_day: 'Day', s_swing: 'Swing',
+                wallet_label: 'Account ($)', wallet_lock_title: 'Lock the account', maxloss_label: 'Max Loss ($)',
+                contract_label: 'Contract Value (per 1.0 of price, per lot)', contract_hint: '— filled by asset type, editable',
+                tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
+                pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
+                pl1: '% of Lot 1', pl2: '% of Lot 2', pl3: '% of Lot 3', e1: 'Entry 1', e2: 'Entry 2', e3: 'Entry 3',
+                sl_label: 'Stop Loss (single)', tp_label: 'Take Profit (single)', tradedate_label: 'Trade Date (for the log)',
+                calc_btn: 'Calculate & Log', calc_hint: 'Every calculation is logged as an open trade. Set the result or "not taken" in the journal.',
+                res_summary: 'Summary:', mean_price: 'Avg Price', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
+                entries_cumrisk: 'Entries & Cumulative Risk', total_lot: 'Total Lot to Trade:', nominal: 'Nominal Size:',
+                real_risk: 'Total Real Risk ($):', target_profit: 'Target Profit ($):', rr_ratio: 'R:R Ratio:', risk_pct: 'Risk %:',
+                goal_rr: 'R:R Goal (1:2)', wallet_risk: 'Account Risk (< 1.5%)', save_image: 'Save Summary (Image)',
+                err_invalid: '⚠️ Invalid data. Check prices and symbol.',
+                journal_title: '📓 Trade Log', toggle: 'Show / Hide', month_summary_btn: 'Month Summary', year_summary_btn: 'Year Summary',
+                st_trades: 'Trades', st_open: 'Open', st_notexec: 'Not Taken', st_winrate: 'Win Rate', st_pnl: 'Total P&L', st_pf: 'Profit Factor', st_expect: 'Expectancy',
+                bd_priority: 'By Priority', bd_style: 'By Style', bd_group: 'Group', bd_n: 'N', bd_hit: 'Win%', bd_pnl: 'P&L',
+                f_all: 'All', f_open: 'Open', f_closed: 'Closed', f_won: 'Won', f_lost: 'Lost', f_notexec: 'Not taken',
+                csv_btn: '⬇️ CSV month', backup_btn: '⬇️ Backup', restore_btn: '⬆️ Restore', clear_btn: '🗑️ Clear',
+                csv_title: 'Export selected month (CSV)', backup_title: 'Full backup of the whole log (JSON)', restore_title: 'Restore from a JSON backup',
+                empty_none: 'No trades yet. Fill a trade and click "Calculate & Log".', empty_month: 'No trades this month/filter.',
+                r_mean: 'Avg', r_sl: 'SL', r_tp: 'TP', r_lot: 'lot', r_risk: 'Risk', r_rr: 'R:R',
+                b_open: 'OPEN', b_won: 'WON', b_lost: 'LOSS', b_be: 'BE', b_notexec: 'NOT TAKEN',
+                btn_result: '💰 Result', btn_notexec: '🚫 Not taken', btn_reopen: '↩︎ Reopen', btn_review: '🔍 Review', btn_date: '📅 Date', btn_notes: '📝 Notes',
+                cum_risk_label: 'Cumulative risk', buy: 'BUY', sell: 'SELL', all_months: 'All months',
+                not_taken_word: 'Not taken', gen_on: 'Generated on', trades_of_month: 'Trades of the month',
+                pnl_monthly: 'Monthly P&L', equity_cum: 'Cumulative Equity', year_word: 'Year', best_month: 'Best Month', worst_month: 'Worst Month', month_word: 'Month', lot_word: 'lot',
+                sum_label: 'Sum: {sum}%',
+                dup_confirm: 'You already logged an identical trade recently.\nLog it anyway?',
+                close_prompt: 'REALIZED result of {sym} (in $).\nPositive = win, negative = loss, 0 = breakeven.\n\nPlan: target +{gain} / risk -{risk}',
+                invalid_value: 'Invalid value.',
+                exit_prompt: 'How did it close? (TP / SL / Manual)\nManual = closed by hand, no conditions (SL/TP not hit).',
+                notexec_prompt: 'Reason for not taking it:',
+                review_prompt: 'Review of {sym} — what went wrong / lesson:',
+                notes_prompt: 'Notes for {sym}:',
+                date_prompt: 'Trade date (DD/MM/YYYY HH:MM):', date_invalid: 'Invalid date. Use DD/MM/YYYY HH:MM.',
+                delete_confirm: 'Delete this trade from the log?', clear_confirm: 'Delete ALL trades from the log? This cannot be undone.',
+                csv_empty: 'No trades to export this month.', backup_empty: 'Log empty — nothing to save.',
+                restore_done: 'Restore complete.\n{added} trade(s) added, {existing} already existed.\nTotal in log: {total}.',
+                restore_invalid: 'Invalid file — not a RiskBook backup.',
+                year_prompt: 'Year for the summary:', year_invalid: 'Invalid year.', year_none: 'No trades in {year}.',
+                month_none: 'No trades this month to summarize.', image_fail: 'Failed to generate the image.',
+                unlock_confirm: 'Unlock the account to change it?',
+                anomaly: '⚠️ THIS LOT IS {ratio}x YOUR NORMAL<br>DOUBLE-CHECK THE SIZE',
+                zerolot: '⚠️ LOT = 0 · TRADE DOESN\'T FIT MAX LOSS<br><span class="text-sm font-semibold">The minimum lot ({step}) would risk {minRisk} &gt; {maxLoss}. Move the stop closer, raise Max Loss, or use fractional lots.</span>',
+                tranchezero: '⚠️ AN ENTRY ROUNDED TO 0 LOT<br><span class="text-sm font-semibold">Its % is too small for this asset\'s minimum step ({step}).</span>',
+                overcap: '🚨 RISK {risk} ABOVE MAX LOSS {maxLoss}<br>REDUCE THE LOTS',
+            },
+            fr: {
+                tagline: 'Sizing · Journal · Stats',
+                inp_title: 'Données du Trade', symbol_label: 'Symbole (ex. BTC, AAPL, SP500) *',
+                asset_type: 'Type d\'actif', a_forex: 'Forex', a_indices: 'Indices', a_crypto: 'Crypto', a_stocks: 'Actions', a_commod: 'Mat. 1res',
+                priority_label: 'Priorité / Confiance', style_label: 'Style', s_day: 'Day', s_swing: 'Swing',
+                wallet_label: 'Compte ($)', wallet_lock_title: 'Verrouiller le compte', maxloss_label: 'Perte Max ($)',
+                contract_label: 'Valeur du contrat (par 1.0 de prix, par lot)', contract_hint: '— rempli selon le type d\'actif, modifiable',
+                tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
+                pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
+                pl1: '% du Lot 1', pl2: '% du Lot 2', pl3: '% du Lot 3', e1: 'Entrée 1', e2: 'Entrée 2', e3: 'Entrée 3',
+                sl_label: 'Stop Loss (unique)', tp_label: 'Take Profit (unique)', tradedate_label: 'Date du trade (pour le journal)',
+                calc_btn: 'Calculer & Journaliser', calc_hint: 'Chaque calcul est journalisé comme trade ouvert. Indique le résultat ou "non pris" dans le journal.',
+                res_summary: 'Résumé :', mean_price: 'Prix Moyen', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
+                entries_cumrisk: 'Entrées & Risque Cumulé', total_lot: 'Lot Total à Trader :', nominal: 'Taille Nominale :',
+                real_risk: 'Risque Réel Total ($) :', target_profit: 'Gain Cible ($) :', rr_ratio: 'Ratio R:R :', risk_pct: 'Risque % :',
+                goal_rr: 'Objectif R:R (1:2)', wallet_risk: 'Risque Compte (< 1,5%)', save_image: 'Enregistrer le Résumé (Image)',
+                err_invalid: '⚠️ Données invalides. Vérifie les prix et le symbole.',
+                journal_title: '📓 Journal de Trades', toggle: 'Afficher / Masquer', month_summary_btn: 'Résumé du Mois', year_summary_btn: 'Résumé Annuel',
+                st_trades: 'Trades', st_open: 'Ouverts', st_notexec: 'Non pris', st_winrate: 'Taux Réussite', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Espérance',
+                bd_priority: 'Par Priorité', bd_style: 'Par Style', bd_group: 'Groupe', bd_n: 'N', bd_hit: 'Réus.%', bd_pnl: 'P&L',
+                f_all: 'Tous', f_open: 'Ouverts', f_closed: 'Fermés', f_won: 'Gagnés', f_lost: 'Perdus', f_notexec: 'Non pris',
+                csv_btn: '⬇️ CSV mois', backup_btn: '⬇️ Backup', restore_btn: '⬆️ Restaurer', clear_btn: '🗑️ Effacer',
+                csv_title: 'Exporter le mois sélectionné (CSV)', backup_title: 'Sauvegarde complète du journal (JSON)', restore_title: 'Restaurer depuis un backup JSON',
+                empty_none: 'Aucun trade. Remplis un trade et clique "Calculer & Journaliser".', empty_month: 'Aucun trade ce mois/filtre.',
+                r_mean: 'Moy', r_sl: 'SL', r_tp: 'TP', r_lot: 'lot', r_risk: 'Risque', r_rr: 'R:R',
+                b_open: 'OUVERT', b_won: 'GAGNÉ', b_lost: 'PERTE', b_be: 'BE', b_notexec: 'NON PRIS',
+                btn_result: '💰 Résultat', btn_notexec: '🚫 Non pris', btn_reopen: '↩︎ Rouvrir', btn_review: '🔍 Revue', btn_date: '📅 Date', btn_notes: '📝 Notes',
+                cum_risk_label: 'Risque cumulé', buy: 'ACHAT', sell: 'VENTE', all_months: 'Tous les mois',
+                not_taken_word: 'Non pris', gen_on: 'Généré le', trades_of_month: 'Trades du mois',
+                pnl_monthly: 'P&L Mensuel', equity_cum: 'Capital Cumulé', year_word: 'Année', best_month: 'Meilleur Mois', worst_month: 'Pire Mois', month_word: 'Mois', lot_word: 'lot',
+                sum_label: 'Somme : {sum}%',
+                dup_confirm: 'Tu as déjà journalisé un trade identique récemment.\nJournaliser quand même ?',
+                close_prompt: 'Résultat RÉALISÉ de {sym} (en $).\nPositif = gain, négatif = perte, 0 = neutre.\n\nPlan : cible +{gain} / risque -{risk}',
+                invalid_value: 'Valeur invalide.',
+                exit_prompt: 'Comment ça a fermé ? (TP / SL / Manual)\nManual = fermé à la main, sans conditions (SL/TP non atteints).',
+                notexec_prompt: 'Raison de ne pas l\'avoir pris :',
+                review_prompt: 'Revue de {sym} — ce qui a mal tourné / leçon :',
+                notes_prompt: 'Notes pour {sym} :',
+                date_prompt: 'Date du trade (JJ/MM/AAAA HH:MM) :', date_invalid: 'Date invalide. Utilise JJ/MM/AAAA HH:MM.',
+                delete_confirm: 'Supprimer ce trade du journal ?', clear_confirm: 'Supprimer TOUS les trades ? Action irréversible.',
+                csv_empty: 'Aucun trade à exporter ce mois.', backup_empty: 'Journal vide — rien à sauvegarder.',
+                restore_done: 'Restauration terminée.\n{added} trade(s) ajouté(s), {existing} existaient déjà.\nTotal : {total}.',
+                restore_invalid: 'Fichier invalide — pas un backup RiskBook.',
+                year_prompt: 'Année du résumé :', year_invalid: 'Année invalide.', year_none: 'Aucun trade en {year}.',
+                month_none: 'Aucun trade ce mois à résumer.', image_fail: 'Échec de génération de l\'image.',
+                unlock_confirm: 'Déverrouiller le compte pour le modifier ?',
+                anomaly: '⚠️ CE LOT EST {ratio}x TON NORMAL<br>VÉRIFIE LA QUANTITÉ',
+                zerolot: '⚠️ LOT = 0 · LE TRADE NE TIENT PAS DANS LA PERTE MAX<br><span class="text-sm font-semibold">Le lot minimum ({step}) risquerait {minRisk} &gt; {maxLoss}. Rapproche le stop, augmente la Perte Max, ou utilise des lots fractionnés.</span>',
+                tranchezero: '⚠️ UNE ENTRÉE A ARRONDI À 0 LOT<br><span class="text-sm font-semibold">Son % est trop petit pour le pas minimum ({step}).</span>',
+                overcap: '🚨 RISQUE {risk} AU-DESSUS DE LA PERTE MAX {maxLoss}<br>RÉDUIS LES LOTS',
+            },
+            es: {
+                tagline: 'Sizing · Diario · Stats',
+                inp_title: 'Datos del Trade', symbol_label: 'Símbolo (ej. BTC, AAPL, SP500) *',
+                asset_type: 'Tipo de Activo', a_forex: 'Forex', a_indices: 'Índices', a_crypto: 'Cripto', a_stocks: 'Acciones', a_commod: 'Materias',
+                priority_label: 'Prioridad / Confianza', style_label: 'Estilo', s_day: 'Day', s_swing: 'Swing',
+                wallet_label: 'Cuenta ($)', wallet_lock_title: 'Bloquear la cuenta', maxloss_label: 'Pérdida Máx ($)',
+                contract_label: 'Valor del Contrato (por 1.0 de precio, por lote)', contract_hint: '— rellenado por el tipo de activo, editable',
+                tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
+                pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
+                pl1: '% del Lote 1', pl2: '% del Lote 2', pl3: '% del Lote 3', e1: 'Entrada 1', e2: 'Entrada 2', e3: 'Entrada 3',
+                sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', tradedate_label: 'Fecha del trade (para el registro)',
+                calc_btn: 'Calcular y Registrar', calc_hint: 'Cada cálculo se registra como trade abierto. Marca el resultado o "no ejecutado" en el diario.',
+                res_summary: 'Resumen:', mean_price: 'Precio Medio', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
+                entries_cumrisk: 'Entradas y Riesgo Acumulado', total_lot: 'Lote Total a Operar:', nominal: 'Tamaño Nominal:',
+                real_risk: 'Riesgo Real Total ($):', target_profit: 'Ganancia Objetivo ($):', rr_ratio: 'Ratio R:R:', risk_pct: 'Riesgo %:',
+                goal_rr: 'Objetivo R:R (1:2)', wallet_risk: 'Riesgo Cuenta (< 1,5%)', save_image: 'Guardar Resumen (Imagen)',
+                err_invalid: '⚠️ Datos inválidos. Revisa los precios y el símbolo.',
+                journal_title: '📓 Registro de Trades', toggle: 'Ver / Ocultar', month_summary_btn: 'Resumen del Mes', year_summary_btn: 'Resumen Anual',
+                st_trades: 'Trades', st_open: 'Abiertos', st_notexec: 'No ejec.', st_winrate: 'Aciertos', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Esperanza',
+                bd_priority: 'Por Prioridad', bd_style: 'Por Estilo', bd_group: 'Grupo', bd_n: 'N', bd_hit: 'Acier.%', bd_pnl: 'P&L',
+                f_all: 'Todas', f_open: 'Abiertas', f_closed: 'Cerradas', f_won: 'Ganadas', f_lost: 'Perdidas', f_notexec: 'No ejecutadas',
+                csv_btn: '⬇️ CSV mes', backup_btn: '⬇️ Backup', restore_btn: '⬆️ Restaurar', clear_btn: '🗑️ Borrar',
+                csv_title: 'Exporta el mes seleccionado (CSV)', backup_title: 'Copia completa del registro (JSON)', restore_title: 'Restaurar desde un backup JSON',
+                empty_none: 'Sin trades. Calcula un trade y pulsa "Calcular y Registrar".', empty_month: 'Sin trades este mes/filtro.',
+                r_mean: 'Med', r_sl: 'SL', r_tp: 'TP', r_lot: 'lote', r_risk: 'Riesgo', r_rr: 'R:R',
+                b_open: 'ABIERTA', b_won: 'GANADA', b_lost: 'PÉRDIDA', b_be: 'BE', b_notexec: 'NO EJEC',
+                btn_result: '💰 Resultado', btn_notexec: '🚫 No ejec.', btn_reopen: '↩︎ Reabrir', btn_review: '🔍 Revisión', btn_date: '📅 Fecha', btn_notes: '📝 Notas',
+                cum_risk_label: 'Riesgo acumulado', buy: 'COMPRA', sell: 'VENTA', all_months: 'Todos los meses',
+                not_taken_word: 'No ejecutada', gen_on: 'Generado el', trades_of_month: 'Trades del mes',
+                pnl_monthly: 'P&L Mensual', equity_cum: 'Capital Acumulado', year_word: 'Año', best_month: 'Mejor Mes', worst_month: 'Peor Mes', month_word: 'Mes', lot_word: 'lote',
+                sum_label: 'Suma: {sum}%',
+                dup_confirm: 'Ya registraste un trade idéntico hace poco.\n¿Registrar igualmente?',
+                close_prompt: 'Resultado REALIZADO de {sym} (en $).\nPositivo = ganancia, negativo = pérdida, 0 = neutro.\n\nPlan: objetivo +{gain} / riesgo -{risk}',
+                invalid_value: 'Valor inválido.',
+                exit_prompt: '¿Cómo cerró? (TP / SL / Manual)\nManual = cerrado a mano, sin condiciones (SL/TP no alcanzados).',
+                notexec_prompt: 'Motivo de no haberlo ejecutado:',
+                review_prompt: 'Revisión de {sym} — qué salió mal / lección:',
+                notes_prompt: 'Notas de {sym}:',
+                date_prompt: 'Fecha del trade (DD/MM/AAAA HH:MM):', date_invalid: 'Fecha inválida. Usa DD/MM/AAAA HH:MM.',
+                delete_confirm: '¿Borrar este trade del registro?', clear_confirm: '¿Borrar TODOS los trades? Esta acción no se deshace.',
+                csv_empty: 'Sin trades para exportar este mes.', backup_empty: 'Registro vacío — nada que guardar.',
+                restore_done: 'Restauración completa.\n{added} trade(s) añadido(s), {existing} ya existían.\nTotal: {total}.',
+                restore_invalid: 'Archivo inválido — no es un backup de RiskBook.',
+                year_prompt: 'Año del resumen:', year_invalid: 'Año inválido.', year_none: 'Sin trades en {year}.',
+                month_none: 'Sin trades este mes para resumir.', image_fail: 'Fallo al generar la imagen.',
+                unlock_confirm: '¿Desbloquear la cuenta para cambiarla?',
+                anomaly: '⚠️ ESTE LOTE ES {ratio}x TU NORMAL<br>CONFIRMA LA CANTIDAD',
+                zerolot: '⚠️ LOTE = 0 · EL TRADE NO CABE EN LA PÉRDIDA MÁX<br><span class="text-sm font-semibold">El lote mínimo ({step}) arriesgaría {minRisk} &gt; {maxLoss}. Acerca el stop, sube la Pérdida Máx, o usa lotes fraccionados.</span>',
+                tranchezero: '⚠️ UNA ENTRADA REDONDEÓ A 0 LOTE<br><span class="text-sm font-semibold">Su % es demasiado pequeño para el paso mínimo ({step}).</span>',
+                overcap: '🚨 RIESGO {risk} POR ENCIMA DE LA PÉRDIDA MÁX {maxLoss}<br>REDUCE LOS LOTES',
+            },
+            pt: {
+                tagline: 'Sizing · Diário · Estatísticas',
+                inp_title: 'Dados da Trade', symbol_label: 'Símbolo (Ex: BTC, AAPL, SP500) *',
+                asset_type: 'Tipo de Ativo', a_forex: 'Forex', a_indices: 'Índices', a_crypto: 'Cripto', a_stocks: 'Ações', a_commod: 'Comod.',
+                priority_label: 'Prioridade / Confiança', style_label: 'Estilo', s_day: 'Day', s_swing: 'Swing',
+                wallet_label: 'Carteira ($)', wallet_lock_title: 'Trancar a carteira', maxloss_label: 'Perda Máx ($)',
+                contract_label: 'Valor do Contrato (por 1.0 de preço, por lote)', contract_hint: '— preenchido pelo tipo de ativo, editável',
+                tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
+                pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
+                pl1: '% do Lote 1', pl2: '% do Lote 2', pl3: '% do Lote 3', e1: 'Entrada 1', e2: 'Entrada 2', e3: 'Entrada 3',
+                sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', tradedate_label: 'Data da Trade (para o log)',
+                calc_btn: 'Calcular e Registar no Log', calc_hint: 'Cada cálculo entra no log como trade aberta. Marca o resultado ou "não executei" no diário.',
+                res_summary: 'Resumo:', mean_price: 'Preço Médio', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
+                entries_cumrisk: 'Entradas & Risco Acumulado', total_lot: 'Lote Total a Negociar:', nominal: 'Tamanho Nominal:',
+                real_risk: 'Risco Real Total ($):', target_profit: 'Lucro Alvo ($):', rr_ratio: 'Rácio R:R:', risk_pct: '% Risco:',
+                goal_rr: 'Objetivo R:R (1:2)', wallet_risk: 'Risco Carteira (< 1.5%)', save_image: 'Guardar Resumo (Imagem)',
+                err_invalid: '⚠️ Dados inválidos. Verifique os preços e o símbolo.',
+                journal_title: '📓 Log de Trades', toggle: 'Ver / Ocultar', month_summary_btn: 'Resumo do Mês', year_summary_btn: 'Resumo Anual',
+                st_trades: 'Trades', st_open: 'Abertas', st_notexec: 'Não Exec.', st_winrate: 'Taxa Acerto', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Expectância',
+                bd_priority: 'Por Prioridade', bd_style: 'Por Estilo', bd_group: 'Grupo', bd_n: 'N', bd_hit: 'Acerto', bd_pnl: 'P&L',
+                f_all: 'Todas', f_open: 'Abertas', f_closed: 'Fechadas', f_won: 'Ganhas', f_lost: 'Perdidas', f_notexec: 'Não executadas',
+                csv_btn: '⬇️ CSV mês', backup_btn: '⬇️ Backup', restore_btn: '⬆️ Restaurar', clear_btn: '🗑️ Limpar',
+                csv_title: 'Exporta o mês selecionado (CSV)', backup_title: 'Backup completo de TODO o log (JSON)', restore_title: 'Restaurar de um backup JSON',
+                empty_none: 'Sem trades registadas ainda. Calcula uma trade e carrega em "Calcular e Registar".', empty_month: 'Sem trades neste mês/filtro.',
+                r_mean: 'Méd', r_sl: 'SL', r_tp: 'TP', r_lot: 'lote', r_risk: 'Risco', r_rr: 'R:R',
+                b_open: 'ABERTA', b_won: 'GANHO', b_lost: 'PERDA', b_be: 'NULO', b_notexec: 'NÃO EXEC',
+                btn_result: '💰 Resultado', btn_notexec: '🚫 Não exec.', btn_reopen: '↩︎ Reabrir', btn_review: '🔍 Revisão', btn_date: '📅 Data', btn_notes: '📝 Notas',
+                cum_risk_label: 'Risco acumulado', buy: 'COMPRA', sell: 'VENDA', all_months: 'Todos os meses',
+                not_taken_word: 'Não executada', gen_on: 'Gerado em', trades_of_month: 'Trades do mês',
+                pnl_monthly: 'P&L Mensal', equity_cum: 'Capital Acumulado', year_word: 'Ano', best_month: 'Melhor Mês', worst_month: 'Pior Mês', month_word: 'Mês', lot_word: 'lote',
+                sum_label: 'Soma: {sum}%',
+                dup_confirm: 'Já registaste uma trade idêntica há pouco.\nRegistar na mesma?',
+                close_prompt: 'Resultado REALIZADO da trade {sym} (em $).\nPositivo = ganho, negativo = perda, 0 = nulo (breakeven).\n\nPlano: alvo +{gain} / risco -{risk}',
+                invalid_value: 'Valor inválido.',
+                exit_prompt: 'Como fechou? (TP / SL / Manual)\nManual = fechada à mão por não haver condições (SL/TP não atingidos).',
+                notexec_prompt: 'Motivo de não ter executado:',
+                review_prompt: 'Revisão de {sym} — o que correu mal / lição:',
+                notes_prompt: 'Notas da trade {sym}:',
+                date_prompt: 'Data de execução (DD/MM/AAAA HH:MM):', date_invalid: 'Data inválida. Usa o formato DD/MM/AAAA HH:MM.',
+                delete_confirm: 'Apagar esta trade do log?', clear_confirm: 'Apagar TODAS as trades do log? Esta ação não se desfaz.',
+                csv_empty: 'Sem trades para exportar neste mês.', backup_empty: 'Log vazio — nada para guardar.',
+                restore_done: 'Restauro concluído.\n{added} trade(s) adicionada(s), {existing} já existiam.\nTotal no log: {total}.',
+                restore_invalid: 'Ficheiro inválido — não é um backup do RiskBook.',
+                year_prompt: 'Ano do resumo anual:', year_invalid: 'Ano inválido.', year_none: 'Sem trades registadas em {year}.',
+                month_none: 'Sem trades neste mês para resumir.', image_fail: 'Falha ao gerar a imagem.',
+                unlock_confirm: 'Destrancar a carteira para poder alterá-la?',
+                anomaly: '⚠️ ESTE LOTE É {ratio}x O TEU NORMAL<br>CONFIRMA A QUANTIDADE',
+                zerolot: '⚠️ LOTE = 0 · O TRADE NÃO CABE NA PERDA MÁX<br><span class="text-sm font-semibold">O lote mínimo deste ativo ({step}) arriscaria {minRisk} &gt; {maxLoss}. Aproxima o stop, aumenta a Perda Máx, ou usa um ativo/step com lote fracionado.</span>',
+                tranchezero: '⚠️ UMA ENTRADA ARREDONDOU PARA 0 LOTE<br><span class="text-sm font-semibold">A % dessa entrada é pequena demais para o incremento mínimo ({step}) deste ativo.</span>',
+                overcap: '🚨 RISCO {risk} ACIMA DA PERDA MÁX {maxLoss}<br>REDUZ OS LOTES',
+            },
+        };
+
+        function t(key, vars) {
+            let s = (I18N[LANG] && I18N[LANG][key]) || I18N.en[key] || key;
+            if (vars) for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
+            return s;
+        }
+        // Alias — usar dentro de funções onde 't' é a variável da trade (evita conflito).
+        const tr = t;
+        function applyStaticTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(el => { el.innerHTML = t(el.dataset.i18n); });
+            document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+            document.documentElement.lang = LANG;
+        }
+        function setLang(l) {
+            if (!LANGS.includes(l)) l = 'en';
+            LANG = l;
+            localStorage.setItem(LANG_KEY, l);
+            document.querySelectorAll('#langSelector .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+            applyStaticTranslations();
+            calculateTradeSummary();
+            renderJournal();
+        }
 
         // Presets por tipo de ativo. contractValue = valor em $ de um movimento de 1.0
         // no preço, por 1 lote. step = incremento mínimo do lote. lotDecimals = casas
@@ -467,12 +711,12 @@
 
         // Mês selecionado no journal ('all' = todos, ou 'AAAA-MM').
         let selectedMonth = 'all';
-        const MONTHS_PT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-            'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
         function formatCurrency(v) {
-            return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'USD' }).format(Math.abs(v));
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Math.abs(v));
         }
+        // Direção mostrada traduzida (valor interno mantém-se 'COMPRA'/'VENDA').
+        function dirLabel(d) { return t(d === 'COMPRA' ? 'buy' : 'sell'); }
 
         // Formata preços de forma sensata consoante a magnitude (forex 5 casas, índices/ações menos)
         function formatPrice(p) {
@@ -572,7 +816,7 @@
             const btn = document.getElementById('lockBalance');
             input.disabled = locked;
             btn.textContent = locked ? '🔒' : '🔓';
-            btn.title = locked ? 'Destrancar a carteira' : 'Trancar a carteira';
+            btn.title = t('wallet_lock_title');
         }
         function setupBalanceLock() {
             const input = document.getElementById('accountBalance');
@@ -588,7 +832,7 @@
             });
             btn.addEventListener('click', () => {
                 if (input.disabled) {
-                    if (confirm("Destrancar a carteira para poder alterá-la?")) {
+                    if (confirm(t('unlock_confirm'))) {
                         localStorage.setItem(BALANCE_LOCK_KEY, '0');
                         setBalanceLockUI(false);
                         input.focus();
@@ -740,7 +984,7 @@
             // Dica da soma das % (verde se ~100%, laranja caso contrário — funciona à mesma).
             const hint = document.getElementById('pctSumHint');
             if (trancheCount > 1) {
-                hint.textContent = `Soma: ${sumPct.toFixed(0)}%`;
+                hint.textContent = t('sum_label', { sum: sumPct.toFixed(0) });
                 hint.style.color = Math.abs(sumPct - 100) < 0.01 ? '#059669' : '#d97706';
             } else {
                 hint.textContent = '';
@@ -788,7 +1032,7 @@
 
             /* ------------------------- Atualização da UI ---------------------- */
             const badge = document.getElementById('tradeTypeBadge');
-            badge.textContent = isBuy ? 'COMPRA' : 'VENDA';
+            badge.textContent = t(isBuy ? 'buy' : 'sell');
             badge.className = `text-xs font-bold uppercase px-3 py-1 rounded-full border ${isBuy ? 'badge-buy' : 'badge-sell'}`;
 
             document.getElementById('resSymbolDisplay').textContent = symbol.toUpperCase();
@@ -804,8 +1048,8 @@
                 row.className = 'flex justify-between';
                 const pctTxt = trancheCount > 1 ? ` · ${(weights[i] * 100).toFixed(0)}%` : '';
                 // Lote tradeable (2 casas) + valor exato calculado (4 casas) entre parênteses.
-                const lotTxt = `${formatLot(lots[i])} <span class="text-gray-400">(${formatLotExact(lotsExact[i])})</span> lote`;
-                row.innerHTML = `<span class="text-gray-600">Entrada ${i + 1} @ ${formatPrice(entries[i])}${pctTxt} · ${lotTxt}</span>`
+                const lotTxt = `${formatLot(lots[i])} <span class="text-gray-400">(${formatLotExact(lotsExact[i])})</span> ${t('lot_word')}`;
+                row.innerHTML = `<span class="text-gray-600">${t('e' + (i + 1))} @ ${formatPrice(entries[i])}${pctTxt} · ${lotTxt}</span>`
                     + `<span class="font-semibold text-red-600">${formatCurrency(trancheRisks[i])}</span>`;
                 linesEl.appendChild(row);
             }
@@ -816,7 +1060,7 @@
                 (i === 0 ? '' : '+') + labels[i] + ': ' + formatCurrency(c)
             ).join('  |  ');
             document.getElementById('cumRiskLine').innerHTML =
-                `Risco acumulado &nbsp; <span class="text-gray-900">${cumStr}</span>`;
+                `${t('cum_risk_label')} &nbsp; <span class="text-gray-900">${cumStr}</span>`;
 
             // Número grande = lote TRADEABLE (2 casas). Linha pequena = valor EXATO (4 casas).
             document.getElementById('quantityToTrade').innerHTML =
@@ -866,17 +1110,12 @@
             const someTrancheZero = lots.some((q, i) => q <= 0 && lotsExact[i] > 0);
             if (totalQty <= 0) {
                 zeroLotAlert.classList.add('show');
-                zeroLotAlert.innerHTML =
-                    `⚠️ LOTE = 0 · O TRADE NÃO CABE NA PERDA MÁX<br>` +
-                    `<span class="text-sm font-semibold">O lote mínimo deste ativo (${formatLotExact(step)}) arriscaria ` +
-                    `${formatCurrency(minLotRisk)} &gt; ${formatCurrency(maxLoss)}. ` +
-                    `Aproxima o stop, aumenta a Perda Máx, ou usa um ativo/step com lote fracionado.</span>`;
+                zeroLotAlert.innerHTML = t('zerolot', {
+                    step: formatLotExact(step), minRisk: formatCurrency(minLotRisk), maxLoss: formatCurrency(maxLoss)
+                });
             } else if (someTrancheZero) {
                 zeroLotAlert.classList.add('show');
-                zeroLotAlert.innerHTML =
-                    `⚠️ UMA ENTRADA ARREDONDOU PARA 0 LOTE<br>` +
-                    `<span class="text-sm font-semibold">A % dessa entrada é pequena demais para o incremento mínimo ` +
-                    `(${formatLotExact(step)}) deste ativo.</span>`;
+                zeroLotAlert.innerHTML = t('tranchezero', { step: formatLotExact(step) });
             } else {
                 zeroLotAlert.classList.remove('show');
             }
@@ -885,8 +1124,7 @@
             // Em modo manual (ou se a Perda Máx for baixada) o risco pode passar o teto.
             if (realRisk > maxLoss + 1e-6) {
                 overCapAlert.classList.add('show');
-                overCapAlert.innerHTML =
-                    `🚨 RISCO ${formatCurrency(realRisk)} ACIMA DA PERDA MÁX ${formatCurrency(maxLoss)}<br>REDUZ OS LOTES`;
+                overCapAlert.innerHTML = t('overcap', { risk: formatCurrency(realRisk), maxLoss: formatCurrency(maxLoss) });
             } else {
                 overCapAlert.classList.remove('show');
             }
@@ -896,8 +1134,7 @@
             if (med && totalQty >= med * ANOMALY_FACTOR) {
                 const ratio = totalQty / med;
                 anomalyAlert.classList.add('show');
-                anomalyAlert.innerHTML =
-                    `⚠️ ESTE LOTE É ${ratio.toFixed(1)}x O TEU NORMAL<br>CONFIRMA A QUANTIDADE`;
+                anomalyAlert.innerHTML = t('anomaly', { ratio: ratio.toFixed(1) });
             } else {
                 anomalyAlert.classList.remove('show');
             }
@@ -925,9 +1162,9 @@
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
         }
         function fmtMonth(key) {
-            if (key === 'all') return 'Todos os meses';
+            if (key === 'all') return t('all_months');
             const [y, m] = key.split('-');
-            return `${MONTHS_PT[+m - 1]} ${y}`;
+            return `${monthsArr()[+m - 1]} ${y}`;
         }
         // Meses com trades, mais recente primeiro.
         function availableMonths(journal) {
@@ -980,10 +1217,10 @@
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
-            const raw = prompt("Data de execução (DD/MM/AAAA HH:MM):", fmtDate(t.ts));
+            const raw = prompt(tr('date_prompt'), fmtDate(t.ts));
             if (raw === null) return;
             const ts = parseDateInput(raw);
-            if (ts === null || isNaN(ts)) { alert("Data inválida. Usa o formato DD/MM/AAAA HH:MM."); return; }
+            if (ts === null || isNaN(ts)) { alert(tr('date_invalid')); return; }
             t.ts = ts;
             saveJournal(journal.sort((a, b) => (b.ts || b.id || 0) - (a.ts || a.id || 0)));
             renderJournal();
@@ -1051,7 +1288,7 @@
             const dup = getJournal().find(x =>
                 (Date.now() - (x.id || 0)) < DUP_WINDOW_MS && tradeSignature(x) === sig);
             if (dup) {
-                if (!confirm("Já registaste uma trade idêntica há pouco.\nRegistar na mesma?")) return;
+                if (!confirm(tr('dup_confirm'))) return;
             }
             addTradeToJournal(t);
         }
@@ -1061,7 +1298,7 @@
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
-            const reason = prompt("Motivo de não ter executado:", t.notExecReason || '');
+            const reason = prompt(tr('notexec_prompt'), t.notExecReason || '');
             if (reason === null) return;
             t.status = 'nao_exec';
             t.resultUSD = null;
@@ -1077,25 +1314,19 @@
             if (!t) return;
             const suggested = t.resultUSD != null ? String(t.resultUSD) : '';
             const raw = prompt(
-                `Resultado REALIZADO da trade ${t.symbol} (em $).\n` +
-                `Positivo = ganho, negativo = perda, 0 = nulo (breakeven).\n\n` +
-                `Plano: alvo +${formatCurrency(t.plannedGain)} / risco -${formatCurrency(t.plannedRisk)}`,
+                tr('close_prompt', { sym: t.symbol, gain: formatCurrency(t.plannedGain), risk: formatCurrency(t.plannedRisk) }),
                 suggested
             );
             if (raw === null) return;                 // cancelou
             const val = parseFloat(String(raw).replace(',', '.'));
-            if (isNaN(val)) { alert("Valor inválido."); return; }
+            if (isNaN(val)) { alert(tr('invalid_value')); return; }
 
             // Como fechou? Sugestão automática: perto do alvo=TP, perto do risco=SL, senão Manual.
             const near = (a, b) => Math.abs(a - b) <= Math.max(1, Math.abs(b) * 0.05);
             let guess = 'Manual';
             if (val > 0 && near(val, t.plannedGain)) guess = 'TP';
             else if (val < 0 && near(val, -t.plannedRisk)) guess = 'SL';
-            const exit = prompt(
-                "Como fechou? (TP / SL / Manual)\n" +
-                "Manual = fechada à mão por não haver condições (SL/TP não atingidos).",
-                t.exitType || guess
-            );
+            const exit = prompt(tr('exit_prompt'), t.exitType || guess);
             if (exit !== null) {
                 const e = exit.trim().toUpperCase();
                 t.exitType = e === 'TP' ? 'TP' : e === 'SL' ? 'SL' : (e ? 'Manual' : guess);
@@ -1125,7 +1356,7 @@
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
-            const raw = prompt(`Revisão de ${t.symbol} — o que correu mal / lição:`, t.review || '');
+            const raw = prompt(tr('review_prompt', { sym: t.symbol }), t.review || '');
             if (raw === null) return;
             t.review = raw.trim();
             saveJournal(journal);
@@ -1137,7 +1368,7 @@
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
-            const raw = prompt(`Notas da trade ${t.symbol}:`, t.notes || '');
+            const raw = prompt(tr('notes_prompt', { sym: t.symbol }), t.notes || '');
             if (raw === null) return;
             t.notes = raw.trim();
             saveJournal(journal);
@@ -1146,7 +1377,7 @@
 
         // Apagar uma trade.
         function deleteTrade(id) {
-            if (!confirm("Apagar esta trade do log?")) return;
+            if (!confirm(tr('delete_confirm'))) return;
             saveJournal(getJournal().filter(x => x.id !== id));
             renderJournal();
         }
@@ -1154,7 +1385,7 @@
         // Limpar todo o log.
         function clearJournal() {
             if (!getJournal().length) return;
-            if (!confirm("Apagar TODAS as trades do log? Esta ação não se desfaz.")) return;
+            if (!confirm(tr('clear_confirm'))) return;
             saveJournal([]);
             renderJournal();
         }
@@ -1196,14 +1427,14 @@
         // Badge de estado.
         function statusBadge(t) {
             const map = {
-                aberto:   ['ABERTA',   '#374151', '#e5e7eb'],
-                ganho:    ['GANHO',    '#065f46', '#d1fae5'],
-                perdido:  ['PERDA',    '#991b1b', '#fee2e2'],
-                nulo:     ['NULO',     '#92400e', '#fef3c7'],
-                nao_exec: ['NÃO EXEC', '#4b5563', '#e5e7eb'],
+                aberto:   ['b_open', '#374151', '#e5e7eb'],
+                ganho:    ['b_won',  '#065f46', '#d1fae5'],
+                perdido:  ['b_lost', '#991b1b', '#fee2e2'],
+                nulo:     ['b_be',   '#92400e', '#fef3c7'],
+                nao_exec: ['b_notexec', '#4b5563', '#e5e7eb'],
             };
-            const [txt, fg, bg] = map[t.status] || map.aberto;
-            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:${fg};background:${bg}">${txt}</span>`;
+            const [key, fg, bg] = map[t.status] || map.aberto;
+            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:${fg};background:${bg}">${tr(key)}</span>`;
         }
 
         // Badge de prioridade (P1 verde/forte … P3 cinza/fraca).
@@ -1244,10 +1475,10 @@
                 <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">${title}</p>
                 <table class="w-full text-xs">
                     <thead><tr class="text-[9px] text-gray-400 uppercase">
-                        <th class="text-left font-bold">Grupo</th>
-                        <th class="text-right font-bold">N</th>
-                        <th class="text-right font-bold">Acerto</th>
-                        <th class="text-right font-bold">P&amp;L</th>
+                        <th class="text-left font-bold">${tr('bd_group')}</th>
+                        <th class="text-right font-bold">${tr('bd_n')}</th>
+                        <th class="text-right font-bold">${tr('bd_hit')}</th>
+                        <th class="text-right font-bold">${tr('bd_pnl')}</th>
                     </tr></thead>
                     <tbody>${rows}</tbody>
                 </table>
@@ -1257,7 +1488,7 @@
         function breakdownHTML(journal) {
             const byPriority = [1, 2, 3].map(p => ({ label: 'P' + p, subset: journal.filter(t => t.priority === p) }));
             const byStyle = [['day', 'Day'], ['swing', 'Swing']].map(([k, l]) => ({ label: l, subset: journal.filter(t => t.style === k) }));
-            return groupStatsTable('Por Prioridade', byPriority) + groupStatsTable('Por Estilo', byStyle);
+            return groupStatsTable(tr('bd_priority'), byPriority) + groupStatsTable(tr('bd_style'), byStyle);
         }
         function renderBreakdown(journal) {
             document.getElementById('journalBreakdown').innerHTML = breakdownHTML(journal);
@@ -1281,13 +1512,13 @@
             const pf = s.profitFactor === Infinity ? '∞' : s.profitFactor.toFixed(2);
             const pnlColor = s.pnl > 0 ? '#059669' : s.pnl < 0 ? '#dc2626' : '#1f2937';
             statsEl.innerHTML =
-                statTile('Trades', s.total) +
-                statTile('Abertas', s.open) +
-                statTile('Não Exec.', s.notExec, s.notExec ? '#6b7280' : '#1f2937') +
-                statTile('Taxa Acerto', s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
-                statTile('P&L Total', formatSigned(s.pnl), pnlColor) +
-                statTile('Profit Factor', pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
-                statTile('Expectância', formatSigned(s.expectancy), s.expectancy >= 0 ? '#059669' : '#dc2626');
+                statTile(tr('st_trades'), s.total) +
+                statTile(tr('st_open'), s.open) +
+                statTile(tr('st_notexec'), s.notExec, s.notExec ? '#6b7280' : '#1f2937') +
+                statTile(tr('st_winrate'), s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
+                statTile(tr('st_pnl'), formatSigned(s.pnl), pnlColor) +
+                statTile(tr('st_pf'), pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
+                statTile(tr('st_expect'), formatSigned(s.expectancy), s.expectancy >= 0 ? '#059669' : '#dc2626');
 
             renderBreakdown(monthTrades);
 
@@ -1299,9 +1530,7 @@
                 return t.status === filter;
             });
 
-            emptyEl.textContent = journal.length
-                ? 'Sem trades neste mês/filtro.'
-                : 'Sem trades registadas ainda. Calcula uma trade e carrega em "Registar Trade".';
+            emptyEl.textContent = journal.length ? tr('empty_month') : tr('empty_none');
             emptyEl.style.display = shown.length ? 'none' : 'block';
             listEl.innerHTML = shown.map(t => {
                 const dirColor = t.direction === 'COMPRA' ? '#065f46' : '#991b1b';
@@ -1314,23 +1543,23 @@
                 const reviewLine = t.review
                     ? `<p class="text-xs mt-1 italic" style="color:#b45309">🔍 ${t.review}</p>` : '';
                 const reasonLine = t.status === 'nao_exec'
-                    ? `<p class="text-xs mt-1 italic" style="color:#6b7280">🚫 Não executada${t.notExecReason ? ' — ' + t.notExecReason : ''}</p>`
+                    ? `<p class="text-xs mt-1 italic" style="color:#6b7280">🚫 ${tr('not_taken_word')}${t.notExecReason ? ' — ' + t.notExecReason : ''}</p>`
                     : '';
                 // Botões conforme o estado
                 const btn = (fn, txt, cls) => `<button onclick="${fn}(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border ${cls}">${txt}</button>`;
                 const actions = [];
-                if (t.status !== 'nao_exec') actions.push(btn('closeTrade', '💰 Resultado', 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'));
-                if (t.status === 'aberto') actions.push(btn('markNotExecuted', '🚫 Não exec.', 'border-gray-300 bg-white hover:bg-gray-100'));
-                if (t.status !== 'aberto') actions.push(btn('reopenTrade', '↩︎ Reabrir', 'border-gray-300 bg-white hover:bg-gray-100'));
-                actions.push(btn('editReview', '🔍 Revisão', 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'));
-                actions.push(btn('editDate', '📅 Data', 'border-gray-300 bg-white hover:bg-gray-100'));
-                actions.push(btn('editNotes', '📝 Notas', 'border-gray-300 bg-white hover:bg-gray-100'));
+                if (t.status !== 'nao_exec') actions.push(btn('closeTrade', tr('btn_result'), 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'));
+                if (t.status === 'aberto') actions.push(btn('markNotExecuted', tr('btn_notexec'), 'border-gray-300 bg-white hover:bg-gray-100'));
+                if (t.status !== 'aberto') actions.push(btn('reopenTrade', tr('btn_reopen'), 'border-gray-300 bg-white hover:bg-gray-100'));
+                actions.push(btn('editReview', tr('btn_review'), 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'));
+                actions.push(btn('editDate', tr('btn_date'), 'border-gray-300 bg-white hover:bg-gray-100'));
+                actions.push(btn('editNotes', tr('btn_notes'), 'border-gray-300 bg-white hover:bg-gray-100'));
                 actions.push(`<span class="ml-auto"></span>` + btn('deleteTrade', '🗑️', 'border-red-300 text-red-600 bg-white hover:bg-red-50'));
                 return `<div class="p-3 rounded-lg border border-gray-200 bg-white">
                     <div class="flex items-center justify-between gap-2 mb-1">
                         <div class="flex items-center gap-2 flex-wrap">
                             <span class="font-bold text-gray-800">${t.symbol}</span>
-                            <span class="text-[10px] font-bold" style="color:${dirColor}">${t.direction}</span>
+                            <span class="text-[10px] font-bold" style="color:${dirColor}">${dirLabel(t.direction)}</span>
                             ${statusBadge(t)}
                             ${priorityBadge(t)}
                             ${styleBadge(t)}
@@ -1339,12 +1568,12 @@
                     </div>
                     <div class="text-xs text-gray-400 mb-1">📅 ${fmtDate(t.ts)}</div>
                     <div class="text-xs text-gray-600 flex flex-wrap gap-x-3">
-                        <span>Méd ${formatPrice(t.avgEntry)}</span>
-                        <span>SL ${formatPrice(t.sl)}</span>
-                        <span>TP ${formatPrice(t.tp)}</span>
-                        <span>${t.totalLot.toFixed(2)} lote</span>
-                        <span>Risco ${formatCurrency(t.plannedRisk)}</span>
-                        <span>R:R ${t.rr.toFixed(2)}</span>
+                        <span>${tr('r_mean')} ${formatPrice(t.avgEntry)}</span>
+                        <span>${tr('r_sl')} ${formatPrice(t.sl)}</span>
+                        <span>${tr('r_tp')} ${formatPrice(t.tp)}</span>
+                        <span>${t.totalLot.toFixed(2)} ${tr('r_lot')}</span>
+                        <span>${tr('r_risk')} ${formatCurrency(t.plannedRisk)}</span>
+                        <span>${tr('r_rr')} ${t.rr.toFixed(2)}</span>
                     </div>
                     ${notes}
                     ${reviewLine}
@@ -1363,7 +1592,7 @@
         // Exporta o MÊS selecionado para CSV (ou todo o log se "Todos os meses").
         function exportJournalCSV() {
             const trades = getMonthTrades();
-            if (!trades.length) { alert("Sem trades para exportar neste mês."); return; }
+            if (!trades.length) { alert(tr('csv_empty')); return; }
             const cols = ['data', 'simbolo', 'tipo', 'direcao', 'prioridade', 'estilo',
                 'entradas', 'pcts', 'preco_medio',
                 'stop', 'take_profit', 'lote_total', 'risco_plan', 'ganho_plan', 'rr', 'risco_pct',
@@ -1395,17 +1624,17 @@
                 : '<span style="color:#9ca3af">—</span>';
             const review = t.review ? `<div style="font-size:11px;font-style:italic;color:#b45309">🔍 ${t.review}</div>` : '';
             const notes = t.notes ? `<div style="font-size:11px;font-style:italic;color:#6b7280">📝 ${t.notes}</div>` : '';
-            const reason = t.status === 'nao_exec' ? `<div style="font-size:11px;font-style:italic;color:#6b7280">🚫 ${t.notExecReason || 'não executada'}</div>` : '';
+            const reason = t.status === 'nao_exec' ? `<div style="font-size:11px;font-style:italic;color:#6b7280">🚫 ${t.notExecReason || tr('not_taken_word')}</div>` : '';
             return `<div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
                         <span style="font-weight:700;color:#1f2937">${t.symbol}</span>
-                        <span style="font-size:10px;font-weight:700;color:${dirColor}">${t.direction}</span>
+                        <span style="font-size:10px;font-weight:700;color:${dirColor}">${dirLabel(t.direction)}</span>
                         ${statusBadge(t)}${priorityBadge(t)}${styleBadge(t)}
                     </div>
                     ${res}
                 </div>
-                <div style="font-size:11px;color:#6b7280;margin-top:2px">📅 ${fmtDate(t.ts)} · ${t.totalLot.toFixed(2)} lote · Risco ${formatCurrency(t.plannedRisk)} · R:R ${t.rr.toFixed(2)}</div>
+                <div style="font-size:11px;color:#6b7280;margin-top:2px">📅 ${fmtDate(t.ts)} · ${t.totalLot.toFixed(2)} ${tr('r_lot')} · ${tr('r_risk')} ${formatCurrency(t.plannedRisk)} · ${tr('r_rr')} ${t.rr.toFixed(2)}</div>
                 ${review}${reason}${notes}
             </div>`;
         }
@@ -1416,12 +1645,12 @@
             const pf = s.profitFactor === Infinity ? '∞' : s.profitFactor.toFixed(2);
             const pnlColor = s.pnl > 0 ? '#059669' : s.pnl < 0 ? '#dc2626' : '#1f2937';
             const statsHTML = `<div class="grid grid-cols-3 gap-2 mb-3">` +
-                statTile('Trades', s.total) +
-                statTile('Abertas', s.open) +
-                statTile('Não Exec.', s.notExec, s.notExec ? '#6b7280' : '#1f2937') +
-                statTile('Taxa Acerto', s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
-                statTile('P&L Total', formatSigned(s.pnl), pnlColor) +
-                statTile('Profit Factor', pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
+                statTile(tr('st_trades'), s.total) +
+                statTile(tr('st_open'), s.open) +
+                statTile(tr('st_notexec'), s.notExec, s.notExec ? '#6b7280' : '#1f2937') +
+                statTile(tr('st_winrate'), s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
+                statTile(tr('st_pnl'), formatSigned(s.pnl), pnlColor) +
+                statTile(tr('st_pf'), pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
                 `</div>`;
             const rows = trades.map(reportRowHTML).join('');
             return `
@@ -1431,15 +1660,15 @@
                 </div>
                 ${statsHTML}
                 <div class="grid grid-cols-2 gap-3 mb-3">${breakdownHTML(trades)}</div>
-                <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin-bottom:6px">Trades do mês</div>
+                <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin-bottom:6px">${tr('trades_of_month')}</div>
                 <div style="display:flex;flex-direction:column;gap:6px">${rows}</div>
-                <div style="text-align:right;font-size:10px;color:#9ca3af;margin-top:12px">Gerado em ${fmtDate(Date.now())}</div>`;
+                <div style="text-align:right;font-size:10px;color:#9ca3af;margin-top:12px">${tr('gen_on')} ${fmtDate(Date.now())}</div>`;
         }
 
         // Gera e descarrega a imagem do resumo mensal.
         async function exportMonthSummary() {
             const trades = getMonthTrades();
-            if (!trades.length) { alert("Sem trades neste mês para resumir."); return; }
+            if (!trades.length) { alert(tr('month_none')); return; }
             const el = document.getElementById('monthReport');
             el.innerHTML = buildMonthReportHTML(trades);
             try {
@@ -1451,7 +1680,7 @@
                 link.click();
             } catch (e) {
                 console.error("Falha ao gerar o resumo mensal", e);
-                alert("Falha ao gerar a imagem.");
+                alert(tr('image_fail'));
             } finally {
                 el.innerHTML = '';
             }
@@ -1513,19 +1742,19 @@
             });
             const pnlColor = totalPnl > 0 ? '#059669' : totalPnl < 0 ? '#dc2626' : '#1f2937';
             const statsHTML = `<div class="grid grid-cols-3 gap-2 mb-3">` +
-                statTile('P&L Ano', formatSigned(totalPnl), pnlColor) +
-                statTile('Trades', yearS.total) +
-                statTile('Taxa Acerto', yearS.winRate.toFixed(0) + '%', yearS.winRate >= 50 ? '#059669' : '#dc2626') +
-                statTile('Profit Factor', yearS.profitFactor === Infinity ? '∞' : yearS.profitFactor.toFixed(2), yearS.profitFactor >= 1 ? '#059669' : '#dc2626') +
-                statTile('Melhor Mês', best < 0 ? '—' : MONTHS_PT[best].slice(0, 3), '#059669') +
-                statTile('Pior Mês', worst < 0 ? '—' : MONTHS_PT[worst].slice(0, 3), '#dc2626') +
+                statTile(tr('st_pnl'), formatSigned(totalPnl), pnlColor) +
+                statTile(tr('st_trades'), yearS.total) +
+                statTile(tr('st_winrate'), yearS.winRate.toFixed(0) + '%', yearS.winRate >= 50 ? '#059669' : '#dc2626') +
+                statTile(tr('st_pf'), yearS.profitFactor === Infinity ? '∞' : yearS.profitFactor.toFixed(2), yearS.profitFactor >= 1 ? '#059669' : '#dc2626') +
+                statTile(tr('best_month'), best < 0 ? '—' : monthsArr()[best].slice(0, 3), '#059669') +
+                statTile(tr('worst_month'), worst < 0 ? '—' : monthsArr()[worst].slice(0, 3), '#dc2626') +
                 `</div>`;
             // Tabela mensal (só meses com trades)
             const tableRows = monthly.map((m, i) => {
                 if (!m.trades) return '';
                 const c = m.s.pnl > 0 ? '#059669' : m.s.pnl < 0 ? '#dc2626' : '#6b7280';
                 return `<tr>
-                    <td style="padding:2px 4px;color:#374151;font-weight:600">${MONTHS_PT[i]}</td>
+                    <td style="padding:2px 4px;color:#374151;font-weight:600">${monthsArr()[i]}</td>
                     <td style="padding:2px 4px;text-align:right;color:#6b7280">${m.trades}</td>
                     <td style="padding:2px 4px;text-align:right;color:${m.s.closed ? (m.s.winRate >= 50 ? '#059669' : '#dc2626') : '#9ca3af'}">${m.s.closed ? m.s.winRate.toFixed(0) + '%' : '—'}</td>
                     <td style="padding:2px 4px;text-align:right;font-weight:700;color:${c}">${m.s.closed ? formatSigned(m.s.pnl) : '—'}</td>
@@ -1534,37 +1763,37 @@
             return `
                 <div style="border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline">
                     <span style="font-size:22px;font-weight:800;color:#1f2937">RiskBook</span>
-                    <span style="font-size:15px;font-weight:700;color:#6366f1">Ano ${year}</span>
+                    <span style="font-size:15px;font-weight:700;color:#6366f1">${tr('year_word')} ${year}</span>
                 </div>
                 ${statsHTML}
-                <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin-bottom:2px">P&L Mensal</div>
+                <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin-bottom:2px">${tr('pnl_monthly')}</div>
                 ${svgMonthlyBars(vals)}
-                <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin:8px 0 2px">Capital Acumulado (${formatSigned(totalPnl)})</div>
+                <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin:8px 0 2px">${tr('equity_cum')} (${formatSigned(totalPnl)})</div>
                 ${svgEquityLine(cum)}
                 <table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:10px">
                     <thead><tr style="font-size:9px;color:#9ca3af;text-transform:uppercase">
-                        <th style="text-align:left;padding:2px 4px">Mês</th>
-                        <th style="text-align:right;padding:2px 4px">N</th>
-                        <th style="text-align:right;padding:2px 4px">Acerto</th>
+                        <th style="text-align:left;padding:2px 4px">${tr('month_word')}</th>
+                        <th style="text-align:right;padding:2px 4px">${tr('bd_n')}</th>
+                        <th style="text-align:right;padding:2px 4px">${tr('bd_hit')}</th>
                         <th style="text-align:right;padding:2px 4px">P&amp;L</th>
                     </tr></thead>
                     <tbody>${tableRows}</tbody>
                 </table>
-                <div style="text-align:right;font-size:10px;color:#9ca3af;margin-top:12px">Gerado em ${fmtDate(Date.now())}</div>`;
+                <div style="text-align:right;font-size:10px;color:#9ca3af;margin-top:12px">${tr('gen_on')} ${fmtDate(Date.now())}</div>`;
         }
 
         // Gera e descarrega a imagem do resumo anual.
         async function exportYearSummary() {
             const journal = getJournal();
-            if (!journal.length) { alert("Log vazio."); return; }
+            if (!journal.length) { alert(tr('backup_empty')); return; }
             const years = Array.from(new Set(journal.map(t => new Date(t.ts).getFullYear()))).sort().reverse();
             const def = selectedMonth !== 'all' ? +selectedMonth.split('-')[0] : years[0];
-            const raw = prompt("Ano do resumo anual:", String(def));
+            const raw = prompt(tr('year_prompt'), String(def));
             if (raw === null) return;
             const year = parseInt(raw, 10);
-            if (isNaN(year)) { alert("Ano inválido."); return; }
+            if (isNaN(year)) { alert(tr('year_invalid')); return; }
             const yearTrades = journal.filter(t => new Date(t.ts).getFullYear() === year);
-            if (!yearTrades.length) { alert(`Sem trades registadas em ${year}.`); return; }
+            if (!yearTrades.length) { alert(tr('year_none', { year: year })); return; }
             const el = document.getElementById('monthReport');
             el.innerHTML = buildYearReportHTML(year, yearTrades);
             try {
@@ -1575,7 +1804,7 @@
                 link.click();
             } catch (e) {
                 console.error("Falha ao gerar o resumo anual", e);
-                alert("Falha ao gerar a imagem.");
+                alert(tr('image_fail'));
             } finally {
                 el.innerHTML = '';
             }
@@ -1584,7 +1813,7 @@
         // Backup COMPLETO do log em JSON (restaura tal e qual noutro browser/PC).
         function exportJournalJSON() {
             const journal = getJournal();
-            if (!journal.length) { alert("Log vazio — nada para guardar."); return; }
+            if (!journal.length) { alert(tr('backup_empty')); return; }
             const payload = {
                 app: 'RiskBook',
                 type: 'journal-backup',
@@ -1625,9 +1854,9 @@
                         .sort((a, b) => (b.ts || b.id || 0) - (a.ts || a.id || 0));
                     saveJournal(merged);
                     renderJournal();
-                    alert(`Restauro concluído.\n${added} trade(s) adicionada(s), ${incoming.length - added} já existiam.\nTotal no log: ${merged.length}.`);
+                    alert(tr('restore_done', { added: added, existing: incoming.length - added, total: merged.length }));
                 } catch (err) {
-                    alert("Ficheiro inválido — não é um backup do RiskBook.");
+                    alert(tr('restore_invalid'));
                 } finally {
                     event.target.value = ''; // permite reimportar o mesmo ficheiro
                 }
@@ -1645,12 +1874,21 @@
                 .forEach(b => b.addEventListener('click', () => applyPriority(parseInt(b.dataset.priority))));
             document.querySelectorAll('#styleSelector .seg-btn')
                 .forEach(b => b.addEventListener('click', () => applyStyle(b.dataset.style)));
+            document.querySelectorAll('#langSelector .seg-btn')
+                .forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
 
             // Recalcula em tempo real ao escrever (risco acumulado ao vivo).
             document.getElementById('inputs').addEventListener('input', calculateTradeSummary);
         }
 
         window.onload = () => {
+            // Língua: guardada > idioma do browser (entre as 4) > inglês.
+            const saved = localStorage.getItem(LANG_KEY);
+            const nav = (navigator.language || 'en').slice(0, 2).toLowerCase();
+            LANG = LANGS.includes(saved) ? saved : (LANGS.includes(nav) ? nav : 'en');
+            document.querySelectorAll('#langSelector .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
+            applyStaticTranslations();
+
             loadSymbolHistory();
             setupListeners();
             setupBalanceLock();
