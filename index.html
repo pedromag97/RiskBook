@@ -338,9 +338,14 @@
 
         <!-- Botões de Ação -->
         <div class="space-y-3">
-            <button onclick="registerTrade()" class="w-full flex items-center justify-center space-x-2 shadow-md rounded-lg py-3 font-bold text-white transition" style="background-color:#3b82f6;" onmouseover="this.style.backgroundColor='#2563eb'" onmouseout="this.style.backgroundColor='#3b82f6'">
-                <span>📓</span><span>Registar Trade no Log</span>
-            </button>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="registerTrade()" class="flex items-center justify-center gap-2 shadow-md rounded-lg py-3 font-bold text-white transition" style="background-color:#3b82f6;" onmouseover="this.style.backgroundColor='#2563eb'" onmouseout="this.style.backgroundColor='#3b82f6'">
+                    <span>📓</span><span>Registar Trade</span>
+                </button>
+                <button onclick="registerNotExecuted()" class="flex items-center justify-center gap-2 shadow-md rounded-lg py-3 font-bold transition border-2" style="border-color:#9ca3af;color:#4b5563;background:#fff;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'">
+                    <span>🚫</span><span>Não Executei</span>
+                </button>
+            </div>
             <button onclick="exportAsImage()" class="export-button flex items-center justify-center space-x-2 shadow-md hover:bg-gray-700 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>Guardar Resumo (Imagem)</span>
@@ -371,6 +376,7 @@
                         <option value="fechado">Fechadas</option>
                         <option value="ganho">Ganhas</option>
                         <option value="perdido">Perdidas</option>
+                        <option value="nao_exec">Não executadas</option>
                     </select>
                     <button onclick="exportJournalCSV()" class="text-sm font-semibold px-3 py-1 rounded-lg border border-gray-300 bg-white hover:bg-gray-100">⬇️ CSV</button>
                     <button onclick="exportJournalJSON()" class="text-sm font-semibold px-3 py-1 rounded-lg border border-blue-300 text-blue-700 bg-white hover:bg-blue-50" title="Backup completo (JSON)">⬇️ Backup</button>
@@ -849,14 +855,9 @@
             renderJournal();
         }
 
-        // Regista o cálculo ATUAL como uma nova trade (estado "aberto").
-        function registerTrade() {
-            if (!lastCalc) {
-                alert("Calcula uma trade válida antes de registar (verifica símbolo e preços).");
-                return;
-            }
-            const journal = getJournal();
-            journal.unshift({
+        // Constrói o objeto-base da trade a partir do cálculo atual.
+        function baseTradeFromCalc() {
+            return {
                 id: Date.now(),
                 ts: Date.now(),
                 symbol: lastCalc.symbol,
@@ -875,15 +876,62 @@
                 riskPct: lastCalc.riskPct,
                 priority: currentPriority,   // 1..3 (confiança)
                 style: currentStyle,         // 'day' | 'swing'
-                status: 'aberto',       // aberto | ganho | perdido | nulo
-                resultUSD: null,        // P&L realizado (preenchido ao fechar)
+                resultUSD: null,             // P&L realizado (preenchido ao fechar)
+                notExecReason: '',           // motivo se não executada
                 notes: ''
-            });
+            };
+        }
+
+        // Adiciona a trade ao log e mostra a secção.
+        function addTradeToJournal(t) {
+            const journal = getJournal();
+            journal.unshift(t);
             saveJournal(journal);
             renderJournal();
-            // Feedback visual rápido no botão de registo.
             document.getElementById('journalBody').classList.remove('hidden');
             document.getElementById('journalSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Regista o cálculo ATUAL como trade EXECUTADA/planeada (estado "aberto").
+        function registerTrade() {
+            if (!lastCalc) {
+                alert("Calcula uma trade válida antes de registar (verifica símbolo e preços).");
+                return;
+            }
+            const t = baseTradeFromCalc();
+            t.status = 'aberto';          // aberto | ganho | perdido | nulo | nao_exec
+            addTradeToJournal(t);
+        }
+
+        // Regista o cálculo ATUAL como NÃO EXECUTADA, com o motivo.
+        function registerNotExecuted() {
+            if (!lastCalc) {
+                alert("Calcula uma trade válida antes de registar (verifica símbolo e preços).");
+                return;
+            }
+            const reason = prompt(
+                "Porque é que NÃO executaste esta trade?\n" +
+                "(ex. não atingiu a entrada, faltou confluência, notícias, fora de sessão, hesitei…)"
+            );
+            if (reason === null) return; // cancelou
+            const t = baseTradeFromCalc();
+            t.status = 'nao_exec';
+            t.notExecReason = reason.trim();
+            addTradeToJournal(t);
+        }
+
+        // Marca uma trade JÁ registada como não executada (com motivo).
+        function markNotExecuted(id) {
+            const journal = getJournal();
+            const t = journal.find(x => x.id === id);
+            if (!t) return;
+            const reason = prompt("Motivo de não ter executado:", t.notExecReason || '');
+            if (reason === null) return;
+            t.status = 'nao_exec';
+            t.resultUSD = null;
+            t.notExecReason = reason.trim();
+            saveJournal(journal);
+            renderJournal();
         }
 
         // Fecha (ou reeditar) uma trade: pede o P&L realizado em $. O estado deriva do sinal.
@@ -908,13 +956,14 @@
             renderJournal();
         }
 
-        // Reabre uma trade fechada (volta a "aberto", apaga o resultado).
+        // Reabre uma trade fechada/não-executada (volta a "aberto", limpa resultado e motivo).
         function reopenTrade(id) {
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
             t.status = 'aberto';
             t.resultUSD = null;
+            t.notExecReason = '';
             saveJournal(journal);
             renderJournal();
         }
@@ -962,6 +1011,7 @@
             return {
                 total: journal.length,
                 open: journal.filter(t => t.status === 'aberto').length,
+                notExec: journal.filter(t => t.status === 'nao_exec').length,
                 closed: closed.length,
                 winRate: decided ? (wins.length / decided) * 100 : 0,
                 pnl,
@@ -982,10 +1032,11 @@
         // Badge de estado.
         function statusBadge(t) {
             const map = {
-                aberto:  ['ABERTA', '#374151', '#e5e7eb'],
-                ganho:   ['GANHO',  '#065f46', '#d1fae5'],
-                perdido: ['PERDA',  '#991b1b', '#fee2e2'],
-                nulo:    ['NULO',   '#92400e', '#fef3c7'],
+                aberto:   ['ABERTA',   '#374151', '#e5e7eb'],
+                ganho:    ['GANHO',    '#065f46', '#d1fae5'],
+                perdido:  ['PERDA',    '#991b1b', '#fee2e2'],
+                nulo:     ['NULO',     '#92400e', '#fef3c7'],
+                nao_exec: ['NÃO EXEC', '#4b5563', '#e5e7eb'],
             };
             const [txt, fg, bg] = map[t.status] || map.aberto;
             return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:${fg};background:${bg}">${txt}</span>`;
@@ -1060,6 +1111,7 @@
             statsEl.innerHTML =
                 statTile('Trades', s.total) +
                 statTile('Abertas', s.open) +
+                statTile('Não Exec.', s.notExec, s.notExec ? '#6b7280' : '#1f2937') +
                 statTile('Taxa Acerto', s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
                 statTile('P&L Total', formatSigned(s.pnl), pnlColor) +
                 statTile('Profit Factor', pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
@@ -1082,6 +1134,18 @@
                     ? `<span class="font-bold" style="color:${t.resultUSD >= 0 ? '#059669' : '#dc2626'}">${formatSigned(t.resultUSD)}</span>`
                     : `<span class="text-gray-400">—</span>`;
                 const notes = t.notes ? `<p class="text-xs text-gray-500 mt-1 italic">📝 ${t.notes}</p>` : '';
+                const reasonLine = t.status === 'nao_exec'
+                    ? `<p class="text-xs mt-1 italic" style="color:#6b7280">🚫 Não executada${t.notExecReason ? ' — ' + t.notExecReason : ''}</p>`
+                    : '';
+                // Botões conforme o estado
+                const btn = (fn, txt, cls) => `<button onclick="${fn}(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border ${cls}">${txt}</button>`;
+                const actions = [];
+                if (t.status !== 'nao_exec') actions.push(btn('closeTrade', '💰 Resultado', 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'));
+                if (t.status === 'aberto') actions.push(btn('markNotExecuted', '🚫 Não exec.', 'border-gray-300 bg-white hover:bg-gray-100'));
+                if (t.status !== 'aberto') actions.push(btn('reopenTrade', '↩︎ Reabrir', 'border-gray-300 bg-white hover:bg-gray-100'));
+                actions.push(btn('editDate', '📅 Data', 'border-gray-300 bg-white hover:bg-gray-100'));
+                actions.push(btn('editNotes', '📝 Notas', 'border-gray-300 bg-white hover:bg-gray-100'));
+                actions.push(`<span class="ml-auto"></span>` + btn('deleteTrade', '🗑️', 'border-red-300 text-red-600 bg-white hover:bg-red-50'));
                 return `<div class="p-3 rounded-lg border border-gray-200 bg-white">
                     <div class="flex items-center justify-between gap-2 mb-1">
                         <div class="flex items-center gap-2 flex-wrap">
@@ -1103,13 +1167,8 @@
                         <span>R:R ${t.rr.toFixed(2)}</span>
                     </div>
                     ${notes}
-                    <div class="flex gap-2 mt-2">
-                        <button onclick="closeTrade(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100">💰 Resultado</button>
-                        ${t.status !== 'aberto' ? `<button onclick="reopenTrade(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-100">↩︎ Reabrir</button>` : ''}
-                        <button onclick="editDate(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-100">📅 Data</button>
-                        <button onclick="editNotes(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-gray-300 bg-white hover:bg-gray-100">📝 Notas</button>
-                        <button onclick="deleteTrade(${t.id})" class="text-xs font-semibold px-2 py-1 rounded border border-red-300 text-red-600 bg-white hover:bg-red-50 ml-auto">🗑️</button>
-                    </div>
+                    ${reasonLine}
+                    <div class="flex gap-2 mt-2 flex-wrap items-center">${actions.join('')}</div>
                 </div>`;
             }).join('');
         }
@@ -1127,14 +1186,15 @@
             const cols = ['data', 'simbolo', 'tipo', 'direcao', 'prioridade', 'estilo',
                 'entradas', 'pcts', 'preco_medio',
                 'stop', 'take_profit', 'lote_total', 'risco_plan', 'ganho_plan', 'rr', 'risco_pct',
-                'estado', 'resultado_usd', 'notas'];
+                'estado', 'resultado_usd', 'motivo_nao_exec', 'notas'];
+            const clean = v => (v || '').replace(/[\n;]/g, ' ');
             const rows = journal.map(t => [
                 fmtDate(t.ts), t.symbol, t.assetType, t.direction,
                 t.priority ? 'P' + t.priority : '', t.style || '',
                 t.entries.join(' '), t.pcts.join(' '), t.avgEntry,
                 t.sl, t.tp, t.totalLot, t.plannedRisk.toFixed(2), t.plannedGain.toFixed(2),
                 t.rr.toFixed(2), t.riskPct.toFixed(2), t.status,
-                t.resultUSD != null ? t.resultUSD : '', (t.notes || '').replace(/[\n;]/g, ' ')
+                t.resultUSD != null ? t.resultUSD : '', clean(t.notExecReason), clean(t.notes)
             ]);
             const csv = [cols.join(';'), ...rows.map(r => r.join(';'))].join('\n');
             const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
