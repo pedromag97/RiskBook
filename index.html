@@ -44,6 +44,34 @@
             border-radius: 12px;
             padding: 1rem;
         }
+
+        /* Modal (substitui prompt/confirm/alert do browser) */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(17, 24, 39, 0.55);
+            display: flex; align-items: center; justify-content: center;
+            padding: 16px; backdrop-filter: blur(2px);
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-card {
+            background: #fff; border-radius: 16px; width: 100%; max-width: 380px;
+            box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.35);
+            padding: 20px; animation: modalIn 0.16s ease-out;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: none; }
+        }
+        .modal-btn {
+            flex: 1; padding: 10px; border-radius: 10px; font-weight: 700; font-size: 15px;
+            transition: all 0.15s; border: 1px solid transparent;
+        }
+        .modal-btn-ok { background: var(--primary-color); color: #fff; }
+        .modal-btn-ok:hover { background: #2563eb; }
+        .modal-btn-ok.danger { background: var(--danger-color); }
+        .modal-btn-ok.danger:hover { background: #dc2626; }
+        .modal-btn-cancel { background: #f3f4f6; color: #4b5563; border-color: #e5e7eb; }
+        .modal-btn-cancel:hover { background: #e5e7eb; }
         .input-field {
             border: 1px solid #d1d5db;
             padding: 10px;
@@ -430,6 +458,19 @@
         </div><!-- /grelha de 3 colunas -->
     </div>
 
+    <!-- Modal (prompt/confirm/alert bonitos) -->
+    <div id="modalOverlay" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 id="modalTitle" class="text-lg font-extrabold text-gray-800"></h3>
+            <p id="modalSubtitle" class="text-xs text-gray-500 mt-0.5 mb-3 whitespace-pre-line"></p>
+            <div id="modalBody"></div>
+            <div class="flex gap-2 mt-4">
+                <button type="button" id="modalCancel" class="modal-btn modal-btn-cancel"></button>
+                <button type="button" id="modalOk" class="modal-btn modal-btn-ok"></button>
+            </div>
+        </div>
+    </div>
+
     <!-- Contentor fora do ecrã para gerar a imagem do resumo mensal -->
     <div id="monthReport" style="position:fixed; left:-10000px; top:0; width:440px; background:#ffffff; padding:20px; font-family:'Inter',sans-serif;"></div>
 
@@ -463,6 +504,10 @@
                 asset_type: 'Asset Type', a_forex: 'Forex', a_indices: 'Indices', a_crypto: 'Crypto', a_stocks: 'Stocks', a_commod: 'Commod.',
                 priority_label: 'Priority / Conviction', style_label: 'Style', s_day: 'Day', s_swing: 'Swing',
                 prio_high: 'High', prio_med: 'Medium', prio_low: 'Low',
+                m_cancel: 'Cancel', m_save: 'Save', m_ok: 'OK', m_confirm: 'Confirm',
+                m_result: 'Realized Result ($)', m_result_hint: 'Positive = win · negative = loss · 0 = breakeven',
+                m_plan: 'Plan: target +{gain} / risk -{risk}', m_exit: 'How did it close?', m_manual: 'Manual',
+                m_notexec: 'Why not taken?', m_review: 'What went wrong / lesson', m_notes: 'Notes', m_date: 'Trade date', m_year: 'Year',
                 wallet_label: 'Account ($)', wallet_lock_title: 'Lock the account', maxloss_label: 'Max Loss ($)',
                 contract_label: 'Contract Value (per 1.0 of price, per lot)', contract_hint: '— filled by asset type, editable',
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
@@ -515,6 +560,10 @@
                 asset_type: 'Type d\'actif', a_forex: 'Forex', a_indices: 'Indices', a_crypto: 'Crypto', a_stocks: 'Actions', a_commod: 'Mat. 1res',
                 priority_label: 'Priorité / Confiance', style_label: 'Style', s_day: 'Day', s_swing: 'Swing',
                 prio_high: 'Haute', prio_med: 'Moyenne', prio_low: 'Basse',
+                m_cancel: 'Annuler', m_save: 'Enregistrer', m_ok: 'OK', m_confirm: 'Confirmer',
+                m_result: 'Résultat réalisé ($)', m_result_hint: 'Positif = gain · négatif = perte · 0 = neutre',
+                m_plan: 'Plan : cible +{gain} / risque -{risk}', m_exit: 'Comment ça a fermé ?', m_manual: 'Manuel',
+                m_notexec: 'Raison de non-prise', m_review: 'Ce qui a mal tourné / leçon', m_notes: 'Notes', m_date: 'Date du trade', m_year: 'Année',
                 wallet_label: 'Compte ($)', wallet_lock_title: 'Verrouiller le compte', maxloss_label: 'Perte Max ($)',
                 contract_label: 'Valeur du contrat (par 1.0 de prix, par lot)', contract_hint: '— rempli selon le type d\'actif, modifiable',
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
@@ -567,6 +616,10 @@
                 asset_type: 'Tipo de Activo', a_forex: 'Forex', a_indices: 'Índices', a_crypto: 'Cripto', a_stocks: 'Acciones', a_commod: 'Materias',
                 priority_label: 'Prioridad / Confianza', style_label: 'Estilo', s_day: 'Day', s_swing: 'Swing',
                 prio_high: 'Alta', prio_med: 'Media', prio_low: 'Baja',
+                m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
+                m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganancia · negativo = pérdida · 0 = neutro',
+                m_plan: 'Plan: objetivo +{gain} / riesgo -{risk}', m_exit: '¿Cómo cerró?', m_manual: 'Manual',
+                m_notexec: 'Motivo de no ejecutar', m_review: 'Qué salió mal / lección', m_notes: 'Notas', m_date: 'Fecha del trade', m_year: 'Año',
                 wallet_label: 'Cuenta ($)', wallet_lock_title: 'Bloquear la cuenta', maxloss_label: 'Pérdida Máx ($)',
                 contract_label: 'Valor del Contrato (por 1.0 de precio, por lote)', contract_hint: '— rellenado por el tipo de activo, editable',
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
@@ -619,6 +672,10 @@
                 asset_type: 'Tipo de Ativo', a_forex: 'Forex', a_indices: 'Índices', a_crypto: 'Cripto', a_stocks: 'Ações', a_commod: 'Comod.',
                 priority_label: 'Prioridade / Confiança', style_label: 'Estilo', s_day: 'Day', s_swing: 'Swing',
                 prio_high: 'Alta', prio_med: 'Média', prio_low: 'Baixa',
+                m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
+                m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganho · negativo = perda · 0 = nulo',
+                m_plan: 'Plano: alvo +{gain} / risco -{risk}', m_exit: 'Como fechou?', m_manual: 'Manual',
+                m_notexec: 'Motivo de não executar', m_review: 'O que correu mal / lição', m_notes: 'Notas', m_date: 'Data da trade', m_year: 'Ano',
                 wallet_label: 'Carteira ($)', wallet_lock_title: 'Trancar a carteira', maxloss_label: 'Perda Máx ($)',
                 contract_label: 'Valor do Contrato (por 1.0 de preço, por lote)', contract_hint: '— preenchido pelo tipo de ativo, editável',
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
@@ -687,6 +744,106 @@
             applyStaticTranslations();
             calculateTradeSummary();
             renderJournal();
+        }
+
+        /* =============================== Modal ============================== */
+        // Modal com formulário. Devolve um objeto {key:value} ou null (cancelar/ESC).
+        // fields: [{key, label, type:'number'|'text'|'textarea'|'datetime'|'choice', value, hint, options}]
+        function showModal({ title, subtitle, fields = [], okText, cancelText, danger }) {
+            return new Promise(resolve => {
+                const overlay = document.getElementById('modalOverlay');
+                document.getElementById('modalTitle').textContent = title || '';
+                document.getElementById('modalSubtitle').textContent = subtitle || '';
+                document.getElementById('modalSubtitle').style.display = subtitle ? 'block' : 'none';
+                const body = document.getElementById('modalBody');
+                body.innerHTML = '';
+                const state = {};
+                let firstInput = null;
+                fields.forEach(f => {
+                    state[f.key] = f.value != null ? f.value : (f.type === 'choice' ? f.options[0].value : '');
+                    const wrap = document.createElement('div');
+                    wrap.className = 'mb-3';
+                    if (f.label) {
+                        const l = document.createElement('label');
+                        l.className = 'block text-xs font-bold text-gray-600 mb-1 uppercase';
+                        l.textContent = f.label;
+                        wrap.appendChild(l);
+                    }
+                    if (f.type === 'choice') {
+                        const grid = document.createElement('div');
+                        grid.className = 'grid gap-2';
+                        grid.style.gridTemplateColumns = `repeat(${f.options.length}, 1fr)`;
+                        f.options.forEach(o => {
+                            const b = document.createElement('button');
+                            b.type = 'button'; b.className = 'seg-btn'; b.textContent = o.label;
+                            if (o.value === state[f.key]) b.classList.add('active');
+                            b.onclick = () => {
+                                state[f.key] = o.value;
+                                grid.querySelectorAll('.seg-btn').forEach(x => x.classList.remove('active'));
+                                b.classList.add('active');
+                            };
+                            grid.appendChild(b);
+                        });
+                        wrap.appendChild(grid);
+                    } else if (f.type === 'textarea') {
+                        const ta = document.createElement('textarea');
+                        ta.className = 'input-field w-full text-sm'; ta.rows = 3;
+                        ta.value = state[f.key]; ta.placeholder = f.placeholder || '';
+                        ta.oninput = () => state[f.key] = ta.value;
+                        wrap.appendChild(ta); firstInput = firstInput || ta;
+                    } else {
+                        const inp = document.createElement('input');
+                        inp.type = f.type === 'number' ? 'number' : f.type === 'datetime' ? 'datetime-local' : 'text';
+                        if (f.type === 'number') inp.step = 'any';
+                        inp.className = 'input-field w-full'; inp.value = state[f.key];
+                        inp.placeholder = f.placeholder || '';
+                        inp.oninput = () => state[f.key] = inp.value;
+                        inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); ok(); } };
+                        wrap.appendChild(inp); firstInput = firstInput || inp;
+                    }
+                    if (f.hint) {
+                        const h = document.createElement('p');
+                        h.className = 'text-[11px] text-gray-400 mt-1'; h.textContent = f.hint;
+                        wrap.appendChild(h);
+                    }
+                    body.appendChild(wrap);
+                });
+                const okBtn = document.getElementById('modalOk');
+                const cancelBtn = document.getElementById('modalCancel');
+                okBtn.textContent = okText || tr('m_ok');
+                okBtn.classList.toggle('danger', !!danger);
+                // cancelText === '' esconde o botão Cancelar (usado no showAlert).
+                if (cancelText === '') {
+                    cancelBtn.style.display = 'none';
+                } else {
+                    cancelBtn.style.display = '';
+                    cancelBtn.textContent = cancelText || tr('m_cancel');
+                }
+                function cleanup() {
+                    overlay.classList.add('hidden');
+                    okBtn.onclick = cancelBtn.onclick = overlay.onclick = null;
+                    document.removeEventListener('keydown', onKey);
+                }
+                function ok() { cleanup(); resolve(state); }
+                function cancel() { cleanup(); resolve(null); }
+                function onKey(e) { if (e.key === 'Escape') cancel(); }
+                okBtn.onclick = ok;
+                cancelBtn.onclick = cancel;
+                overlay.onclick = e => { if (e.target === overlay) cancel(); };
+                document.addEventListener('keydown', onKey);
+                overlay.classList.remove('hidden');
+                setTimeout(() => { if (firstInput) { firstInput.focus(); if (firstInput.select) firstInput.select(); } }, 50);
+            });
+        }
+
+        // Confirmação bonita. Devolve true/false.
+        async function showConfirm(message, opts = {}) {
+            const r = await showModal({ title: opts.title || tr('m_confirm'), subtitle: message, fields: [], okText: opts.okText, cancelText: opts.cancelText, danger: opts.danger });
+            return r !== null;
+        }
+        // Aviso bonito (um só botão).
+        function showAlert(message, title) {
+            return showModal({ title: title || '', subtitle: message, fields: [], okText: tr('m_ok'), cancelText: '' }).then(() => { });
         }
 
         // Presets por tipo de ativo. contractValue = valor em $ de um movimento de 1.0
@@ -838,9 +995,9 @@
             input.addEventListener('input', () => {
                 if (!input.disabled) localStorage.setItem(BALANCE_KEY, input.value);
             });
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', async () => {
                 if (input.disabled) {
-                    if (confirm(t('unlock_confirm'))) {
+                    if (await showConfirm(t('unlock_confirm'))) {
                         localStorage.setItem(BALANCE_LOCK_KEY, '0');
                         setBalanceLockUI(false);
                         input.focus();
@@ -1221,14 +1378,17 @@
         }
 
         // Editar a data de execução de uma trade (backfill de trades registadas mais tarde).
-        function editDate(id) {
+        async function editDate(id) {
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
-            const raw = prompt(tr('date_prompt'), fmtDate(t.ts));
-            if (raw === null) return;
-            const ts = parseDateInput(raw);
-            if (ts === null || isNaN(ts)) { alert(tr('date_invalid')); return; }
+            const res = await showModal({
+                title: `${t.symbol} · 📅`, okText: tr('m_save'),
+                fields: [{ key: 'date', type: 'datetime', label: tr('m_date'), value: toDatetimeLocalValue(t.ts) }]
+            });
+            if (!res) return;
+            const ts = res.date ? new Date(res.date).getTime() : NaN;
+            if (isNaN(ts)) { showAlert(tr('date_invalid')); return; }
             t.ts = ts;
             saveJournal(journal.sort((a, b) => (b.ts || b.id || 0) - (a.ts || a.id || 0)));
             renderJournal();
@@ -1284,7 +1444,7 @@
 
         // Calcula E regista: cada cálculo entra no log como trade "aberta".
         // A decisão de executar (resultado) ou "não executei" é feita depois, no log.
-        function calculateAndRegister() {
+        async function calculateAndRegister() {
             calculateTradeSummary();
             if (!lastCalc) return;        // dados inválidos — erro já mostrado
             const t = baseTradeFromCalc();
@@ -1296,51 +1456,48 @@
             const dup = getJournal().find(x =>
                 (Date.now() - (x.id || 0)) < DUP_WINDOW_MS && tradeSignature(x) === sig);
             if (dup) {
-                if (!confirm(tr('dup_confirm'))) return;
+                if (!(await showConfirm(tr('dup_confirm')))) return;
             }
             addTradeToJournal(t);
         }
 
         // Marca uma trade JÁ registada como não executada (com motivo).
-        function markNotExecuted(id) {
+        async function markNotExecuted(id) {
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
-            const reason = prompt(tr('notexec_prompt'), t.notExecReason || '');
-            if (reason === null) return;
+            const res = await showModal({
+                title: `${t.symbol} · 🚫`, okText: tr('m_save'),
+                fields: [{ key: 'reason', type: 'textarea', label: tr('m_notexec'), value: t.notExecReason || '' }]
+            });
+            if (!res) return;
             t.status = 'nao_exec';
             t.resultUSD = null;
-            t.notExecReason = reason.trim();
+            t.notExecReason = res.reason.trim();
             saveJournal(journal);
             renderJournal();
         }
 
         // Fecha (ou reeditar) uma trade: pede o P&L realizado em $ e COMO fechou.
-        function closeTrade(id) {
+        async function closeTrade(id) {
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
-            const suggested = t.resultUSD != null ? String(t.resultUSD) : '';
-            const raw = prompt(
-                tr('close_prompt', { sym: t.symbol, gain: formatCurrency(t.plannedGain), risk: formatCurrency(t.plannedRisk) }),
-                suggested
-            );
-            if (raw === null) return;                 // cancelou
-            const val = parseFloat(String(raw).replace(',', '.'));
-            if (isNaN(val)) { alert(tr('invalid_value')); return; }
-
-            // Como fechou? Sugestão automática: perto do alvo=TP, perto do risco=SL, senão Manual.
-            const near = (a, b) => Math.abs(a - b) <= Math.max(1, Math.abs(b) * 0.05);
-            let guess = 'Manual';
-            if (val > 0 && near(val, t.plannedGain)) guess = 'TP';
-            else if (val < 0 && near(val, -t.plannedRisk)) guess = 'SL';
-            const exit = prompt(tr('exit_prompt'), t.exitType || guess);
-            if (exit !== null) {
-                const e = exit.trim().toUpperCase();
-                t.exitType = e === 'TP' ? 'TP' : e === 'SL' ? 'SL' : (e ? 'Manual' : guess);
-            }
-
+            const res = await showModal({
+                title: `${t.symbol} · ${dirLabel(t.direction)}`,
+                subtitle: tr('m_plan', { gain: formatCurrency(t.plannedGain), risk: formatCurrency(t.plannedRisk) }),
+                okText: tr('m_save'),
+                fields: [
+                    { key: 'result', type: 'number', label: tr('m_result'), hint: tr('m_result_hint'), value: t.resultUSD != null ? String(t.resultUSD) : '' },
+                    { key: 'exit', type: 'choice', label: tr('m_exit'), value: t.exitType || 'Manual',
+                      options: [{ value: 'TP', label: 'TP' }, { value: 'SL', label: 'SL' }, { value: 'Manual', label: tr('m_manual') }] },
+                ]
+            });
+            if (!res) return;
+            const val = parseFloat(String(res.result).replace(',', '.'));
+            if (isNaN(val)) { showAlert(tr('invalid_value')); return; }
             t.resultUSD = val;
+            t.exitType = res.exit;
             t.status = val > 0 ? 'ganho' : val < 0 ? 'perdido' : 'nulo';
             saveJournal(journal);
             renderJournal();
@@ -1360,40 +1517,46 @@
         }
 
         // Revisão pós-trade: o que correu mal / lição a reter.
-        function editReview(id) {
+        async function editReview(id) {
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
-            const raw = prompt(tr('review_prompt', { sym: t.symbol }), t.review || '');
-            if (raw === null) return;
-            t.review = raw.trim();
+            const res = await showModal({
+                title: `${t.symbol} · 🔍`, okText: tr('m_save'),
+                fields: [{ key: 'review', type: 'textarea', label: tr('m_review'), value: t.review || '' }]
+            });
+            if (!res) return;
+            t.review = res.review.trim();
             saveJournal(journal);
             renderJournal();
         }
 
         // Editar notas da trade.
-        function editNotes(id) {
+        async function editNotes(id) {
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
-            const raw = prompt(tr('notes_prompt', { sym: t.symbol }), t.notes || '');
-            if (raw === null) return;
-            t.notes = raw.trim();
+            const res = await showModal({
+                title: `${t.symbol} · 📝`, okText: tr('m_save'),
+                fields: [{ key: 'notes', type: 'textarea', label: tr('m_notes'), value: t.notes || '' }]
+            });
+            if (!res) return;
+            t.notes = res.notes.trim();
             saveJournal(journal);
             renderJournal();
         }
 
         // Apagar uma trade.
-        function deleteTrade(id) {
-            if (!confirm(tr('delete_confirm'))) return;
+        async function deleteTrade(id) {
+            if (!(await showConfirm(tr('delete_confirm'), { danger: true }))) return;
             saveJournal(getJournal().filter(x => x.id !== id));
             renderJournal();
         }
 
         // Limpar todo o log.
-        function clearJournal() {
+        async function clearJournal() {
             if (!getJournal().length) return;
-            if (!confirm(tr('clear_confirm'))) return;
+            if (!(await showConfirm(tr('clear_confirm'), { danger: true }))) return;
             saveJournal([]);
             renderJournal();
         }
@@ -1615,7 +1778,7 @@
         // Exporta o MÊS selecionado para CSV (ou todo o log se "Todos os meses").
         function exportJournalCSV() {
             const trades = getMonthTrades();
-            if (!trades.length) { alert(tr('csv_empty')); return; }
+            if (!trades.length) { showAlert(tr('csv_empty')); return; }
             const cols = ['data', 'simbolo', 'tipo', 'direcao', 'prioridade', 'estilo',
                 'entradas', 'pcts', 'preco_medio',
                 'stop', 'take_profit', 'lote_total', 'risco_plan', 'ganho_plan', 'rr', 'risco_pct',
@@ -1691,7 +1854,7 @@
         // Gera e descarrega a imagem do resumo mensal.
         async function exportMonthSummary() {
             const trades = getMonthTrades();
-            if (!trades.length) { alert(tr('month_none')); return; }
+            if (!trades.length) { showAlert(tr('month_none')); return; }
             const el = document.getElementById('monthReport');
             el.innerHTML = buildMonthReportHTML(trades);
             try {
@@ -1703,7 +1866,7 @@
                 link.click();
             } catch (e) {
                 console.error("Falha ao gerar o resumo mensal", e);
-                alert(tr('image_fail'));
+                showAlert(tr('image_fail'));
             } finally {
                 el.innerHTML = '';
             }
@@ -1808,15 +1971,18 @@
         // Gera e descarrega a imagem do resumo anual.
         async function exportYearSummary() {
             const journal = getJournal();
-            if (!journal.length) { alert(tr('backup_empty')); return; }
+            if (!journal.length) { showAlert(tr('backup_empty')); return; }
             const years = Array.from(new Set(journal.map(t => new Date(t.ts).getFullYear()))).sort().reverse();
             const def = selectedMonth !== 'all' ? +selectedMonth.split('-')[0] : years[0];
-            const raw = prompt(tr('year_prompt'), String(def));
-            if (raw === null) return;
-            const year = parseInt(raw, 10);
-            if (isNaN(year)) { alert(tr('year_invalid')); return; }
+            const res = await showModal({
+                title: tr('year_summary_btn'), okText: tr('m_ok'),
+                fields: [{ key: 'year', type: 'number', label: tr('m_year'), value: String(def) }]
+            });
+            if (!res) return;
+            const year = parseInt(res.year, 10);
+            if (isNaN(year)) { showAlert(tr('year_invalid')); return; }
             const yearTrades = journal.filter(t => new Date(t.ts).getFullYear() === year);
-            if (!yearTrades.length) { alert(tr('year_none', { year: year })); return; }
+            if (!yearTrades.length) { showAlert(tr('year_none', { year: year })); return; }
             const el = document.getElementById('monthReport');
             el.innerHTML = buildYearReportHTML(year, yearTrades);
             try {
@@ -1827,7 +1993,7 @@
                 link.click();
             } catch (e) {
                 console.error("Falha ao gerar o resumo anual", e);
-                alert(tr('image_fail'));
+                showAlert(tr('image_fail'));
             } finally {
                 el.innerHTML = '';
             }
@@ -1836,7 +2002,7 @@
         // Backup COMPLETO do log em JSON (restaura tal e qual noutro browser/PC).
         function exportJournalJSON() {
             const journal = getJournal();
-            if (!journal.length) { alert(tr('backup_empty')); return; }
+            if (!journal.length) { showAlert(tr('backup_empty')); return; }
             const payload = {
                 app: 'RiskBook',
                 type: 'journal-backup',
@@ -1877,9 +2043,9 @@
                         .sort((a, b) => (b.ts || b.id || 0) - (a.ts || a.id || 0));
                     saveJournal(merged);
                     renderJournal();
-                    alert(tr('restore_done', { added: added, existing: incoming.length - added, total: merged.length }));
+                    showAlert(tr('restore_done', { added: added, existing: incoming.length - added, total: merged.length }));
                 } catch (err) {
-                    alert(tr('restore_invalid'));
+                    showAlert(tr('restore_invalid'));
                 } finally {
                     event.target.value = ''; // permite reimportar o mesmo ficheiro
                 }
