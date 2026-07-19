@@ -363,11 +363,14 @@
 
             <div id="journalBody">
                 <!-- Navegador de mês -->
-                <div class="flex items-center gap-2 mb-3">
+                <div class="flex items-center gap-2 mb-2">
                     <button onclick="stepMonth(1)" title="Mês anterior" class="seg-btn px-3 py-2">‹</button>
                     <select id="monthSelect" onchange="onMonthChange()" class="input-field text-sm py-2 px-2 flex-1 font-bold text-center"></select>
                     <button onclick="stepMonth(-1)" title="Mês seguinte" class="seg-btn px-3 py-2">›</button>
                 </div>
+                <button onclick="exportMonthSummary()" class="w-full mb-3 flex items-center justify-center gap-2 text-sm font-bold text-white rounded-lg py-2 shadow-md transition" style="background-color:#10b981;" onmouseover="this.style.backgroundColor='#059669'" onmouseout="this.style.backgroundColor='#10b981'">
+                    <span>🖼️</span><span>Guardar Resumo do Mês (Imagem)</span>
+                </button>
 
                 <!-- Estatísticas -->
                 <div id="journalStats" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4"></div>
@@ -399,6 +402,9 @@
             </div>
         </section>
     </div>
+
+    <!-- Contentor fora do ecrã para gerar a imagem do resumo mensal -->
+    <div id="monthReport" style="position:fixed; left:-10000px; top:0; width:440px; background:#ffffff; padding:20px; font-family:'Inter',sans-serif;"></div>
 
     <script>
         const CURRENCY_SYMBOL = "$";
@@ -1155,11 +1161,13 @@
             </div>`;
         }
 
-        function renderBreakdown(journal) {
+        function breakdownHTML(journal) {
             const byPriority = [1, 2, 3].map(p => ({ label: 'P' + p, subset: journal.filter(t => t.priority === p) }));
             const byStyle = [['day', 'Day'], ['swing', 'Swing']].map(([k, l]) => ({ label: l, subset: journal.filter(t => t.style === k) }));
-            document.getElementById('journalBreakdown').innerHTML =
-                groupStatsTable('Por Prioridade', byPriority) + groupStatsTable('Por Estilo', byStyle);
+            return groupStatsTable('Por Prioridade', byPriority) + groupStatsTable('Por Estilo', byStyle);
+        }
+        function renderBreakdown(journal) {
+            document.getElementById('journalBreakdown').innerHTML = breakdownHTML(journal);
         }
 
         function renderJournal() {
@@ -1281,6 +1289,76 @@
             const tag = selectedMonth === 'all' ? 'todos' : selectedMonth;
             link.download = `RiskBook-Log-${tag}.csv`;
             link.click();
+        }
+
+        // Linha compacta (sem botões) para o relatório em imagem.
+        function reportRowHTML(t) {
+            const dirColor = t.direction === 'COMPRA' ? '#065f46' : '#991b1b';
+            const res = t.resultUSD != null
+                ? `<span style="font-weight:700;color:${t.resultUSD >= 0 ? '#059669' : '#dc2626'}">${formatSigned(t.resultUSD)}</span>`
+                : '<span style="color:#9ca3af">—</span>';
+            const review = t.review ? `<div style="font-size:11px;font-style:italic;color:#b45309">🔍 ${t.review}</div>` : '';
+            const notes = t.notes ? `<div style="font-size:11px;font-style:italic;color:#6b7280">📝 ${t.notes}</div>` : '';
+            const reason = t.status === 'nao_exec' ? `<div style="font-size:11px;font-style:italic;color:#6b7280">🚫 ${t.notExecReason || 'não executada'}</div>` : '';
+            return `<div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                        <span style="font-weight:700;color:#1f2937">${t.symbol}</span>
+                        <span style="font-size:10px;font-weight:700;color:${dirColor}">${t.direction}</span>
+                        ${statusBadge(t)}${priorityBadge(t)}${styleBadge(t)}
+                    </div>
+                    ${res}
+                </div>
+                <div style="font-size:11px;color:#6b7280;margin-top:2px">📅 ${fmtDate(t.ts)} · ${t.totalLot.toFixed(2)} lote · Risco ${formatCurrency(t.plannedRisk)} · R:R ${t.rr.toFixed(2)}</div>
+                ${review}${reason}${notes}
+            </div>`;
+        }
+
+        // Monta o HTML do resumo mensal (cabeçalho + stats + breakdown + lista).
+        function buildMonthReportHTML(trades) {
+            const s = computeStats(trades);
+            const pf = s.profitFactor === Infinity ? '∞' : s.profitFactor.toFixed(2);
+            const pnlColor = s.pnl > 0 ? '#059669' : s.pnl < 0 ? '#dc2626' : '#1f2937';
+            const statsHTML = `<div class="grid grid-cols-3 gap-2 mb-3">` +
+                statTile('Trades', s.total) +
+                statTile('Abertas', s.open) +
+                statTile('Não Exec.', s.notExec, s.notExec ? '#6b7280' : '#1f2937') +
+                statTile('Taxa Acerto', s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
+                statTile('P&L Total', formatSigned(s.pnl), pnlColor) +
+                statTile('Profit Factor', pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
+                `</div>`;
+            const rows = trades.map(reportRowHTML).join('');
+            return `
+                <div style="border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline">
+                    <span style="font-size:22px;font-weight:800;color:#1f2937">RiskBook</span>
+                    <span style="font-size:15px;font-weight:700;color:#3b82f6">${fmtMonth(selectedMonth)}</span>
+                </div>
+                ${statsHTML}
+                <div class="grid grid-cols-2 gap-3 mb-3">${breakdownHTML(trades)}</div>
+                <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin-bottom:6px">Trades do mês</div>
+                <div style="display:flex;flex-direction:column;gap:6px">${rows}</div>
+                <div style="text-align:right;font-size:10px;color:#9ca3af;margin-top:12px">Gerado em ${fmtDate(Date.now())}</div>`;
+        }
+
+        // Gera e descarrega a imagem do resumo mensal.
+        async function exportMonthSummary() {
+            const trades = getMonthTrades();
+            if (!trades.length) { alert("Sem trades neste mês para resumir."); return; }
+            const el = document.getElementById('monthReport');
+            el.innerHTML = buildMonthReportHTML(trades);
+            try {
+                const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
+                const link = document.createElement('a');
+                const tag = selectedMonth === 'all' ? 'todos' : selectedMonth;
+                link.download = `RiskBook-Resumo-${tag}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (e) {
+                console.error("Falha ao gerar o resumo mensal", e);
+                alert("Falha ao gerar a imagem.");
+            } finally {
+                el.innerHTML = '';
+            }
         }
 
         // Backup COMPLETO do log em JSON (restaura tal e qual noutro browser/PC).
