@@ -1,6 +1,10 @@
 # RiskBook
 
-**Sizing · Diário · Estatísticas** — calculadora de position sizing e diário de trading para CFDs em prop firms, num único ficheiro HTML, offline.
+**The simplest position-size calculator + trade journal.** No signup, no cloud, works offline, 4 languages. / Calculadora de position sizing e diário de trading para CFDs em prop firms, num único ficheiro HTML.
+
+- 🌍 **4 idiomas** — Inglês, Francês, Espanhol, Português (troca ao vivo, deteta o browser).
+- 📲 **PWA** — instalável e **offline** quando servido por https (ex. GitHub Pages).
+- 🔒 **Privado** — todos os dados ficam no `localStorage` do teu dispositivo. Nada sai para a cloud.
 
 ## O que faz
 
