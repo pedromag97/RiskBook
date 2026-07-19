@@ -262,10 +262,16 @@
                 </div>
             </div>
 
-            <button onclick="calculateTradeSummary()" class="calculate-button w-full mt-4 flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600 transition">
+            <div class="pt-2">
+                <label for="tradeDate" class="block text-xs font-bold text-gray-600 mb-1 uppercase">Data da Trade (para o log)</label>
+                <input type="datetime-local" id="tradeDate" class="input-field w-full text-sm">
+            </div>
+
+            <button onclick="calculateAndRegister()" class="calculate-button w-full mt-2 flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M12 16h.01"/><path d="M16 16h.01"/><path d="M8 16h.01"/><path d="M12 20h.01"/><path d="M16 20h.01"/><path d="M8 20h.01"/></svg>
-                <span>Calcular Resumo</span>
+                <span>Calcular e Registar no Log</span>
             </button>
+            <p class="text-xs text-gray-400 text-center mt-1">Cada cálculo entra no log como trade aberta. Marca o resultado ou "não executei" no diário.</p>
         </section>
 
         <!-- COLUNA 2 — Resultado + ações -->
@@ -354,18 +360,6 @@
 
         <!-- Botões de Ação -->
         <div class="space-y-3">
-            <div>
-                <label for="tradeDate" class="block text-xs font-bold text-gray-600 mb-1 uppercase">Data da Trade (para o log)</label>
-                <input type="datetime-local" id="tradeDate" class="input-field w-full text-sm">
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-                <button onclick="registerTrade()" class="flex items-center justify-center gap-2 shadow-md rounded-lg py-3 font-bold text-white transition" style="background-color:#3b82f6;" onmouseover="this.style.backgroundColor='#2563eb'" onmouseout="this.style.backgroundColor='#3b82f6'">
-                    <span>📓</span><span>Registar Trade</span>
-                </button>
-                <button onclick="registerNotExecuted()" class="flex items-center justify-center gap-2 shadow-md rounded-lg py-3 font-bold transition border-2" style="border-color:#9ca3af;color:#4b5563;background:#fff;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#fff'">
-                    <span>🚫</span><span>Não Executei</span>
-                </button>
-            </div>
             <button onclick="exportAsImage()" class="export-button flex items-center justify-center space-x-2 shadow-md hover:bg-gray-700 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>Guardar Resumo (Imagem)</span>
@@ -1034,31 +1028,13 @@
             document.getElementById('journalSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Regista o cálculo ATUAL como trade EXECUTADA/planeada (estado "aberto").
-        function registerTrade() {
-            if (!lastCalc) {
-                alert("Calcula uma trade válida antes de registar (verifica símbolo e preços).");
-                return;
-            }
+        // Calcula E regista: cada cálculo entra no log como trade "aberta".
+        // A decisão de executar (resultado) ou "não executei" é feita depois, no log.
+        function calculateAndRegister() {
+            calculateTradeSummary();
+            if (!lastCalc) return;        // dados inválidos — erro já mostrado
             const t = baseTradeFromCalc();
             t.status = 'aberto';          // aberto | ganho | perdido | nulo | nao_exec
-            addTradeToJournal(t);
-        }
-
-        // Regista o cálculo ATUAL como NÃO EXECUTADA, com o motivo.
-        function registerNotExecuted() {
-            if (!lastCalc) {
-                alert("Calcula uma trade válida antes de registar (verifica símbolo e preços).");
-                return;
-            }
-            const reason = prompt(
-                "Porque é que NÃO executaste esta trade?\n" +
-                "(ex. não atingiu a entrada, faltou confluência, notícias, fora de sessão, hesitei…)"
-            );
-            if (reason === null) return; // cancelou
-            const t = baseTradeFromCalc();
-            t.status = 'nao_exec';
-            t.notExecReason = reason.trim();
             addTradeToJournal(t);
         }
 
