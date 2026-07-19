@@ -898,6 +898,13 @@
             const owner = (localStorage.getItem(OWNER_KEY) || '').trim();
             return owner ? `RiskBook ${tr('owned_by', { name: owner })}` : 'RiskBook';
         }
+        // Prefixo seguro para nomes de ficheiro ("RiskBook" ou "RiskBook-Joao").
+        function filePrefix() {
+            const slug = (localStorage.getItem(OWNER_KEY) || '')
+                .normalize('NFD').replace(/[̀-ͯ]/g, '')  // tira acentos
+                .replace(/[^a-zA-Z0-9]/g, '');                     // só letras/números
+            return slug ? `RiskBook-${slug}` : 'RiskBook';
+        }
         async function editOwner() {
             const cur = localStorage.getItem(OWNER_KEY) || '';
             const res = await showModal({
@@ -1030,7 +1037,7 @@
             try {
                 const canvas = await html2canvas(area, { backgroundColor: "#f3f4f6", scale: 3 });
                 const link = document.createElement('a');
-                link.download = `RiskBook-${symbol.toUpperCase()}-${new Date().getTime()}.png`;
+                link.download = `${filePrefix()}-${symbol.toUpperCase()}-${new Date().getTime()}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             } catch (e) {
@@ -1903,7 +1910,7 @@
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             const tag = selectedMonth === 'all' ? 'todos' : selectedMonth;
-            link.download = `RiskBook-Log-${tag}.csv`;
+            link.download = `${filePrefix()}-Log-${tag}.csv`;
             link.click();
         }
 
@@ -1967,7 +1974,7 @@
                 const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
                 const link = document.createElement('a');
                 const tag = selectedMonth === 'all' ? 'todos' : selectedMonth;
-                link.download = `RiskBook-Resumo-${tag}.png`;
+                link.download = `${filePrefix()}-Resumo-${tag}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             } catch (e) {
@@ -2094,7 +2101,7 @@
             try {
                 const canvas = await html2canvas(el, { backgroundColor: '#ffffff', scale: 2 });
                 const link = document.createElement('a');
-                link.download = `RiskBook-Ano-${year}.png`;
+                link.download = `${filePrefix()}-Ano-${year}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             } catch (e) {
@@ -2119,7 +2126,7 @@
             const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `RiskBook-Backup-${new Date().getTime()}.json`;
+            link.download = `${filePrefix()}-Backup-${new Date().getTime()}.json`;
             link.click();
         }
 
