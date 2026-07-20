@@ -200,6 +200,7 @@
 
     <div class="app-container w-full p-6 rounded-xl">
         <header class="mb-6 text-center pb-4 border-b border-gray-200 relative">
+            <a id="supportBtn" href="#" target="_blank" rel="noopener noreferrer" data-i18n-title="support_title" class="hidden absolute top-0 right-0 text-sm font-semibold text-gray-400 hover:text-pink-500 transition">♥ <span data-i18n="support_btn">Apoiar</span></a>
             <div class="flex items-center justify-center gap-3 mb-1">
                 <svg width="34" height="34" viewBox="0 0 192 192" aria-hidden="true"><rect width="192" height="192" rx="42" fill="#2563eb"/><path fill="#ffffff" fill-rule="evenodd" d="M66 38h60c8.8 0 16 7.2 16 16v96c0 3.3-3.7 5.2-6.4 3.2L96 125.5 56.4 153.2c-2.7 1.9-6.4 0-6.4-3.2V54c0-8.8 7.2-16 16-16zM74 70h44c5 0 9 4 9 9s-4 9-9 9H74c-5 0-9-4-9-9s4-9 9-9z"/></svg>
                 <h1 id="appTitle" onclick="editOwner()" class="text-3xl font-extrabold text-gray-800 cursor-pointer inline-block">RiskBook</h1>
@@ -546,6 +547,9 @@
         const WALLETRISK_KEY = "riskcalc_walletrisk";
         const GOALS_LOCK_KEY = "riskcalc_goals_locked";
         const OWNER_KEY = "riskbook_owner";
+        // Link de donativo (Ko-fi / Buy Me a Coffee / GitHub Sponsors / PayPal.me…).
+        // Vazio = botão "Apoiar" escondido. Cola aqui o teu link para o mostrar.
+        const DONATION_URL = "";
         const LOTS_STORAGE_PREFIX = "riskcalc_lots_";   // + tipo de ativo
         const ANOMALY_FACTOR = 2.5;                      // lote >= 2.5x a mediana => alerta
         const ANOMALY_HISTORY_MAX = 20;                  // guarda os últimos 20 lotes por tipo
@@ -609,7 +613,7 @@
                 f_all: 'All', f_open: 'Open', f_closed: 'Closed', f_won: 'Won', f_lost: 'Lost', f_notexec: 'Not taken',
                 csv_btn: 'CSV month', backup_btn: 'Backup', restore_btn: 'Restore', clear_btn: 'Clear',
                 csv_title: 'Export selected month (CSV)', backup_title: 'Full backup of the whole log (JSON)', restore_title: 'Restore from a JSON backup',
-                clear_title: 'Delete ALL trades from the log', month_prev: 'Previous month', month_next: 'Next month', a_commod_full: 'Commodities', month_summary_title: 'Download the month summary as an image', year_summary_title: 'Download the year summary as an image', btn_delete: 'Delete trade',
+                clear_title: 'Delete ALL trades from the log', month_prev: 'Previous month', month_next: 'Next month', a_commod_full: 'Commodities', month_summary_title: 'Download the month summary as an image', year_summary_title: 'Download the year summary as an image', btn_delete: 'Delete trade', support_btn: 'Support', support_title: 'Support RiskBook',
                 empty_none: 'No trades yet. Fill a trade and click "Calculate & Log".', empty_month: 'No trades this month/filter.',
                 r_mean: 'Avg', r_sl: 'SL', r_tp: 'TP', r_lot: 'lot', r_risk: 'Risk', r_rr: 'R:R',
                 b_open: 'OPEN', b_won: 'WON', b_lost: 'LOSS', b_be: 'BE', b_notexec: 'NOT TAKEN',
@@ -669,7 +673,7 @@
                 f_all: 'Tous', f_open: 'Ouverts', f_closed: 'Fermés', f_won: 'Gagnés', f_lost: 'Perdus', f_notexec: 'Non pris',
                 csv_btn: 'CSV mois', backup_btn: 'Backup', restore_btn: 'Restaurer', clear_btn: 'Effacer',
                 csv_title: 'Exporter le mois sélectionné (CSV)', backup_title: 'Sauvegarde complète du journal (JSON)', restore_title: 'Restaurer depuis un backup JSON',
-                clear_title: 'Supprimer TOUS les trades du journal', month_prev: 'Mois précédent', month_next: 'Mois suivant', a_commod_full: 'Matières premières', month_summary_title: 'Télécharger le résumé du mois en image', year_summary_title: 'Télécharger le résumé annuel en image', btn_delete: 'Supprimer le trade',
+                clear_title: 'Supprimer TOUS les trades du journal', month_prev: 'Mois précédent', month_next: 'Mois suivant', a_commod_full: 'Matières premières', month_summary_title: 'Télécharger le résumé du mois en image', year_summary_title: 'Télécharger le résumé annuel en image', btn_delete: 'Supprimer le trade', support_btn: 'Soutenir', support_title: 'Soutenir RiskBook',
                 empty_none: 'Aucun trade. Remplis un trade et clique "Calculer & Journaliser".', empty_month: 'Aucun trade ce mois/filtre.',
                 r_mean: 'Moy', r_sl: 'SL', r_tp: 'TP', r_lot: 'lot', r_risk: 'Risque', r_rr: 'R:R',
                 b_open: 'OUVERT', b_won: 'GAGNÉ', b_lost: 'PERTE', b_be: 'BE', b_notexec: 'NON PRIS',
@@ -729,7 +733,7 @@
                 f_all: 'Todas', f_open: 'Abiertas', f_closed: 'Cerradas', f_won: 'Ganadas', f_lost: 'Perdidas', f_notexec: 'No ejecutadas',
                 csv_btn: 'CSV mes', backup_btn: 'Backup', restore_btn: 'Restaurar', clear_btn: 'Borrar',
                 csv_title: 'Exporta el mes seleccionado (CSV)', backup_title: 'Copia completa del registro (JSON)', restore_title: 'Restaurar desde un backup JSON',
-                clear_title: 'Borrar TODOS los trades del registro', month_prev: 'Mes anterior', month_next: 'Mes siguiente', a_commod_full: 'Materias primas', month_summary_title: 'Descargar el resumen del mes en imagen', year_summary_title: 'Descargar el resumen anual en imagen', btn_delete: 'Borrar trade',
+                clear_title: 'Borrar TODOS los trades del registro', month_prev: 'Mes anterior', month_next: 'Mes siguiente', a_commod_full: 'Materias primas', month_summary_title: 'Descargar el resumen del mes en imagen', year_summary_title: 'Descargar el resumen anual en imagen', btn_delete: 'Borrar trade', support_btn: 'Apoyar', support_title: 'Apoyar RiskBook',
                 empty_none: 'Sin trades. Calcula un trade y pulsa "Calcular y Registrar".', empty_month: 'Sin trades este mes/filtro.',
                 r_mean: 'Med', r_sl: 'SL', r_tp: 'TP', r_lot: 'lote', r_risk: 'Riesgo', r_rr: 'R:R',
                 b_open: 'ABIERTA', b_won: 'GANADA', b_lost: 'PÉRDIDA', b_be: 'BE', b_notexec: 'NO EJEC',
@@ -789,7 +793,7 @@
                 f_all: 'Todas', f_open: 'Abertas', f_closed: 'Fechadas', f_won: 'Ganhas', f_lost: 'Perdidas', f_notexec: 'Não executadas',
                 csv_btn: 'CSV mês', backup_btn: 'Backup', restore_btn: 'Restaurar', clear_btn: 'Limpar',
                 csv_title: 'Exporta o mês selecionado (CSV)', backup_title: 'Backup completo de TODO o log (JSON)', restore_title: 'Restaurar de um backup JSON',
-                clear_title: 'Apagar TODAS as trades do log', month_prev: 'Mês anterior', month_next: 'Mês seguinte', a_commod_full: 'Commodities', month_summary_title: 'Descarregar o resumo do mês em imagem', year_summary_title: 'Descarregar o resumo anual em imagem', btn_delete: 'Apagar trade',
+                clear_title: 'Apagar TODAS as trades do log', month_prev: 'Mês anterior', month_next: 'Mês seguinte', a_commod_full: 'Commodities', month_summary_title: 'Descarregar o resumo do mês em imagem', year_summary_title: 'Descarregar o resumo anual em imagem', btn_delete: 'Apagar trade', support_btn: 'Apoiar', support_title: 'Apoiar o RiskBook',
                 empty_none: 'Sem trades registadas ainda. Calcula uma trade e carrega em "Calcular e Registar".', empty_month: 'Sem trades neste mês/filtro.',
                 r_mean: 'Méd', r_sl: 'SL', r_tp: 'TP', r_lot: 'lote', r_risk: 'Risco', r_rr: 'R:R',
                 b_open: 'ABERTA', b_won: 'GANHO', b_lost: 'PERDA', b_be: 'NULO', b_notexec: 'NÃO EXEC',
@@ -954,6 +958,13 @@
             const suffix = owner ? ` <span class="text-gray-400 font-normal">${tr('owned_by', { name: escapeHtml(owner) })}</span>` : '';
             el.innerHTML = `RiskBook${suffix} <svg class="inline align-middle" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c8cdd4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3l4 4L8 20l-5 1 1-5z"/></svg>`;
             el.title = tr('owner_title');
+        }
+        // Botão de apoio (donativo). Escondido enquanto DONATION_URL estiver vazio.
+        function setupSupport() {
+            const el = document.getElementById('supportBtn');
+            if (!el) return;
+            if (DONATION_URL) { el.href = DONATION_URL; el.classList.remove('hidden'); }
+            else el.classList.add('hidden');
         }
         // Texto do dono para os relatórios em imagem ("RiskBook" ou "RiskBook de X").
         function ownerReportTitle() {
@@ -2256,6 +2267,7 @@
             document.querySelectorAll('#langSelector .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
             applyStaticTranslations();
             applyOwner();
+            setupSupport();
 
             loadSymbolHistory();
             setupListeners();
