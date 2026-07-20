@@ -359,11 +359,11 @@
                 <input type="datetime-local" id="tradeDate" class="input-field w-full text-sm">
             </div>
 
-            <button onclick="calculateAndRegister()" class="calculate-button w-full mt-2 flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600 transition">
+            <button onclick="calculateTradeSummary()" class="calculate-button w-full mt-2 flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M12 16h.01"/><path d="M16 16h.01"/><path d="M8 16h.01"/><path d="M12 20h.01"/><path d="M16 20h.01"/><path d="M8 20h.01"/></svg>
-                <span data-i18n="calc_btn">Calcular e Registar no Log</span>
+                <span data-i18n="calc_btn">Calcular Resumo</span>
             </button>
-            <p class="text-xs text-gray-400 text-center mt-1" data-i18n="calc_hint">Cada cálculo entra no log como trade aberta.</p>
+            <p class="text-xs text-gray-400 text-center mt-1" data-i18n="calc_hint">Analisa o resumo e depois regista a trade no log.</p>
         </section>
 
         <!-- COLUNA 2 — Resultado + ações -->
@@ -452,6 +452,9 @@
 
         <!-- Botões de Ação -->
         <div class="space-y-3">
+            <button onclick="registerTrade()" class="w-full flex items-center justify-center gap-2 shadow-md rounded-xl py-3 font-bold text-white transition" style="background-color:#3b82f6;" onmouseover="this.style.backgroundColor='#2563eb'" onmouseout="this.style.backgroundColor='#3b82f6'">
+                <span>📓</span><span data-i18n="reg_btn">Registar no Log</span>
+            </button>
             <button onclick="exportAsImage()" class="export-button flex items-center justify-center space-x-2 shadow-md hover:bg-gray-700 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span data-i18n="save_image">Guardar Resumo (Imagem)</span>
@@ -591,7 +594,7 @@
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
                 pl1: '% of Lot 1', pl2: '% of Lot 2', pl3: '% of Lot 3', e1: 'Entry 1', e2: 'Entry 2', e3: 'Entry 3',
                 sl_label: 'Stop Loss (single)', tp_label: 'Take Profit (single)', tradedate_label: 'Trade Date (for the log)',
-                calc_btn: 'Calculate & Log', calc_hint: 'Every calculation is logged as an open trade. Set the result or "not taken" in the journal.',
+                calc_btn: 'Calculate', reg_btn: 'Register in Log', calc_hint: 'Review the summary below, then register the trade in the log.',
                 res_summary: 'Summary:', mean_price: 'Avg Price', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entries & Cumulative Risk', total_lot: 'Total Lot to Trade:', nominal: 'Nominal Size:',
                 real_risk: 'Total Real Risk ($):', target_profit: 'Target Profit ($):', rr_ratio: 'R:R Ratio:', risk_pct: 'Risk %:',
@@ -651,7 +654,7 @@
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
                 pl1: '% du Lot 1', pl2: '% du Lot 2', pl3: '% du Lot 3', e1: 'Entrée 1', e2: 'Entrée 2', e3: 'Entrée 3',
                 sl_label: 'Stop Loss (unique)', tp_label: 'Take Profit (unique)', tradedate_label: 'Date du trade (pour le journal)',
-                calc_btn: 'Calculer & Journaliser', calc_hint: 'Chaque calcul est journalisé comme trade ouvert. Indique le résultat ou "non pris" dans le journal.',
+                calc_btn: 'Calculer', reg_btn: 'Journaliser', calc_hint: 'Analyse le résumé ci-dessous, puis journalise le trade.',
                 res_summary: 'Résumé :', mean_price: 'Prix Moyen', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entrées & Risque Cumulé', total_lot: 'Lot Total à Trader :', nominal: 'Taille Nominale :',
                 real_risk: 'Risque Réel Total ($) :', target_profit: 'Gain Cible ($) :', rr_ratio: 'Ratio R:R :', risk_pct: 'Risque % :',
@@ -711,7 +714,7 @@
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
                 pl1: '% del Lote 1', pl2: '% del Lote 2', pl3: '% del Lote 3', e1: 'Entrada 1', e2: 'Entrada 2', e3: 'Entrada 3',
                 sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', tradedate_label: 'Fecha del trade (para el registro)',
-                calc_btn: 'Calcular y Registrar', calc_hint: 'Cada cálculo se registra como trade abierto. Marca el resultado o "no ejecutado" en el diario.',
+                calc_btn: 'Calcular', reg_btn: 'Registrar en el diario', calc_hint: 'Revisa el resumen y luego regístralo en el diario.',
                 res_summary: 'Resumen:', mean_price: 'Precio Medio', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entradas y Riesgo Acumulado', total_lot: 'Lote Total a Operar:', nominal: 'Tamaño Nominal:',
                 real_risk: 'Riesgo Real Total ($):', target_profit: 'Ganancia Objetivo ($):', rr_ratio: 'Ratio R:R:', risk_pct: 'Riesgo %:',
@@ -771,7 +774,7 @@
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
                 pl1: '% do Lote 1', pl2: '% do Lote 2', pl3: '% do Lote 3', e1: 'Entrada 1', e2: 'Entrada 2', e3: 'Entrada 3',
                 sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', tradedate_label: 'Data da Trade (para o log)',
-                calc_btn: 'Calcular e Registar no Log', calc_hint: 'Cada cálculo entra no log como trade aberta. Marca o resultado ou "não executei" no diário.',
+                calc_btn: 'Calcular Resumo', reg_btn: 'Registar no Log', calc_hint: 'Analisa o resumo e depois regista a trade no log.',
                 res_summary: 'Resumo:', mean_price: 'Preço Médio', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entradas & Risco Acumulado', total_lot: 'Lote Total a Negociar:', nominal: 'Tamanho Nominal:',
                 real_risk: 'Risco Real Total ($):', target_profit: 'Lucro Alvo ($):', rr_ratio: 'Rácio R:R:', risk_pct: '% Risco:',
@@ -1614,11 +1617,14 @@
                 n(t.totalLot), t.priority, t.style].join('|');
         }
 
-        // Calcula E regista: cada cálculo entra no log como trade "aberta".
-        // A decisão de executar (resultado) ou "não executei" é feita depois, no log.
-        async function calculateAndRegister() {
-            calculateTradeSummary();
-            if (!lastCalc) return;        // dados inválidos — erro já mostrado
+        // Regista no log a trade JÁ calculada (depois de o utilizador analisar o resumo).
+        // Fluxo: Calcular Resumo → analisar → Registar no Log. Estado "aberto".
+        async function registerTrade() {
+            calculateTradeSummary();      // garante que o resumo reflete os inputs atuais
+            if (!lastCalc) {
+                showAlert(tr('err_invalid'));   // dados inválidos
+                return;
+            }
             const t = baseTradeFromCalc();
             t.status = 'aberto';          // aberto | ganho | perdido | nulo | nao_exec
 
