@@ -493,7 +493,7 @@
                 <div id="journalStats" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4"></div>
 
                 <!-- Breakdown por prioridade / estilo -->
-                <div id="journalBreakdown" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4"></div>
+                <div id="journalBreakdown" class="grid grid-cols-1 gap-3 mb-4"></div>
 
                 <!-- Filtro + exportação -->
                 <div class="grid grid-cols-2 gap-2 mb-3">
@@ -1893,18 +1893,18 @@
                     <td class="py-0.5 pr-2 font-semibold text-gray-700">${g.label}</td>
                     <td class="py-0.5 px-1 text-right text-gray-500">${g.subset.length}</td>
                     <td class="py-0.5 px-1 text-right" style="color:${wrColor}">${s.closed ? s.winRate.toFixed(0) + '%' : '—'}</td>
-                    <td class="py-0.5 pl-1 text-right font-semibold" style="color:${pnlColor}">${s.closed ? formatSigned(s.pnl) : '—'}</td>
+                    <td class="py-0.5 pl-1 text-right font-semibold whitespace-nowrap" style="color:${pnlColor}">${s.closed ? formatSigned(s.pnl) : '—'}</td>
                 </tr>`;
             }).join('');
             if (!rows) return '';
-            return `<div class="p-2 bg-gray-50 rounded-lg border border-gray-200">
+            return `<div class="p-2 bg-gray-50 rounded-lg border border-gray-200 overflow-x-auto">
                 <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">${title}</p>
-                <table class="w-full text-xs">
+                <table class="w-full text-xs" style="min-width:220px">
                     <thead><tr class="text-[9px] text-gray-400 uppercase">
                         <th class="text-left font-bold">${tr('bd_group')}</th>
                         <th class="text-right font-bold">${tr('bd_n')}</th>
                         <th class="text-right font-bold">${tr('bd_hit')}</th>
-                        <th class="text-right font-bold">${tr('bd_pnl')}</th>
+                        <th class="text-right font-bold whitespace-nowrap">${tr('bd_pnl')}</th>
                     </tr></thead>
                     <tbody>${rows}</tbody>
                 </table>
@@ -2093,7 +2093,7 @@
                     <span style="font-size:15px;font-weight:700;color:#3b82f6">${fmtMonth(selectedMonth)}</span>
                 </div>
                 ${statsHTML}
-                <div class="grid grid-cols-2 gap-3 mb-3">${breakdownHTML(trades)}</div>
+                <div class="grid grid-cols-1 gap-3 mb-3">${breakdownHTML(trades)}</div>
                 <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin-bottom:6px">${tr('trades_of_month')}</div>
                 <div style="display:flex;flex-direction:column;gap:6px">${rows}</div>
                 <div style="text-align:right;font-size:10px;color:#9ca3af;margin-top:12px">${tr('gen_on')} ${fmtDate(Date.now())}</div>`;
