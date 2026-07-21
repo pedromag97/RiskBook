@@ -591,6 +591,7 @@
                 m_cancel: 'Cancel', m_save: 'Save', m_ok: 'OK', m_confirm: 'Confirm',
                 m_result: 'Realized Result ($)', m_result_hint: 'Positive = win · negative = loss · 0 = breakeven',
                 m_plan: 'Plan: target +{gain} / risk -{risk}', m_exit: 'How did it close?', m_manual: 'Manual',
+                m_exits: 'Exits (partial)', m_add_exit: 'Add partial exit', m_total: 'Total',
                 m_notexec: 'Why not taken?', m_review: 'What went wrong / lesson', m_notes: 'Notes', m_date: 'Trade date', m_year: 'Year',
                 wallet_label: 'Account ($)', wallet_lock_title: 'Lock the account', maxloss_label: 'Max Loss ($)',
                 contract_label: 'Contract Value (per 1.0 of price, per lot)', contract_hint: '— filled by asset type, editable',
@@ -651,6 +652,7 @@
                 m_cancel: 'Annuler', m_save: 'Enregistrer', m_ok: 'OK', m_confirm: 'Confirmer',
                 m_result: 'Résultat réalisé ($)', m_result_hint: 'Positif = gain · négatif = perte · 0 = neutre',
                 m_plan: 'Plan : cible +{gain} / risque -{risk}', m_exit: 'Comment ça a fermé ?', m_manual: 'Manuel',
+                m_exits: 'Sorties (partielles)', m_add_exit: 'Ajouter une sortie', m_total: 'Total',
                 m_notexec: 'Raison de non-prise', m_review: 'Ce qui a mal tourné / leçon', m_notes: 'Notes', m_date: 'Date du trade', m_year: 'Année',
                 wallet_label: 'Compte ($)', wallet_lock_title: 'Verrouiller le compte', maxloss_label: 'Perte Max ($)',
                 contract_label: 'Valeur du contrat (par 1.0 de prix, par lot)', contract_hint: '— rempli selon le type d\'actif, modifiable',
@@ -711,6 +713,7 @@
                 m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
                 m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganancia · negativo = pérdida · 0 = neutro',
                 m_plan: 'Plan: objetivo +{gain} / riesgo -{risk}', m_exit: '¿Cómo cerró?', m_manual: 'Manual',
+                m_exits: 'Salidas (parciales)', m_add_exit: 'Añadir salida', m_total: 'Total',
                 m_notexec: 'Motivo de no ejecutar', m_review: 'Qué salió mal / lección', m_notes: 'Notas', m_date: 'Fecha del trade', m_year: 'Año',
                 wallet_label: 'Cuenta ($)', wallet_lock_title: 'Bloquear la cuenta', maxloss_label: 'Pérdida Máx ($)',
                 contract_label: 'Valor del Contrato (por 1.0 de precio, por lote)', contract_hint: '— rellenado por el tipo de activo, editable',
@@ -771,6 +774,7 @@
                 m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
                 m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganho · negativo = perda · 0 = nulo',
                 m_plan: 'Plano: alvo +{gain} / risco -{risk}', m_exit: 'Como fechou?', m_manual: 'Manual',
+                m_exits: 'Saídas (parciais)', m_add_exit: 'Adicionar saída', m_total: 'Total',
                 m_notexec: 'Motivo de não executar', m_review: 'O que correu mal / lição', m_notes: 'Notas', m_date: 'Data da trade', m_year: 'Ano',
                 wallet_label: 'Carteira ($)', wallet_lock_title: 'Trancar a carteira', maxloss_label: 'Perda Máx ($)',
                 contract_label: 'Valor do Contrato (por 1.0 de preço, por lote)', contract_hint: '— preenchido pelo tipo de ativo, editável',
@@ -886,6 +890,48 @@
                             grid.appendChild(b);
                         });
                         wrap.appendChild(grid);
+                    } else if (f.type === 'partials') {
+                        // Lista de saídas parcelares: cada linha = $ + tipo (TP/SL/Manual).
+                        let arr = Array.isArray(state[f.key]) ? state[f.key] : [];
+                        if (!arr.length) arr.push({ usd: '', type: 'Manual' });
+                        state[f.key] = arr;
+                        const list = document.createElement('div'); list.className = 'space-y-2';
+                        const totalEl = document.createElement('div'); totalEl.className = 'text-sm font-bold text-right mt-2';
+                        const renderTotal = () => {
+                            const sum = arr.reduce((s, e) => s + (parseFloat(String(e.usd).replace(',', '.')) || 0), 0);
+                            totalEl.innerHTML = `${tr('m_total')}: <span style="color:${sum > 0 ? '#059669' : sum < 0 ? '#dc2626' : '#374151'}">${formatSigned(sum)}</span>`;
+                        };
+                        const renderRows = () => {
+                            list.innerHTML = '';
+                            arr.forEach((e, i) => {
+                                const row = document.createElement('div'); row.className = 'flex items-center gap-2';
+                                const inp = document.createElement('input');
+                                inp.type = 'number'; inp.step = 'any'; inp.className = 'input-field text-sm'; inp.style.flex = '1';
+                                inp.value = e.usd; inp.placeholder = '$';
+                                inp.oninput = () => { e.usd = inp.value; renderTotal(); };
+                                const seg = document.createElement('div'); seg.className = 'flex gap-1';
+                                [['TP', 'TP'], ['SL', 'SL'], ['Manual', 'M']].forEach(([val, lab]) => {
+                                    const b = document.createElement('button');
+                                    b.type = 'button'; b.textContent = lab; b.title = val === 'Manual' ? tr('m_manual') : val;
+                                    b.className = 'seg-btn'; b.style.padding = '6px 9px'; b.style.fontSize = '11px';
+                                    if (e.type === val) b.classList.add('active');
+                                    b.onclick = () => { e.type = val; seg.querySelectorAll('.seg-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); };
+                                    seg.appendChild(b);
+                                });
+                                const rm = document.createElement('button');
+                                rm.type = 'button'; rm.textContent = '✕'; rm.title = tr('btn_delete');
+                                rm.className = 'text-gray-400 hover:text-red-500 px-1 text-sm';
+                                rm.onclick = () => { arr.splice(i, 1); if (!arr.length) arr.push({ usd: '', type: 'Manual' }); renderRows(); renderTotal(); };
+                                row.append(inp, seg, rm);
+                                list.appendChild(row);
+                            });
+                        };
+                        const addBtn = document.createElement('button');
+                        addBtn.type = 'button'; addBtn.className = 'text-xs font-bold text-blue-600 mt-2 hover:underline';
+                        addBtn.textContent = '➕ ' + tr('m_add_exit');
+                        addBtn.onclick = () => { arr.push({ usd: '', type: 'Manual' }); renderRows(); renderTotal(); };
+                        renderRows(); renderTotal();
+                        wrap.append(list, addBtn, totalEl);
                     } else if (f.type === 'textarea') {
                         const ta = document.createElement('textarea');
                         ta.className = 'input-field w-full text-sm'; ta.rows = 3;
@@ -1601,8 +1647,9 @@
                 riskPct: lastCalc.riskPct,
                 priority: currentPriority,   // 1..3 (confiança)
                 style: currentStyle,         // 'day' | 'swing'
-                resultUSD: null,             // P&L realizado (preenchido ao fechar)
-                exitType: '',                // 'TP' | 'SL' | 'Manual' — como fechou
+                resultUSD: null,             // P&L realizado total (soma das saídas)
+                exitType: '',                // 'TP' | 'SL' | 'Manual' | 'Parcial'
+                exits: [],                   // saídas parcelares: [{usd, type}]
                 notExecReason: '',           // motivo se não executada
                 review: '',                  // revisão pós-trade: o que correu mal / lição
                 notes: ''
@@ -1672,22 +1719,29 @@
             const journal = getJournal();
             const t = journal.find(x => x.id === id);
             if (!t) return;
+            // Estado inicial das saídas: usa as existentes, ou converte o resultado antigo,
+            // ou uma linha vazia (compatível com trades registadas antes desta feature).
+            const initial = (t.exits && t.exits.length)
+                ? t.exits.map(e => ({ usd: String(e.usd), type: e.type || 'Manual' }))
+                : (t.resultUSD != null ? [{ usd: String(t.resultUSD), type: t.exitType || 'Manual' }] : [{ usd: '', type: 'Manual' }]);
             const res = await showModal({
                 title: `${t.symbol} · ${dirLabel(t.direction)}`,
                 subtitle: tr('m_plan', { gain: formatCurrency(t.plannedGain), risk: formatCurrency(t.plannedRisk) }),
                 okText: tr('m_save'),
                 fields: [
-                    { key: 'result', type: 'number', label: tr('m_result'), hint: tr('m_result_hint'), value: t.resultUSD != null ? String(t.resultUSD) : '' },
-                    { key: 'exit', type: 'choice', label: tr('m_exit'), value: t.exitType || 'Manual',
-                      options: [{ value: 'TP', label: 'TP' }, { value: 'SL', label: 'SL' }, { value: 'Manual', label: tr('m_manual') }] },
+                    { key: 'exits', type: 'partials', label: tr('m_exits'), hint: tr('m_result_hint'), value: initial },
                 ]
             });
             if (!res) return;
-            const val = parseFloat(String(res.result).replace(',', '.'));
-            if (isNaN(val)) { showAlert(tr('invalid_value')); return; }
-            t.resultUSD = val;
-            t.exitType = res.exit;
-            t.status = val > 0 ? 'ganho' : val < 0 ? 'perdido' : 'nulo';
+            const exits = res.exits
+                .map(e => ({ usd: parseFloat(String(e.usd).replace(',', '.')), type: e.type }))
+                .filter(e => !isNaN(e.usd));
+            if (!exits.length) { showAlert(tr('invalid_value')); return; }
+            const sum = exits.reduce((s, e) => s + e.usd, 0);
+            t.exits = exits;
+            t.resultUSD = sum;                                   // total realizado (soma das saídas)
+            t.exitType = exits.length > 1 ? 'Parcial' : exits[0].type;
+            t.status = sum > 0 ? 'ganho' : sum < 0 ? 'perdido' : 'nulo';
             saveJournal(journal);
             renderJournal();
         }
@@ -1700,6 +1754,7 @@
             t.status = 'aberto';
             t.resultUSD = null;
             t.exitType = '';
+            t.exits = [];
             t.notExecReason = '';
             saveJournal(journal);
             renderJournal();
@@ -1911,6 +1966,8 @@
                     ? `${exitTag}<span class="font-bold" style="color:${t.resultUSD >= 0 ? '#059669' : '#dc2626'}">${formatSigned(t.resultUSD)}</span>`
                     : `<span class="text-gray-400">—</span>`;
                 const notes = t.notes ? `<p class="text-xs text-gray-500 mt-1 italic">📝 ${t.notes}</p>` : '';
+                const exitsLine = (t.exits && t.exits.length > 1)
+                    ? `<p class="text-xs mt-1" style="color:#6b7280">💰 ${tr('m_exits')}: ${t.exits.map(e => `${e.type} ${formatSigned(e.usd)}`).join(' · ')}</p>` : '';
                 const reviewLine = t.review
                     ? `<p class="text-xs mt-1 italic" style="color:#b45309">🔍 ${t.review}</p>` : '';
                 const reasonLine = t.status === 'nao_exec'
@@ -1949,6 +2006,7 @@
                             <span>${tr('r_risk')} ${formatCurrency(t.plannedRisk)}</span>
                             <span>${tr('r_rr')} ${t.rr.toFixed(2)}</span>
                         </div>
+                        ${exitsLine}
                         ${notes}
                         ${reviewLine}
                         ${reasonLine}
@@ -1971,15 +2029,16 @@
             const cols = ['data', 'simbolo', 'tipo', 'direcao', 'prioridade', 'estilo',
                 'entradas', 'pcts', 'preco_medio',
                 'stop', 'take_profit', 'lote_total', 'risco_plan', 'ganho_plan', 'rr', 'risco_pct',
-                'estado', 'resultado_usd', 'tipo_saida', 'motivo_nao_exec', 'revisao', 'notas'];
+                'estado', 'resultado_usd', 'tipo_saida', 'saidas_parciais', 'motivo_nao_exec', 'revisao', 'notas'];
             const clean = v => (v || '').replace(/[\n;]/g, ' ');
+            const partialsStr = t => (t.exits && t.exits.length) ? t.exits.map(e => `${e.type} ${e.usd}`).join(' | ') : '';
             const rows = trades.map(t => [
                 fmtDate(t.ts), t.symbol, t.assetType, t.direction,
                 t.priority ? 'P' + t.priority : '', t.style || '',
                 t.entries.join(' '), t.pcts.join(' '), t.avgEntry,
                 t.sl, t.tp, t.totalLot, t.plannedRisk.toFixed(2), t.plannedGain.toFixed(2),
                 t.rr.toFixed(2), t.riskPct.toFixed(2), t.status,
-                t.resultUSD != null ? t.resultUSD : '', t.exitType || '', clean(t.notExecReason), clean(t.review), clean(t.notes)
+                t.resultUSD != null ? t.resultUSD : '', t.exitType || '', partialsStr(t), clean(t.notExecReason), clean(t.review), clean(t.notes)
             ]);
             const csv = [cols.join(';'), ...rows.map(r => r.join(';'))].join('\n');
             const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
