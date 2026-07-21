@@ -591,7 +591,7 @@
                 m_cancel: 'Cancel', m_save: 'Save', m_ok: 'OK', m_confirm: 'Confirm',
                 m_result: 'Realized Result ($)', m_result_hint: 'Positive = win · negative = loss · 0 = breakeven',
                 m_plan: 'Plan: target +{gain} / risk -{risk}', m_exit: 'How did it close?', m_manual: 'Manual',
-                m_exits: 'Exits (partial)', m_add_exit: 'Add partial exit', m_total: 'Total',
+                m_exits: 'Exits (partial)', m_add_exit: 'Add partial exit', m_total: 'Total', m_price: 'Price',
                 m_notexec: 'Why not taken?', m_review: 'What went wrong / lesson', m_notes: 'Notes', m_date: 'Trade date', m_year: 'Year',
                 wallet_label: 'Account ($)', wallet_lock_title: 'Lock the account', maxloss_label: 'Max Loss ($)',
                 contract_label: 'Contract Value (per 1.0 of price, per lot)', contract_hint: '— filled by asset type, editable',
@@ -652,7 +652,7 @@
                 m_cancel: 'Annuler', m_save: 'Enregistrer', m_ok: 'OK', m_confirm: 'Confirmer',
                 m_result: 'Résultat réalisé ($)', m_result_hint: 'Positif = gain · négatif = perte · 0 = neutre',
                 m_plan: 'Plan : cible +{gain} / risque -{risk}', m_exit: 'Comment ça a fermé ?', m_manual: 'Manuel',
-                m_exits: 'Sorties (partielles)', m_add_exit: 'Ajouter une sortie', m_total: 'Total',
+                m_exits: 'Sorties (partielles)', m_add_exit: 'Ajouter une sortie', m_total: 'Total', m_price: 'Prix',
                 m_notexec: 'Raison de non-prise', m_review: 'Ce qui a mal tourné / leçon', m_notes: 'Notes', m_date: 'Date du trade', m_year: 'Année',
                 wallet_label: 'Compte ($)', wallet_lock_title: 'Verrouiller le compte', maxloss_label: 'Perte Max ($)',
                 contract_label: 'Valeur du contrat (par 1.0 de prix, par lot)', contract_hint: '— rempli selon le type d\'actif, modifiable',
@@ -713,7 +713,7 @@
                 m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
                 m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganancia · negativo = pérdida · 0 = neutro',
                 m_plan: 'Plan: objetivo +{gain} / riesgo -{risk}', m_exit: '¿Cómo cerró?', m_manual: 'Manual',
-                m_exits: 'Salidas (parciales)', m_add_exit: 'Añadir salida', m_total: 'Total',
+                m_exits: 'Salidas (parciales)', m_add_exit: 'Añadir salida', m_total: 'Total', m_price: 'Precio',
                 m_notexec: 'Motivo de no ejecutar', m_review: 'Qué salió mal / lección', m_notes: 'Notas', m_date: 'Fecha del trade', m_year: 'Año',
                 wallet_label: 'Cuenta ($)', wallet_lock_title: 'Bloquear la cuenta', maxloss_label: 'Pérdida Máx ($)',
                 contract_label: 'Valor del Contrato (por 1.0 de precio, por lote)', contract_hint: '— rellenado por el tipo de activo, editable',
@@ -774,7 +774,7 @@
                 m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
                 m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganho · negativo = perda · 0 = nulo',
                 m_plan: 'Plano: alvo +{gain} / risco -{risk}', m_exit: 'Como fechou?', m_manual: 'Manual',
-                m_exits: 'Saídas (parciais)', m_add_exit: 'Adicionar saída', m_total: 'Total',
+                m_exits: 'Saídas (parciais)', m_add_exit: 'Adicionar saída', m_total: 'Total', m_price: 'Preço',
                 m_notexec: 'Motivo de não executar', m_review: 'O que correu mal / lição', m_notes: 'Notas', m_date: 'Data da trade', m_year: 'Ano',
                 wallet_label: 'Carteira ($)', wallet_lock_title: 'Trancar a carteira', maxloss_label: 'Perda Máx ($)',
                 contract_label: 'Valor do Contrato (por 1.0 de preço, por lote)', contract_hint: '— preenchido pelo tipo de ativo, editável',
@@ -905,11 +905,18 @@
                             list.innerHTML = '';
                             arr.forEach((e, i) => {
                                 const row = document.createElement('div'); row.className = 'flex items-center gap-2';
+                                // Preço de saída (opcional).
+                                const priceInp = document.createElement('input');
+                                priceInp.type = 'number'; priceInp.step = 'any'; priceInp.className = 'input-field text-sm';
+                                priceInp.style.flex = '1'; priceInp.style.minWidth = '0';
+                                priceInp.value = e.price || ''; priceInp.placeholder = tr('m_price');
+                                priceInp.oninput = () => { e.price = priceInp.value; };
+                                // Resultado ($) da saída.
                                 const inp = document.createElement('input');
-                                inp.type = 'number'; inp.step = 'any'; inp.className = 'input-field text-sm'; inp.style.flex = '1';
+                                inp.type = 'number'; inp.step = 'any'; inp.className = 'input-field text-sm'; inp.style.flex = '1'; inp.style.minWidth = '0';
                                 inp.value = e.usd; inp.placeholder = '$';
                                 inp.oninput = () => { e.usd = inp.value; renderTotal(); };
-                                const seg = document.createElement('div'); seg.className = 'flex gap-1';
+                                const seg = document.createElement('div'); seg.className = 'flex gap-1 shrink-0';
                                 [['TP', 'TP'], ['SL', 'SL'], ['Manual', 'M']].forEach(([val, lab]) => {
                                     const b = document.createElement('button');
                                     b.type = 'button'; b.textContent = lab; b.title = val === 'Manual' ? tr('m_manual') : val;
@@ -922,7 +929,7 @@
                                 rm.type = 'button'; rm.textContent = '✕'; rm.title = tr('btn_delete');
                                 rm.className = 'text-gray-400 hover:text-red-500 px-1 text-sm';
                                 rm.onclick = () => { arr.splice(i, 1); if (!arr.length) arr.push({ usd: '', type: 'Manual' }); renderRows(); renderTotal(); };
-                                row.append(inp, seg, rm);
+                                row.append(priceInp, inp, seg, rm);
                                 list.appendChild(row);
                             });
                         };
@@ -1552,6 +1559,15 @@
             const p = n => String(n).padStart(2, '0');
             return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
         }
+        // Só o dia (para agrupar o log) e só a hora.
+        function fmtDay(ts) {
+            const d = new Date(ts); const p = n => String(n).padStart(2, '0');
+            return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()}`;
+        }
+        function fmtTime(ts) {
+            const d = new Date(ts); const p = n => String(n).padStart(2, '0');
+            return `${p(d.getHours())}:${p(d.getMinutes())}`;
+        }
 
         // Chave de mês "AAAA-MM" e etiqueta "Julho 2026".
         function monthKey(ts) {
@@ -1722,8 +1738,8 @@
             // Estado inicial das saídas: usa as existentes, ou converte o resultado antigo,
             // ou uma linha vazia (compatível com trades registadas antes desta feature).
             const initial = (t.exits && t.exits.length)
-                ? t.exits.map(e => ({ usd: String(e.usd), type: e.type || 'Manual' }))
-                : (t.resultUSD != null ? [{ usd: String(t.resultUSD), type: t.exitType || 'Manual' }] : [{ usd: '', type: 'Manual' }]);
+                ? t.exits.map(e => ({ usd: String(e.usd), type: e.type || 'Manual', price: e.price != null ? String(e.price) : '' }))
+                : (t.resultUSD != null ? [{ usd: String(t.resultUSD), type: t.exitType || 'Manual', price: '' }] : [{ usd: '', type: 'Manual', price: '' }]);
             const res = await showModal({
                 title: `${t.symbol} · ${dirLabel(t.direction)}`,
                 subtitle: tr('m_plan', { gain: formatCurrency(t.plannedGain), risk: formatCurrency(t.plannedRisk) }),
@@ -1734,7 +1750,13 @@
             });
             if (!res) return;
             const exits = res.exits
-                .map(e => ({ usd: parseFloat(String(e.usd).replace(',', '.')), type: e.type }))
+                .map(e => {
+                    const usd = parseFloat(String(e.usd).replace(',', '.'));
+                    const p = (e.price !== '' && e.price != null) ? parseFloat(String(e.price).replace(',', '.')) : null;
+                    const out = { usd, type: e.type };
+                    if (p != null && !isNaN(p)) out.price = p;   // preço só se preenchido
+                    return out;
+                })
                 .filter(e => !isNaN(e.usd));
             if (!exits.length) { showAlert(tr('invalid_value')); return; }
             const sum = exits.reduce((s, e) => s + e.usd, 0);
@@ -1958,22 +1980,23 @@
 
             emptyEl.textContent = journal.length ? tr('empty_month') : tr('empty_none');
             emptyEl.style.display = shown.length ? 'none' : 'block';
-            listEl.innerHTML = shown.map(t => {
+            // Ordena por data (mais recente primeiro) e agrupa por dia.
+            const sorted = [...shown].sort((a, b) => (b.ts || b.id || 0) - (a.ts || a.id || 0));
+            const cardHTML = t => {
                 const dirColor = t.direction === 'COMPRA' ? '#065f46' : '#991b1b';
-                const exitTag = t.exitType
-                    ? `<span class="text-[9px] font-bold text-gray-400 mr-1">${t.exitType}</span>` : '';
+                // Linha minimizada: só o resultado (limpo, sem tag de saída).
                 const resTxt = t.resultUSD != null
-                    ? `${exitTag}<span class="font-bold" style="color:${t.resultUSD >= 0 ? '#059669' : '#dc2626'}">${formatSigned(t.resultUSD)}</span>`
+                    ? `<span class="font-bold" style="color:${t.resultUSD >= 0 ? '#059669' : '#dc2626'}">${formatSigned(t.resultUSD)}</span>`
                     : `<span class="text-gray-400">—</span>`;
                 const notes = t.notes ? `<p class="text-xs text-gray-500 mt-1 italic">📝 ${t.notes}</p>` : '';
-                const exitsLine = (t.exits && t.exits.length > 1)
-                    ? `<p class="text-xs mt-1" style="color:#6b7280">💰 ${tr('m_exits')}: ${t.exits.map(e => `${e.type} ${formatSigned(e.usd)}`).join(' · ')}</p>` : '';
+                // Detalhe das saídas (tipo · $ · preço) — mostrado só ao expandir.
+                const exitsLine = (t.exits && t.exits.length)
+                    ? `<p class="text-xs mt-1" style="color:#6b7280">💰 ${tr('m_exits')}: ${t.exits.map(e => `${e.type} ${formatSigned(e.usd)}${e.price != null ? ' @' + formatPrice(e.price) : ''}`).join(' · ')}</p>` : '';
                 const reviewLine = t.review
                     ? `<p class="text-xs mt-1 italic" style="color:#b45309">🔍 ${t.review}</p>` : '';
                 const reasonLine = t.status === 'nao_exec'
                     ? `<p class="text-xs mt-1 italic" style="color:#6b7280">🚫 ${tr('not_taken_word')}${t.notExecReason ? ' — ' + t.notExecReason : ''}</p>`
                     : '';
-                // Botões conforme o estado
                 const btn = (fn, txt, cls, icon, titleTxt) => `<button onclick="${fn}(${t.id})" title="${titleTxt || txt}" class="act-btn ${cls}">${ACT_ICONS[icon] || ''}${txt ? '<span>' + txt + '</span>' : ''}</button>`;
                 const actions = [];
                 if (t.status !== 'nao_exec') actions.push(btn('closeTrade', tr('btn_result'), 'border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100', 'money'));
@@ -1984,20 +2007,21 @@
                 actions.push(btn('editNotes', tr('btn_notes'), '', 'pencil'));
                 actions.push(`<span class="ml-auto"></span>` + btn('deleteTrade', '', 'border-red-200 text-red-600 bg-white hover:bg-red-50', 'trash', tr('btn_delete')));
                 const open = expandedTrades.has(t.id);
+                // Linha minimizada: só ativo · compra/venda · resultado.
                 return `<div class="rounded-lg border border-gray-200 bg-white">
                     <div onclick="toggleTradeDetails(${t.id}, this)" class="p-3 flex items-center justify-between gap-2 cursor-pointer select-none">
-                        <div class="flex items-center gap-2 flex-wrap min-w-0">
-                            <span class="chev text-gray-400 text-xs transition-transform" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>
-                            <span class="font-bold text-gray-800">${t.symbol}</span>
-                            <span class="text-[10px] font-bold" style="color:${dirColor}">${dirLabel(t.direction)}</span>
-                            ${statusBadge(t)}
-                            ${priorityBadge(t)}
-                            ${styleBadge(t)}
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="chev text-gray-400 text-xs transition-transform shrink-0" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>
+                            <span class="font-bold text-gray-800 truncate">${t.symbol}</span>
+                            <span class="text-[10px] font-bold shrink-0" style="color:${dirColor}">${dirLabel(t.direction)}</span>
                         </div>
-                        ${resTxt}
+                        <div class="shrink-0">${resTxt}</div>
                     </div>
                     <div id="td-${t.id}" class="px-3 pb-3 ${open ? '' : 'hidden'}">
-                        <div class="text-xs text-gray-400 mb-1">📅 ${fmtDate(t.ts)}</div>
+                        <div class="flex items-center gap-2 flex-wrap mb-2">
+                            ${statusBadge(t)}${priorityBadge(t)}${styleBadge(t)}
+                            <span class="text-xs text-gray-400">🕒 ${fmtTime(t.ts)}</span>
+                        </div>
                         <div class="text-xs text-gray-600 flex flex-wrap gap-x-3">
                             <span>${tr('r_mean')} ${formatPrice(t.avgEntry)}</span>
                             <span>${tr('r_sl')} ${formatPrice(t.sl)}</span>
@@ -2006,14 +2030,21 @@
                             <span>${tr('r_risk')} ${formatCurrency(t.plannedRisk)}</span>
                             <span>${tr('r_rr')} ${t.rr.toFixed(2)}</span>
                         </div>
-                        ${exitsLine}
-                        ${notes}
-                        ${reviewLine}
-                        ${reasonLine}
+                        ${exitsLine}${notes}${reviewLine}${reasonLine}
                         <div class="flex gap-2 mt-2 flex-wrap items-center">${actions.join('')}</div>
                     </div>
                 </div>`;
-            }).join('');
+            };
+            let listHTML = '', lastDay = null;
+            sorted.forEach(t => {
+                const day = fmtDay(t.ts);
+                if (day !== lastDay) {
+                    listHTML += `<div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide pt-3 pb-1">${day}</div>`;
+                    lastDay = day;
+                }
+                listHTML += cardHTML(t);
+            });
+            listEl.innerHTML = listHTML;
         }
 
         // Formata $ com sinal (+/−) para P&L.
@@ -2031,7 +2062,7 @@
                 'stop', 'take_profit', 'lote_total', 'risco_plan', 'ganho_plan', 'rr', 'risco_pct',
                 'estado', 'resultado_usd', 'tipo_saida', 'saidas_parciais', 'motivo_nao_exec', 'revisao', 'notas'];
             const clean = v => (v || '').replace(/[\n;]/g, ' ');
-            const partialsStr = t => (t.exits && t.exits.length) ? t.exits.map(e => `${e.type} ${e.usd}`).join(' | ') : '';
+            const partialsStr = t => (t.exits && t.exits.length) ? t.exits.map(e => `${e.type} ${e.usd}${e.price != null ? ' @' + e.price : ''}`).join(' | ') : '';
             const rows = trades.map(t => [
                 fmtDate(t.ts), t.symbol, t.assetType, t.direction,
                 t.priority ? 'P' + t.priority : '', t.style || '',
