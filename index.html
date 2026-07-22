@@ -596,7 +596,7 @@
                 m_cancel: 'Cancel', m_save: 'Save', m_ok: 'OK', m_confirm: 'Confirm',
                 m_result: 'Realized Result ($)', m_result_hint: 'Positive = win · negative = loss · 0 = breakeven',
                 m_plan: 'Plan: target +{gain} / risk -{risk}', m_exit: 'How did it close?', m_manual: 'Manual',
-                m_exits: 'Exits (partial)', m_add_exit: 'Add partial exit', m_total: 'Total', m_price: 'Price',
+                m_exits: 'Exits (partial)', m_add_exit: 'Add partial exit', m_total: 'Total', m_price: 'Price', edit_class: 'Click to change',
                 collapse_all: 'Collapse all', expand_all: 'Expand all',
                 m_notexec: 'Why not taken?', m_review: 'What went wrong / lesson', m_notes: 'Notes', m_date: 'Trade date', m_year: 'Year',
                 wallet_label: 'Account ($)', wallet_lock_title: 'Lock the account', maxloss_label: 'Max Loss ($)',
@@ -658,7 +658,7 @@
                 m_cancel: 'Annuler', m_save: 'Enregistrer', m_ok: 'OK', m_confirm: 'Confirmer',
                 m_result: 'Résultat réalisé ($)', m_result_hint: 'Positif = gain · négatif = perte · 0 = neutre',
                 m_plan: 'Plan : cible +{gain} / risque -{risk}', m_exit: 'Comment ça a fermé ?', m_manual: 'Manuel',
-                m_exits: 'Sorties (partielles)', m_add_exit: 'Ajouter une sortie', m_total: 'Total', m_price: 'Prix',
+                m_exits: 'Sorties (partielles)', m_add_exit: 'Ajouter une sortie', m_total: 'Total', m_price: 'Prix', edit_class: 'Cliquer pour changer',
                 collapse_all: 'Tout réduire', expand_all: 'Tout ouvrir',
                 m_notexec: 'Raison de non-prise', m_review: 'Ce qui a mal tourné / leçon', m_notes: 'Notes', m_date: 'Date du trade', m_year: 'Année',
                 wallet_label: 'Compte ($)', wallet_lock_title: 'Verrouiller le compte', maxloss_label: 'Perte Max ($)',
@@ -720,7 +720,7 @@
                 m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
                 m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganancia · negativo = pérdida · 0 = neutro',
                 m_plan: 'Plan: objetivo +{gain} / riesgo -{risk}', m_exit: '¿Cómo cerró?', m_manual: 'Manual',
-                m_exits: 'Salidas (parciales)', m_add_exit: 'Añadir salida', m_total: 'Total', m_price: 'Precio',
+                m_exits: 'Salidas (parciales)', m_add_exit: 'Añadir salida', m_total: 'Total', m_price: 'Precio', edit_class: 'Clic para cambiar',
                 collapse_all: 'Minimizar todas', expand_all: 'Expandir todas',
                 m_notexec: 'Motivo de no ejecutar', m_review: 'Qué salió mal / lección', m_notes: 'Notas', m_date: 'Fecha del trade', m_year: 'Año',
                 wallet_label: 'Cuenta ($)', wallet_lock_title: 'Bloquear la cuenta', maxloss_label: 'Pérdida Máx ($)',
@@ -782,7 +782,7 @@
                 m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
                 m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganho · negativo = perda · 0 = nulo',
                 m_plan: 'Plano: alvo +{gain} / risco -{risk}', m_exit: 'Como fechou?', m_manual: 'Manual',
-                m_exits: 'Saídas (parciais)', m_add_exit: 'Adicionar saída', m_total: 'Total', m_price: 'Preço',
+                m_exits: 'Saídas (parciais)', m_add_exit: 'Adicionar saída', m_total: 'Total', m_price: 'Preço', edit_class: 'Clicar para mudar',
                 collapse_all: 'Minimizar todas', expand_all: 'Expandir todas',
                 m_notexec: 'Motivo de não executar', m_review: 'O que correu mal / lição', m_notes: 'Notas', m_date: 'Data da trade', m_year: 'Ano',
                 wallet_label: 'Carteira ($)', wallet_lock_title: 'Trancar a carteira', maxloss_label: 'Perda Máx ($)',
@@ -1904,7 +1904,8 @@
 
         // Badge de prioridade (Alta verde/forte … Baixa cinza/fraca).
         const PRIO_KEY = { 1: 'prio_high', 2: 'prio_med', 3: 'prio_low' };
-        function priorityBadge(t) {
+        // editable=true torna o badge clicável (cicla o valor no log).
+        function priorityBadge(t, editable) {
             if (!t.priority) return '';
             const map = {
                 1: ['#065f46', '#d1fae5'],   // Alta — mais confiança
@@ -1912,14 +1913,28 @@
                 3: ['#374151', '#e5e7eb'],   // Baixa — menos confiança
             };
             const [fg, bg] = map[t.priority] || map[2];
-            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:${fg};background:${bg}">${tr(PRIO_KEY[t.priority] || 'prio_med')}</span>`;
+            const edit = editable ? ` onclick="event.stopPropagation();cyclePriority(${t.id})" title="${tr('edit_class')}" style="cursor:pointer;` : ' style="';
+            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full"${edit}color:${fg};background:${bg}">${tr(PRIO_KEY[t.priority] || 'prio_med')}</span>`;
         }
 
-        // Badge de estilo (Day / Swing).
-        function styleBadge(t) {
+        // Badge de estilo (Day / Swing). editable=true torna-o clicável (alterna).
+        function styleBadge(t, editable) {
             if (!t.style) return '';
             const txt = t.style === 'swing' ? 'SWING' : 'DAY';
-            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:#1e40af;background:#dbeafe">${txt}</span>`;
+            const edit = editable ? ` onclick="event.stopPropagation();cycleStyle(${t.id})" title="${tr('edit_class')}" style="cursor:pointer;` : ' style="';
+            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full"${edit}color:#1e40af;background:#dbeafe">${txt}</span>`;
+        }
+
+        // Reclassificar no log: ciclar prioridade (Alta→Média→Baixa) e estilo (Day↔Swing).
+        function cyclePriority(id) {
+            const journal = getJournal(); const t = journal.find(x => x.id === id); if (!t) return;
+            t.priority = ((t.priority || 0) % 3) + 1;   // 0/3→1, 1→2, 2→3
+            saveJournal(journal); renderJournal();
+        }
+        function cycleStyle(id) {
+            const journal = getJournal(); const t = journal.find(x => x.id === id); if (!t) return;
+            t.style = t.style === 'day' ? 'swing' : 'day';
+            saveJournal(journal); renderJournal();
         }
 
         // Mini-tabela de estatísticas por grupo (prioridade ou estilo).
@@ -2039,7 +2054,7 @@
                     </div>
                     <div id="td-${t.id}" class="px-3 pb-3 ${open ? '' : 'hidden'}">
                         <div class="flex items-center gap-2 flex-wrap mb-2">
-                            ${statusBadge(t)}${priorityBadge(t)}${styleBadge(t)}
+                            ${statusBadge(t)}${priorityBadge(t, true)}${styleBadge(t, true)}
                             <span class="text-xs text-gray-400">🕒 ${fmtTime(t.ts)}</span>
                         </div>
                         <div class="text-xs text-gray-600 flex flex-wrap gap-x-3">
