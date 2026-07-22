@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RiskBook — Position Size Calculator & Trade Journal</title>
+    <title>RiskBook — The Simplest Trade Journal & Position Calculator</title>
 
     <!-- PWA: manifesto, ícones e cor de tema -->
     <link rel="manifest" href="manifest.json">
@@ -205,7 +205,7 @@
                 <svg width="34" height="34" viewBox="0 0 192 192" aria-hidden="true"><rect width="192" height="192" rx="42" fill="#2563eb"/><path fill="#ffffff" fill-rule="evenodd" d="M66 38h60c8.8 0 16 7.2 16 16v96c0 3.3-3.7 5.2-6.4 3.2L96 125.5 56.4 153.2c-2.7 1.9-6.4 0-6.4-3.2V54c0-8.8 7.2-16 16-16zM74 70h44c5 0 9 4 9 9s-4 9-9 9H74c-5 0-9-4-9-9s4-9 9-9z"/></svg>
                 <h1 id="appTitle" onclick="editOwner()" class="text-3xl font-extrabold text-gray-800 cursor-pointer inline-block">RiskBook</h1>
             </div>
-            <p class="text-gray-500" data-i18n="tagline">Sizing · Diário · Estatísticas</p>
+            <p class="text-gray-500" data-i18n="tagline">O diário de trading & calculadora de lotes mais simples</p>
             <div id="langSelector" class="flex justify-center gap-1 mt-3">
                 <button type="button" class="seg-btn px-3 py-1" data-lang="en" title="English">EN</button>
                 <button type="button" class="seg-btn px-3 py-1" data-lang="fr" title="Français">FR</button>
@@ -588,7 +588,7 @@
 
         const I18N = {
             en: {
-                tagline: 'Sizing · Journal · Stats',
+                tagline: 'The Simplest Trade Journal & Position Calculator',
                 inp_title: 'Trade Data', symbol_label: 'Symbol (e.g. BTC, AAPL, SP500) *',
                 asset_type: 'Asset Type', a_forex: 'Forex', a_indices: 'Indices', a_crypto: 'Crypto', a_stocks: 'Stocks', a_commod: 'Commod.',
                 priority_label: 'Priority / Conviction', style_label: 'Style', s_day: 'Day', s_swing: 'Swing',
@@ -650,7 +650,7 @@
                 overcap: '🚨 RISK {risk} ABOVE MAX LOSS {maxLoss}<br>REDUCE THE LOTS',
             },
             fr: {
-                tagline: 'Sizing · Journal · Stats',
+                tagline: 'Le journal de trading & calculateur de lots le plus simple',
                 inp_title: 'Données du Trade', symbol_label: 'Symbole (ex. BTC, AAPL, SP500) *',
                 asset_type: 'Type d\'actif', a_forex: 'Forex', a_indices: 'Indices', a_crypto: 'Crypto', a_stocks: 'Actions', a_commod: 'Mat. 1res',
                 priority_label: 'Priorité / Confiance', style_label: 'Style', s_day: 'Day', s_swing: 'Swing',
@@ -712,7 +712,7 @@
                 overcap: '🚨 RISQUE {risk} AU-DESSUS DE LA PERTE MAX {maxLoss}<br>RÉDUIS LES LOTS',
             },
             es: {
-                tagline: 'Sizing · Diario · Stats',
+                tagline: 'El diario de trading y calculadora de lotes más simple',
                 inp_title: 'Datos del Trade', symbol_label: 'Símbolo (ej. BTC, AAPL, SP500) *',
                 asset_type: 'Tipo de Activo', a_forex: 'Forex', a_indices: 'Índices', a_crypto: 'Cripto', a_stocks: 'Acciones', a_commod: 'Materias',
                 priority_label: 'Prioridad / Confianza', style_label: 'Estilo', s_day: 'Day', s_swing: 'Swing',
@@ -774,7 +774,7 @@
                 overcap: '🚨 RIESGO {risk} POR ENCIMA DE LA PÉRDIDA MÁX {maxLoss}<br>REDUCE LOS LOTES',
             },
             pt: {
-                tagline: 'Sizing · Diário · Estatísticas',
+                tagline: 'O diário de trading & calculadora de lotes mais simples',
                 inp_title: 'Dados da Trade', symbol_label: 'Símbolo (Ex: BTC, AAPL, SP500) *',
                 asset_type: 'Tipo de Ativo', a_forex: 'Forex', a_indices: 'Índices', a_crypto: 'Cripto', a_stocks: 'Ações', a_commod: 'Comod.',
                 priority_label: 'Prioridade / Confiança', style_label: 'Estilo', s_day: 'Day', s_swing: 'Swing',
