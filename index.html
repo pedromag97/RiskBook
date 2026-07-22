@@ -2002,10 +2002,12 @@
             const sorted = [...shown].sort((a, b) => (b.ts || b.id || 0) - (a.ts || a.id || 0));
             const cardHTML = t => {
                 const dirColor = t.direction === 'COMPRA' ? '#065f46' : '#991b1b';
-                // Linha minimizada: só o resultado (limpo, sem tag de saída).
-                const resTxt = t.resultUSD != null
-                    ? `<span class="font-bold" style="color:${t.resultUSD >= 0 ? '#059669' : '#dc2626'}">${formatSigned(t.resultUSD)}</span>`
-                    : `<span class="text-gray-400">—</span>`;
+                // Linha minimizada: resultado, ou 🚫 se não executada, ou — se aberta.
+                const resTxt = t.status === 'nao_exec'
+                    ? `<span title="${tr('not_taken_word')}">🚫</span>`
+                    : t.resultUSD != null
+                        ? `<span class="font-bold" style="color:${t.resultUSD >= 0 ? '#059669' : '#dc2626'}">${formatSigned(t.resultUSD)}</span>`
+                        : `<span class="text-gray-400">—</span>`;
                 const notes = t.notes ? `<p class="text-xs text-gray-500 mt-1 italic">📝 ${t.notes}</p>` : '';
                 // Detalhe das saídas (tipo · $ · preço) — mostrado só ao expandir.
                 const exitsLine = (t.exits && t.exits.length)
