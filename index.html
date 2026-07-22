@@ -600,7 +600,7 @@
                 m_cancel: 'Cancel', m_save: 'Save', m_ok: 'OK', m_confirm: 'Confirm',
                 m_result: 'Realized Result ($)', m_result_hint: 'Positive = win · negative = loss · 0 = breakeven',
                 m_plan: 'Plan: target +{gain} / risk -{risk}', m_exit: 'How did it close?', m_manual: 'Manual',
-                m_exits: 'Exits (partial)', m_add_exit: 'Add partial exit', m_total: 'Total', m_price: 'Price', edit_class: 'Click to change', exec_entries: 'Executed',
+                m_exits: 'Exits (partial)', m_add_exit: 'Add partial exit', m_total: 'Total', m_price: 'Price', edit_class: 'Click to change', exec_entries: 'Executed', edit_entries: 'Edit entries', exec_min: 'At least one entry must be executed.',
                 collapse_all: 'Collapse all', expand_all: 'Expand all',
                 m_notexec: 'Why not taken?', m_review: 'What went wrong / lesson', m_notes: 'Notes', m_date: 'Trade date', m_year: 'Year',
                 wallet_label: 'Account ($)', wallet_lock_title: 'Lock the account', maxloss_label: 'Max Loss ($)',
@@ -662,7 +662,7 @@
                 m_cancel: 'Annuler', m_save: 'Enregistrer', m_ok: 'OK', m_confirm: 'Confirmer',
                 m_result: 'Résultat réalisé ($)', m_result_hint: 'Positif = gain · négatif = perte · 0 = neutre',
                 m_plan: 'Plan : cible +{gain} / risque -{risk}', m_exit: 'Comment ça a fermé ?', m_manual: 'Manuel',
-                m_exits: 'Sorties (partielles)', m_add_exit: 'Ajouter une sortie', m_total: 'Total', m_price: 'Prix', edit_class: 'Cliquer pour changer', exec_entries: 'Exécutées',
+                m_exits: 'Sorties (partielles)', m_add_exit: 'Ajouter une sortie', m_total: 'Total', m_price: 'Prix', edit_class: 'Cliquer pour changer', exec_entries: 'Exécutées', edit_entries: 'Modifier les entrées', exec_min: 'Au moins une entrée doit être exécutée.',
                 collapse_all: 'Tout réduire', expand_all: 'Tout ouvrir',
                 m_notexec: 'Raison de non-prise', m_review: 'Ce qui a mal tourné / leçon', m_notes: 'Notes', m_date: 'Date du trade', m_year: 'Année',
                 wallet_label: 'Compte ($)', wallet_lock_title: 'Verrouiller le compte', maxloss_label: 'Perte Max ($)',
@@ -724,7 +724,7 @@
                 m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
                 m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganancia · negativo = pérdida · 0 = neutro',
                 m_plan: 'Plan: objetivo +{gain} / riesgo -{risk}', m_exit: '¿Cómo cerró?', m_manual: 'Manual',
-                m_exits: 'Salidas (parciales)', m_add_exit: 'Añadir salida', m_total: 'Total', m_price: 'Precio', edit_class: 'Clic para cambiar', exec_entries: 'Ejecutadas',
+                m_exits: 'Salidas (parciales)', m_add_exit: 'Añadir salida', m_total: 'Total', m_price: 'Precio', edit_class: 'Clic para cambiar', exec_entries: 'Ejecutadas', edit_entries: 'Editar entradas', exec_min: 'Al menos una entrada debe ejecutarse.',
                 collapse_all: 'Minimizar todas', expand_all: 'Expandir todas',
                 m_notexec: 'Motivo de no ejecutar', m_review: 'Qué salió mal / lección', m_notes: 'Notas', m_date: 'Fecha del trade', m_year: 'Año',
                 wallet_label: 'Cuenta ($)', wallet_lock_title: 'Bloquear la cuenta', maxloss_label: 'Pérdida Máx ($)',
@@ -786,7 +786,7 @@
                 m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
                 m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganho · negativo = perda · 0 = nulo',
                 m_plan: 'Plano: alvo +{gain} / risco -{risk}', m_exit: 'Como fechou?', m_manual: 'Manual',
-                m_exits: 'Saídas (parciais)', m_add_exit: 'Adicionar saída', m_total: 'Total', m_price: 'Preço', edit_class: 'Clicar para mudar', exec_entries: 'Executadas',
+                m_exits: 'Saídas (parciais)', m_add_exit: 'Adicionar saída', m_total: 'Total', m_price: 'Preço', edit_class: 'Clicar para mudar', exec_entries: 'Executadas', edit_entries: 'Editar entradas', exec_min: 'Pelo menos uma entrada tem de ser executada.',
                 collapse_all: 'Minimizar todas', expand_all: 'Expandir todas',
                 m_notexec: 'Motivo de não executar', m_review: 'O que correu mal / lição', m_notes: 'Notas', m_date: 'Data da trade', m_year: 'Ano',
                 wallet_label: 'Carteira ($)', wallet_lock_title: 'Trancar a carteira', maxloss_label: 'Perda Máx ($)',
@@ -952,6 +952,31 @@
                         addBtn.onclick = () => { arr.push({ usd: '', type: 'Manual' }); renderRows(); renderTotal(); };
                         renderRows(); renderTotal();
                         wrap.append(list, addBtn, totalEl);
+                    } else if (f.type === 'entries') {
+                        // Editar entradas: preço + lote + executada por entrada.
+                        let arr = Array.isArray(state[f.key]) ? state[f.key] : [];
+                        state[f.key] = arr;
+                        const hdr = document.createElement('div');
+                        hdr.className = 'flex items-center gap-2 text-[10px] text-gray-400 uppercase font-bold mb-1';
+                        hdr.innerHTML = `<span style="width:18px"></span><span style="flex:1">${tr('m_price')}</span><span style="flex:1">${tr('r_lot')}</span><span style="width:34px;text-align:center">✓</span>`;
+                        const list = document.createElement('div'); list.className = 'space-y-2';
+                        arr.forEach((e, i) => {
+                            const row = document.createElement('div'); row.className = 'flex items-center gap-2';
+                            const lab = document.createElement('span'); lab.className = 'text-sm font-bold text-gray-500'; lab.style.width = '18px'; lab.textContent = (i + 1);
+                            const price = document.createElement('input');
+                            price.type = 'number'; price.step = 'any'; price.className = 'input-field text-sm'; price.style.flex = '1'; price.style.minWidth = '0';
+                            price.value = e.price; price.oninput = () => e.price = price.value;
+                            const lot = document.createElement('input');
+                            lot.type = 'number'; lot.step = 'any'; lot.className = 'input-field text-sm'; lot.style.flex = '1'; lot.style.minWidth = '0';
+                            lot.value = e.lot; lot.oninput = () => e.lot = lot.value;
+                            const ex = document.createElement('button');
+                            ex.type = 'button'; ex.style.width = '34px'; ex.style.padding = '6px 0';
+                            const paint = () => { ex.className = 'seg-btn' + (e.executed ? ' active' : ''); ex.textContent = e.executed ? '✓' : '✕'; };
+                            ex.onclick = () => { e.executed = !e.executed; paint(); }; paint();
+                            row.append(lab, price, lot, ex);
+                            list.appendChild(row);
+                        });
+                        wrap.append(hdr, list);
                     } else if (f.type === 'textarea') {
                         const ta = document.createElement('textarea');
                         ta.className = 'input-field w-full text-sm'; ta.rows = 3;
@@ -1972,6 +1997,33 @@
             t.plannedGain = totalLot * Math.abs(t.tp - avg) * cv;
             t.rr = dRisk > 0 ? Math.abs(t.tp - avg) / dRisk : 0;
         }
+        // Editar os preços/lotes reais das entradas (ex. a 2ª ordem encheu a outro preço).
+        async function editEntries(id) {
+            const journal = getJournal(); const t = journal.find(x => x.id === id); if (!t) return;
+            if (t.cValue == null) t.cValue = getCValue(t);   // captura antes de mexer no plano
+            const ex = t.executed || t.entries.map(() => true);
+            const initial = t.entries.map((p, i) => ({ price: String(p), lot: String(t.lots[i]), executed: ex[i] }));
+            const res = await showModal({
+                title: `${t.symbol} · ${tr('edit_entries')}`, okText: tr('m_save'),
+                fields: [{ key: 'entries', type: 'entries', value: initial }]
+            });
+            if (!res) return;
+            const rows = res.entries.map(e => ({
+                price: parseFloat(String(e.price).replace(',', '.')),
+                lot: parseFloat(String(e.lot).replace(',', '.')),
+                executed: !!e.executed
+            }));
+            if (rows.some(r => isNaN(r.price) || isNaN(r.lot))) { showAlert(tr('invalid_value')); return; }
+            if (!rows.some(r => r.executed)) { showAlert(tr('exec_min')); return; }
+            t.entries = rows.map(r => r.price);
+            t.lots = rows.map(r => r.lot);
+            t.executed = rows.map(r => r.executed);
+            const tot = t.lots.reduce((s, l) => s + l, 0);
+            t.pcts = t.lots.map(l => tot > 0 ? +(l / tot * 100).toFixed(1) : 0);
+            recomputeExecuted(t);
+            saveJournal(journal); renderJournal();
+        }
+
         // Liga/desliga uma entrada planeada como executada (mantém pelo menos 1).
         function toggleEntry(id, i) {
             const journal = getJournal(); const t = journal.find(x => x.id === id); if (!t) return;
@@ -2093,6 +2145,7 @@
                     ? `<div class="flex items-center gap-1 flex-wrap mt-2 text-xs">
                             <span class="text-gray-400 mr-1">${tr('exec_entries')}:</span>
                             ${t.entries.map((e, i) => `<button onclick="event.stopPropagation();toggleEntry(${t.id},${i})" title="${tr('edit_class')}" class="px-2 py-0.5 rounded-full border font-semibold ${execArr[i] ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-gray-200 bg-white text-gray-400 line-through'}">${i + 1} @${formatPrice(e)}</button>`).join('')}
+                            <button onclick="event.stopPropagation();editEntries(${t.id})" title="${tr('edit_entries')}" class="text-blue-600 hover:underline font-semibold ml-1">✏️</button>
                         </div>` : '';
                 const open = expandedTrades.has(t.id);
                 // Linha minimizada: só ativo · compra/venda · resultado.
