@@ -501,6 +501,15 @@
                 <!-- Breakdown por prioridade / estilo -->
                 <div id="journalBreakdown" class="grid grid-cols-1 gap-3 mb-4"></div>
 
+                <!-- Gráficos (retrátil) -->
+                <div class="mb-4">
+                    <button id="chartsToggle" onclick="toggleCharts()" class="w-full flex items-center justify-between text-xs font-bold text-gray-500 uppercase tracking-wide px-1 py-1 hover:text-gray-700">
+                        <span class="flex items-center gap-1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span data-i18n="charts_title">Gráficos</span></span>
+                        <svg id="chartsChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div id="journalCharts" class="grid grid-cols-1 gap-3 mt-2"></div>
+                </div>
+
                 <!-- Filtro + exportação -->
                 <div class="grid grid-cols-2 gap-2 mb-3">
                     <select id="journalFilter" onchange="renderJournal()" class="input-field text-sm py-2 px-2 col-span-2">
@@ -627,6 +636,7 @@
                 err_invalid: '⚠️ Invalid data. Check prices and symbol.',
                 journal_title: 'Trade Log', toggle: 'Show / Hide', month_summary_btn: 'Month Summary', year_summary_btn: 'Year Summary',
                 st_trades: 'Trades', st_open: 'Open', st_notexec: 'Not Taken', st_winrate: 'Win Rate', st_pnl: 'Total P&L', st_pf: 'Profit Factor', st_expect: 'Expectancy',
+                charts_title: 'Charts', charts_nodata: 'Not enough data', chart_equity: 'Equity curve', chart_pertrade: 'P&L per trade', chart_permonth: 'P&L per month', chart_avg: 'Avg win vs avg loss', avg_win: 'Avg win', avg_loss: 'Avg loss',
                 bd_priority: 'By Priority', bd_style: 'By Style', bd_group: 'Group', bd_n: 'N', bd_hit: 'Win%', bd_pnl: 'P&L',
                 f_all: 'All', f_open: 'Open', f_closed: 'Closed', f_won: 'Won', f_lost: 'Lost', f_notexec: 'Not taken',
                 csv_btn: 'CSV month', backup_btn: 'Backup', restore_btn: 'Restore', clear_btn: 'Clear',
@@ -689,6 +699,7 @@
                 err_invalid: '⚠️ Données invalides. Vérifie les prix et le symbole.',
                 journal_title: 'Journal de Trades', toggle: 'Afficher / Masquer', month_summary_btn: 'Résumé du Mois', year_summary_btn: 'Résumé Annuel',
                 st_trades: 'Trades', st_open: 'Ouverts', st_notexec: 'Non pris', st_winrate: 'Taux Réussite', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Espérance',
+                charts_title: 'Graphiques', charts_nodata: 'Données insuffisantes', chart_equity: 'Courbe de capital', chart_pertrade: 'P&L par trade', chart_permonth: 'P&L par mois', chart_avg: 'Gain moy. vs perte moy.', avg_win: 'Gain moy.', avg_loss: 'Perte moy.',
                 bd_priority: 'Par Priorité', bd_style: 'Par Style', bd_group: 'Groupe', bd_n: 'N', bd_hit: 'Réus.%', bd_pnl: 'P&L',
                 f_all: 'Tous', f_open: 'Ouverts', f_closed: 'Fermés', f_won: 'Gagnés', f_lost: 'Perdus', f_notexec: 'Non pris',
                 csv_btn: 'CSV mois', backup_btn: 'Backup', restore_btn: 'Restaurer', clear_btn: 'Effacer',
@@ -751,6 +762,7 @@
                 err_invalid: '⚠️ Datos inválidos. Revisa los precios y el símbolo.',
                 journal_title: 'Registro de Trades', toggle: 'Ver / Ocultar', month_summary_btn: 'Resumen del Mes', year_summary_btn: 'Resumen Anual',
                 st_trades: 'Trades', st_open: 'Abiertos', st_notexec: 'No ejec.', st_winrate: 'Aciertos', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Esperanza',
+                charts_title: 'Gráficos', charts_nodata: 'Datos insuficientes', chart_equity: 'Curva de capital', chart_pertrade: 'P&L por trade', chart_permonth: 'P&L por mes', chart_avg: 'Ganancia media vs pérdida media', avg_win: 'Gan. media', avg_loss: 'Pérd. media',
                 bd_priority: 'Por Prioridad', bd_style: 'Por Estilo', bd_group: 'Grupo', bd_n: 'N', bd_hit: 'Acier.%', bd_pnl: 'P&L',
                 f_all: 'Todas', f_open: 'Abiertas', f_closed: 'Cerradas', f_won: 'Ganadas', f_lost: 'Perdidas', f_notexec: 'No ejecutadas',
                 csv_btn: 'CSV mes', backup_btn: 'Backup', restore_btn: 'Restaurar', clear_btn: 'Borrar',
@@ -813,6 +825,7 @@
                 err_invalid: '⚠️ Dados inválidos. Verifique os preços e o símbolo.',
                 journal_title: 'Log de Trades', toggle: 'Ver / Ocultar', month_summary_btn: 'Resumo do Mês', year_summary_btn: 'Resumo Anual',
                 st_trades: 'Trades', st_open: 'Abertas', st_notexec: 'Não Exec.', st_winrate: 'Taxa Acerto', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Expectância',
+                charts_title: 'Gráficos', charts_nodata: 'Dados insuficientes', chart_equity: 'Curva de capital', chart_pertrade: 'P&L por trade', chart_permonth: 'P&L por mês', chart_avg: 'Ganho médio vs perda média', avg_win: 'Ganho médio', avg_loss: 'Perda média',
                 bd_priority: 'Por Prioridade', bd_style: 'Por Estilo', bd_group: 'Grupo', bd_n: 'N', bd_hit: 'Acerto', bd_pnl: 'P&L',
                 f_all: 'Todas', f_open: 'Abertas', f_closed: 'Fechadas', f_won: 'Ganhas', f_lost: 'Perdidas', f_notexec: 'Não executadas',
                 csv_btn: 'CSV mês', backup_btn: 'Backup', restore_btn: 'Restaurar', clear_btn: 'Limpar',
@@ -1996,6 +2009,132 @@
             };
         }
 
+        // ---------- Gráficos (SVG inline, sem dependências) ----------
+        let chartsOpen = localStorage.getItem('riskcalc_charts_open') === '1';
+        function toggleCharts() {
+            chartsOpen = !chartsOpen;
+            localStorage.setItem('riskcalc_charts_open', chartsOpen ? '1' : '0');
+            renderJournal();
+        }
+        const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        // Card branco com título para envolver um gráfico.
+        function chartCard(title, inner) {
+            return `<div class="p-3 bg-white rounded-lg border border-gray-200">
+                        <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2">${esc(title)}</p>
+                        ${inner}
+                    </div>`;
+        }
+        function chartEmpty() {
+            return `<p class="text-center text-gray-300 text-xs py-6">${tr('charts_nodata')}</p>`;
+        }
+        // Curva de equity: P&L acumulado (fechadas + parciais realizadas), por ordem cronológica.
+        function svgEquity(trades) {
+            const pts = trades.filter(t => typeof t.resultUSD === 'number')
+                .sort((a, b) => (a.ts || a.id || 0) - (b.ts || b.id || 0));
+            if (pts.length < 2) return chartEmpty();
+            let cum = 0; const eq = [0];
+            pts.forEach(t => { cum += t.resultUSD; eq.push(cum); });
+            const W = 320, H = 130, pL = 40, pR = 10, pT = 12, pB = 14;
+            const iw = W - pL - pR, ih = H - pT - pB;
+            let lo = Math.min(...eq, 0), hi = Math.max(...eq, 0);
+            if (lo === hi) { lo -= 1; hi += 1; }
+            const x = i => pL + (eq.length === 1 ? 0 : iw * i / (eq.length - 1));
+            const y = v => pT + ih * (1 - (v - lo) / (hi - lo));
+            const line = eq.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+            const area = `${line} L${x(eq.length - 1).toFixed(1)} ${y(lo).toFixed(1)} L${x(0).toFixed(1)} ${y(lo).toFixed(1)} Z`;
+            const pos = cum >= 0, col = pos ? '#059669' : '#dc2626';
+            const zeroY = y(0).toFixed(1);
+            return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-height:150px" preserveAspectRatio="xMidYMid meet">
+                <line x1="${pL}" y1="${zeroY}" x2="${W - pR}" y2="${zeroY}" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="3 3"/>
+                <text x="4" y="${(+zeroY + 3)}" font-size="9" fill="#9ca3af">0</text>
+                <text x="4" y="${(y(hi) + 8).toFixed(1)}" font-size="9" fill="#9ca3af">${fmtShort(hi)}</text>
+                <text x="4" y="${(y(lo)).toFixed(1)}" font-size="9" fill="#9ca3af">${fmtShort(lo)}</text>
+                <path d="${area}" fill="${col}" opacity="0.10"/>
+                <path d="${line}" fill="none" stroke="${col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+                <circle cx="${x(eq.length - 1).toFixed(1)}" cy="${y(cum).toFixed(1)}" r="3" fill="${col}"/>
+                <text x="${(W - pR)}" y="${(y(cum) - 5).toFixed(1)}" font-size="10" font-weight="bold" fill="${col}" text-anchor="end">${formatSigned(cum)}</text>
+            </svg>`;
+        }
+        // Barras de P&L por trade (fechadas + parciais).
+        function svgPerTrade(trades) {
+            const pts = trades.filter(t => typeof t.resultUSD === 'number')
+                .sort((a, b) => (a.ts || a.id || 0) - (b.ts || b.id || 0));
+            if (!pts.length) return chartEmpty();
+            return svgBars(pts.map(t => ({ v: t.resultUSD, label: t.symbol || '' })), true);
+        }
+        // Barras de P&L por mês (todo o histórico, últimos 12 meses).
+        function svgPerMonth(journal) {
+            const map = {};
+            journal.forEach(t => { if (typeof t.resultUSD === 'number') { const k = monthKey(t.ts); map[k] = (map[k] || 0) + t.resultUSD; } });
+            let keys = Object.keys(map).sort();
+            if (!keys.length) return chartEmpty();
+            keys = keys.slice(-12);
+            const mn = monthsArr();
+            return svgBars(keys.map(k => { const m = +k.split('-')[1] - 1; return { v: map[k], label: mn[m].slice(0, 3) }; }), false);
+        }
+        // Gerador genérico de gráfico de barras centrado no zero. showLabels=false esconde eixo x quando há muitas barras.
+        function svgBars(items, hideLabelsIfMany) {
+            const W = 320, H = 130, pT = 14, pB = 20, pL = 6, pR = 6;
+            const n = items.length, iw = W - pL - pR, ih = H - pT - pB;
+            let lo = Math.min(0, ...items.map(d => d.v)), hi = Math.max(0, ...items.map(d => d.v));
+            if (lo === hi) { hi += 1; }
+            const y = v => pT + ih * (1 - (v - lo) / (hi - lo));
+            const zeroY = y(0);
+            const bw = Math.max(1, iw / n * 0.7), gap = iw / n;
+            const showLabels = !(hideLabelsIfMany && n > 12);
+            let bars = '';
+            items.forEach((d, i) => {
+                const cx = pL + gap * i + gap / 2, col = d.v >= 0 ? '#059669' : '#dc2626';
+                const top = Math.min(zeroY, y(d.v)), h = Math.max(1, Math.abs(y(d.v) - zeroY));
+                bars += `<rect x="${(cx - bw / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="1" fill="${col}"><title>${esc(d.label)}: ${formatSigned(d.v)}</title></rect>`;
+                if (showLabels) bars += `<text x="${cx.toFixed(1)}" y="${H - 6}" font-size="8" fill="#9ca3af" text-anchor="middle" transform="rotate(0 ${cx.toFixed(1)} ${H - 6})">${esc(String(d.label).slice(0, 4))}</text>`;
+            });
+            return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-height:150px" preserveAspectRatio="xMidYMid meet">
+                <line x1="${pL}" y1="${zeroY.toFixed(1)}" x2="${W - pR}" y2="${zeroY.toFixed(1)}" stroke="#e5e7eb" stroke-width="1"/>
+                ${bars}
+            </svg>`;
+        }
+        // Ganho médio vs perda média + R:R real.
+        function svgAvg(s) {
+            if (!s.avgWin && !s.avgLoss) return chartEmpty();
+            const W = 320, H = 130, base = 96, top = 16, maxV = Math.max(s.avgWin, s.avgLoss, 1);
+            const bar = (cx, v, col) => {
+                const h = (base - top) * (v / maxV), yy = base - h;
+                return `<rect x="${cx - 45}" y="${yy.toFixed(1)}" width="90" height="${Math.max(1, h).toFixed(1)}" rx="3" fill="${col}"/>
+                        <text x="${cx}" y="${(yy - 5).toFixed(1)}" font-size="11" font-weight="bold" fill="${col}" text-anchor="middle">${formatCurrency(v)}</text>`;
+            };
+            const rr = s.avgLoss > 0 ? (s.avgWin / s.avgLoss) : 0;
+            const rrCol = rr >= 2 ? '#059669' : rr >= 1 ? '#d97706' : '#dc2626';
+            return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-height:150px" preserveAspectRatio="xMidYMid meet">
+                <line x1="20" y1="${base}" x2="${W - 20}" y2="${base}" stroke="#e5e7eb" stroke-width="1"/>
+                ${bar(90, s.avgWin, '#059669')}
+                ${bar(230, s.avgLoss, '#dc2626')}
+                <text x="90" y="${base + 14}" font-size="9" fill="#6b7280" text-anchor="middle">${esc(tr('avg_win'))}</text>
+                <text x="230" y="${base + 14}" font-size="9" fill="#6b7280" text-anchor="middle">${esc(tr('avg_loss'))}</text>
+                <text x="${W / 2}" y="${H - 2}" font-size="10" fill="${rrCol}" text-anchor="middle" font-weight="bold">R:R ${rr ? rr.toFixed(2) : '—'} : 1</text>
+            </svg>`;
+        }
+        // Formata valores curtos para eixos ($1.2k).
+        function fmtShort(v) {
+            const a = Math.abs(v);
+            if (a >= 1000) return (v / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+            return Math.round(v).toString();
+        }
+        function renderCharts(monthTrades, journal) {
+            const el = document.getElementById('journalCharts');
+            const chev = document.getElementById('chartsChevron');
+            if (chev) chev.style.transform = chartsOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+            if (!el) return;
+            if (!chartsOpen) { el.innerHTML = ''; el.style.display = 'none'; return; }
+            el.style.display = 'grid';
+            const s = computeStats(monthTrades);
+            el.innerHTML =
+                chartCard(tr('chart_equity'), svgEquity(monthTrades)) +
+                chartCard(tr('chart_pertrade'), svgPerTrade(monthTrades)) +
+                chartCard(tr('chart_permonth'), svgPerMonth(journal)) +
+                chartCard(tr('chart_avg'), svgAvg(s));
+        }
+
         function statTile(label, value, color) {
             return `<div class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-center">
                         <p class="text-[10px] text-gray-400 uppercase font-bold">${label}</p>
@@ -2165,6 +2304,7 @@
                 statTile(tr('st_expect'), formatSigned(s.expectancy), s.expectancy >= 0 ? '#059669' : '#dc2626');
 
             renderBreakdown(monthTrades);
+            renderCharts(monthTrades, journal);
 
             // Lista: trades do mês + filtro de estado.
             const shown = monthTrades.filter(t => {
