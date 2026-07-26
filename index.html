@@ -312,47 +312,53 @@
             </p>
             <div class="space-y-2">
                 <div class="tranche-row grid grid-cols-12 gap-2 items-end" data-idx="0">
-                    <div class="col-span-6">
+                    <div class="col-span-4">
                         <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="e1">Entrada 1</label>
                         <input type="number" id="entry1" value="1.0800" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
-                    <div class="col-span-6">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pl1">% do Lote 1</label>
+                    <div class="col-span-4">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="sl_short">SL</label>
+                        <input type="number" id="sl1" value="1.0750" min="0" step="any" class="input-field w-full text-sm tranche-input">
+                    </div>
+                    <div class="col-span-4">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pct_short">%</label>
                         <input type="number" id="pct1" value="40" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                 </div>
                 <div class="tranche-row grid grid-cols-12 gap-2 items-end hidden" data-idx="1">
-                    <div class="col-span-6">
+                    <div class="col-span-4">
                         <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="e2">Entrada 2</label>
                         <input type="number" id="entry2" value="1.0790" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
-                    <div class="col-span-6">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pl2">% do Lote 2</label>
+                    <div class="col-span-4">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="sl_short">SL</label>
+                        <input type="number" id="sl2" value="1.0750" min="0" step="any" class="input-field w-full text-sm tranche-input">
+                    </div>
+                    <div class="col-span-4">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pct_short">%</label>
                         <input type="number" id="pct2" value="30" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                 </div>
                 <div class="tranche-row grid grid-cols-12 gap-2 items-end hidden" data-idx="2">
-                    <div class="col-span-6">
+                    <div class="col-span-4">
                         <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="e3">Entrada 3</label>
                         <input type="number" id="entry3" value="1.0780" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
-                    <div class="col-span-6">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pl3">% do Lote 3</label>
+                    <div class="col-span-4">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="sl_short">SL</label>
+                        <input type="number" id="sl3" value="1.0750" min="0" step="any" class="input-field w-full text-sm tranche-input">
+                    </div>
+                    <div class="col-span-4">
+                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pct_short">%</label>
                         <input type="number" id="pct3" value="30" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                 </div>
             </div>
 
-            <!-- Stop / Take Profit partilhados por todas as tranches -->
-            <div class="grid grid-cols-2 gap-2 pt-2">
-                <div>
-                    <label for="stopLossPrice" class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="sl_label">Stop Loss (único)</label>
-                    <input type="number" id="stopLossPrice" value="1.0750" min="0" step="any" class="input-field w-full text-sm">
-                </div>
-                <div>
-                    <label for="takeProfitPrice" class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="tp_label">Take Profit (único)</label>
-                    <input type="number" id="takeProfitPrice" value="1.0950" min="0" step="any" class="input-field w-full text-sm">
-                </div>
+            <!-- Take Profit único (SL é por entrada, acima) -->
+            <div class="pt-2">
+                <label for="takeProfitPrice" class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="tp_label">Take Profit (único)</label>
+                <input type="number" id="takeProfitPrice" value="1.0950" min="0" step="any" class="input-field w-full text-sm">
             </div>
 
             <div class="pt-2">
@@ -609,7 +615,7 @@
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
                 pl1: '% of Lot 1', pl2: '% of Lot 2', pl3: '% of Lot 3', e1: 'Entry 1', e2: 'Entry 2', e3: 'Entry 3',
-                sl_label: 'Stop Loss (single)', tp_label: 'Take Profit (single)', tradedate_label: 'Trade Date (for the log)',
+                sl_label: 'Stop Loss (single)', tp_label: 'Take Profit (single)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Trade Date (for the log)',
                 calc_btn: 'Calculate', reg_btn: 'Register in Log', calc_hint: 'Review the summary below, then register the trade in the log.',
                 res_summary: 'Summary:', mean_price: 'Avg Price', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entries & Cumulative Risk', total_lot: 'Total Lot to Trade:', nominal: 'Nominal Size:',
@@ -671,7 +677,7 @@
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
                 pl1: '% du Lot 1', pl2: '% du Lot 2', pl3: '% du Lot 3', e1: 'Entrée 1', e2: 'Entrée 2', e3: 'Entrée 3',
-                sl_label: 'Stop Loss (unique)', tp_label: 'Take Profit (unique)', tradedate_label: 'Date du trade (pour le journal)',
+                sl_label: 'Stop Loss (unique)', tp_label: 'Take Profit (unique)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Date du trade (pour le journal)',
                 calc_btn: 'Calculer', reg_btn: 'Journaliser', calc_hint: 'Analyse le résumé ci-dessous, puis journalise le trade.',
                 res_summary: 'Résumé :', mean_price: 'Prix Moyen', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entrées & Risque Cumulé', total_lot: 'Lot Total à Trader :', nominal: 'Taille Nominale :',
@@ -733,7 +739,7 @@
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
                 pl1: '% del Lote 1', pl2: '% del Lote 2', pl3: '% del Lote 3', e1: 'Entrada 1', e2: 'Entrada 2', e3: 'Entrada 3',
-                sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', tradedate_label: 'Fecha del trade (para el registro)',
+                sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Fecha del trade (para el registro)',
                 calc_btn: 'Calcular', reg_btn: 'Registrar en el diario', calc_hint: 'Revisa el resumen y luego regístralo en el diario.',
                 res_summary: 'Resumen:', mean_price: 'Precio Medio', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entradas y Riesgo Acumulado', total_lot: 'Lote Total a Operar:', nominal: 'Tamaño Nominal:',
@@ -795,7 +801,7 @@
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
                 pl1: '% do Lote 1', pl2: '% do Lote 2', pl3: '% do Lote 3', e1: 'Entrada 1', e2: 'Entrada 2', e3: 'Entrada 3',
-                sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', tradedate_label: 'Data da Trade (para o log)',
+                sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Data da Trade (para o log)',
                 calc_btn: 'Calcular Resumo', reg_btn: 'Registar no Log', calc_hint: 'Analisa o resumo e depois regista a trade no log.',
                 res_summary: 'Resumo:', mean_price: 'Preço Médio', stop_loss: 'Stop Loss', take_profit: 'Take Profit',
                 entries_cumrisk: 'Entradas & Risco Acumulado', total_lot: 'Lote Total a Negociar:', nominal: 'Tamanho Nominal:',
@@ -962,30 +968,32 @@
                         renderRows(); renderTotal();
                         wrap.append(list, addBtn, totalEl);
                     } else if (f.type === 'entries') {
-                        // Lista LIVRE de entradas reais: preço + lote, adicionar/remover.
+                        // Lista LIVRE de entradas reais: preço + SL + lote, adicionar/remover.
                         let arr = Array.isArray(state[f.key]) ? state[f.key] : [];
-                        if (!arr.length) arr.push({ price: '', lot: '' });
+                        if (!arr.length) arr.push({ price: '', sl: '', lot: '' });
                         state[f.key] = arr;
                         const hdr = document.createElement('div');
                         hdr.className = 'flex items-center gap-2 text-[10px] text-gray-400 uppercase font-bold mb-1';
-                        hdr.innerHTML = `<span style="width:18px"></span><span style="flex:1">${tr('m_price')}</span><span style="flex:1">${tr('r_lot')}</span><span style="width:22px"></span>`;
+                        hdr.innerHTML = `<span style="width:18px"></span><span style="flex:1">${tr('m_price')}</span><span style="flex:1">${tr('sl_short')}</span><span style="flex:1">${tr('r_lot')}</span><span style="width:22px"></span>`;
                         const list = document.createElement('div'); list.className = 'space-y-2';
                         const renderRows = () => {
                             list.innerHTML = '';
                             arr.forEach((e, i) => {
                                 const row = document.createElement('div'); row.className = 'flex items-center gap-2';
                                 const lab = document.createElement('span'); lab.className = 'text-sm font-bold text-gray-500'; lab.style.width = '18px'; lab.textContent = (i + 1);
-                                const price = document.createElement('input');
-                                price.type = 'number'; price.step = 'any'; price.className = 'input-field text-sm'; price.style.flex = '1'; price.style.minWidth = '0';
-                                price.value = e.price; price.placeholder = tr('m_price'); price.oninput = () => e.price = price.value; attachMath(price);
-                                const lot = document.createElement('input');
-                                lot.type = 'number'; lot.step = 'any'; lot.className = 'input-field text-sm'; lot.style.flex = '1'; lot.style.minWidth = '0';
-                                lot.value = e.lot; lot.placeholder = tr('r_lot'); lot.oninput = () => e.lot = lot.value; attachMath(lot);
+                                const mk = (val, ph, on) => {
+                                    const el = document.createElement('input');
+                                    el.type = 'number'; el.step = 'any'; el.className = 'input-field text-sm'; el.style.flex = '1'; el.style.minWidth = '0';
+                                    el.value = (val != null ? val : ''); el.placeholder = ph; el.oninput = on; attachMath(el); return el;
+                                };
+                                const price = mk(e.price, tr('m_price'), function () { e.price = this.value; });
+                                const sl = mk(e.sl, tr('sl_short'), function () { e.sl = this.value; });
+                                const lot = mk(e.lot, tr('r_lot'), function () { e.lot = this.value; });
                                 const rm = document.createElement('button');
                                 rm.type = 'button'; rm.textContent = '✕'; rm.title = tr('btn_delete');
                                 rm.className = 'text-gray-400 hover:text-red-500 px-1 text-sm'; rm.style.width = '22px';
-                                rm.onclick = () => { arr.splice(i, 1); if (!arr.length) arr.push({ price: '', lot: '' }); renderRows(); };
-                                row.append(lab, price, lot, rm);
+                                rm.onclick = () => { arr.splice(i, 1); if (!arr.length) arr.push({ price: '', sl: '', lot: '' }); renderRows(); };
+                                row.append(lab, price, sl, lot, rm);
                                 list.appendChild(row);
                             });
                         };
@@ -993,7 +1001,7 @@
                         const addBtn = document.createElement('button');
                         addBtn.type = 'button'; addBtn.className = 'text-xs font-bold text-blue-600 mt-2 hover:underline';
                         addBtn.textContent = '➕ ' + tr('m_add_entry');
-                        addBtn.onclick = () => { arr.push({ price: '', lot: '' }); renderRows(); };
+                        addBtn.onclick = () => { arr.push({ price: '', sl: '', lot: '' }); renderRows(); };
                         wrap.append(hdr, list, addBtn);
                     } else if (f.type === 'textarea') {
                         const ta = document.createElement('textarea');
@@ -1389,7 +1397,6 @@
             const balance = parseFloat(document.getElementById('accountBalance').value);
             const maxLoss = parseFloat(document.getElementById('maxLossAmount').value);
             const cValue = parseFloat(document.getElementById('contractSize').value); // valor por 1.0 de preço, por lote
-            const sl = parseFloat(document.getElementById('stopLossPrice').value);
             const tp = parseFloat(document.getElementById('takeProfitPrice').value);
 
             const error = document.getElementById('error-message');
@@ -1398,28 +1405,28 @@
             const zeroLotAlert = document.getElementById('zeroLotAlert');
             lastCalc = null; // invalida até o cálculo chegar ao fim com dados válidos
 
-            // Recolhe as entradas ativas (1 a 3) e valida.
-            const entries = [];
+            // Recolhe as entradas ativas (1 a 3) + o SL de cada entrada.
+            const entries = [], sls = [];
             for (let i = 0; i < trancheCount; i++) {
-                const e = parseFloat(document.getElementById('entry' + (i + 1)).value);
-                entries.push(e);
+                entries.push(parseFloat(document.getElementById('entry' + (i + 1)).value));
+                sls.push(parseFloat(document.getElementById('sl' + (i + 1)).value));
             }
 
-            const baseInvalid = !symbol || isNaN(balance) || isNaN(maxLoss) || isNaN(sl) || isNaN(tp)
-                || entries.some(e => isNaN(e));
+            const baseInvalid = !symbol || isNaN(balance) || isNaN(maxLoss) || isNaN(tp)
+                || entries.some(e => isNaN(e)) || sls.some(s => isNaN(s));
             if (baseInvalid) { error.classList.remove('hidden'); return; }
 
-            // Todas as entradas têm de estar do MESMO lado do stop, senão o "risco médio"
-            // não faz sentido (haveria entradas já do lado errado do stop).
-            const allAbove = entries.every(e => e > sl);
-            const allBelow = entries.every(e => e < sl);
+            // Cada entrada tem de estar do lado certo do SEU stop, e todas do mesmo lado
+            // (todas compra ou todas venda). Senão o cálculo de risco não faz sentido.
+            const allAbove = entries.every((e, i) => e > sls[i]);
+            const allBelow = entries.every((e, i) => e < sls[i]);
             if (!allAbove && !allBelow) { error.classList.remove('hidden'); return; }
             error.classList.add('hidden');
 
-            const isBuy = allAbove; // entradas acima do stop => COMPRA
+            const isBuy = allAbove; // entradas acima do seu stop => COMPRA
 
-            // Distância de cada entrada ao stop (em unidades de preço). Sempre > 0 aqui.
-            const riskPoints = entries.map(e => Math.abs(e - sl));
+            // Distância de cada entrada ao SEU stop (em unidades de preço). Sempre > 0 aqui.
+            const riskPoints = entries.map((e, i) => Math.abs(e - sls[i]));
 
             // -------------------------------------------------------------------
             // DISTRIBUIÇÃO DOS LOTES
@@ -1496,19 +1503,23 @@
                 ? lots.reduce((sum, q, i) => sum + q * entries[i], 0) / totalQty
                 : entries[0];
 
-            const avgRiskPoints = Math.abs(avgEntry - sl);
             const rewardPoints = Math.abs(tp - avgEntry);
 
-            // Risco por tranche + risco acumulado (para mostrar a soma a crescer).
+            // Risco por tranche (cada entrada até ao SEU stop) + risco acumulado.
             const trancheRisks = lots.map((q, i) => q * riskPoints[i] * cValue);
             const cumulative = [];
             trancheRisks.reduce((acc, r) => { const s = acc + r; cumulative.push(s); return s; }, 0);
 
-            const realRisk = totalQty * avgRiskPoints * cValue; // == soma de trancheRisks
-            const gain = totalQty * rewardPoints * cValue;
-            const rr = avgRiskPoints > 0 ? rewardPoints / avgRiskPoints : 0;
+            const realRisk = trancheRisks.reduce((a, b) => a + b, 0);  // soma dos riscos por entrada
+            const gain = totalQty * rewardPoints * cValue;             // TP único: do preço médio ao TP
+            const rr = realRisk > 0 ? gain / realRisk : 0;
             const riskPct = (realRisk / balance) * 100;
             const nominal = totalQty * cValue * avgEntry;
+            // SL para mostrar: valor único se todos iguais, senão intervalo.
+            const slMin = Math.min(...sls), slMax = Math.max(...sls);
+            const slDisplay = (slMin === slMax) ? formatPrice(slMin) : `${formatPrice(slMin)}–${formatPrice(slMax)}`;
+            // SL médio ponderado (valor único representativo p/ compatibilidade).
+            const avgSL = totalQty > 0 ? lots.reduce((s, q, i) => s + q * sls[i], 0) / totalQty : sls[0];
 
             /* ------------------------- Atualização da UI ---------------------- */
             const badge = document.getElementById('tradeTypeBadge');
@@ -1517,7 +1528,7 @@
 
             document.getElementById('resSymbolDisplay').textContent = symbol.toUpperCase();
             document.getElementById('resEntry').textContent = formatPrice(avgEntry);
-            document.getElementById('resSL').textContent = formatPrice(sl);
+            document.getElementById('resSL').textContent = slDisplay;
             document.getElementById('resTP').textContent = formatPrice(tp);
 
             // Linhas por tranche
@@ -1529,7 +1540,7 @@
                 const pctTxt = trancheCount > 1 ? ` · ${(weights[i] * 100).toFixed(0)}%` : '';
                 // Lote tradeable (2 casas) + valor exato calculado (4 casas) entre parênteses.
                 const lotTxt = `${formatLot(lots[i])} <span class="text-gray-400">(${formatLotExact(lotsExact[i])})</span> ${t('lot_word')}`;
-                row.innerHTML = `<span class="text-gray-600">${t('e' + (i + 1))} @ ${formatPrice(entries[i])}${pctTxt} · ${lotTxt}</span>`
+                row.innerHTML = `<span class="text-gray-600">${t('e' + (i + 1))} @ ${formatPrice(entries[i])} <span class="text-red-400">${t('sl_short')} ${formatPrice(sls[i])}</span>${pctTxt} · ${lotTxt}</span>`
                     + `<span class="font-semibold text-red-600">${formatCurrency(trancheRisks[i])}</span>`;
                 linesEl.appendChild(row);
             }
@@ -1566,7 +1577,7 @@
                 direction: isBuy ? 'COMPRA' : 'VENDA',
                 entries: entries.slice(),
                 pcts: pcts.slice(),
-                avgEntry, sl, tp,
+                avgEntry, sl: avgSL, sls: sls.slice(), tp,
                 lots: lots.slice(),
                 totalLot: totalQty,
                 plannedRisk: realRisk,
@@ -1595,7 +1606,7 @@
             // Acontece quando o incremento mínimo do ativo (ex. Índices/Ações = 1 contrato)
             // é maior do que o lote exato calculado — ou seja, nem o mínimo cabe no teto.
             const step = currentStep();
-            const minLotRisk = step * avgRiskPoints * cValue;  // risco de negociar o incremento mínimo
+            const minLotRisk = step * weightedRP * cValue;  // risco de negociar o incremento mínimo (ponderado)
             const someTrancheZero = lots.some((q, i) => q <= 0 && lotsExact[i] > 0);
             if (totalQty <= 0) {
                 zeroLotAlert.classList.add('show');
@@ -1740,6 +1751,7 @@
                 lots: lastCalc.lots,
                 avgEntry: lastCalc.avgEntry,
                 sl: lastCalc.sl,
+                sls: lastCalc.sls ? lastCalc.sls.slice() : null,   // SL por entrada
                 tp: lastCalc.tp,
                 totalLot: lastCalc.totalLot,
                 plannedRisk: lastCalc.plannedRisk,
@@ -2050,29 +2062,34 @@
             const totalLot = t.lots.reduce((s, l) => s + l, 0);
             if (!totalLot) return;
             const avg = t.entries.reduce((s, p, i) => s + p * t.lots[i], 0) / totalLot;
-            const dRisk = Math.abs(avg - t.sl);
+            // SL por entrada (se existir e bater com o nº de entradas); senão o SL único.
+            const sls = (t.sls && t.sls.length === t.entries.length) ? t.sls : t.entries.map(() => t.sl);
+            const risk = t.entries.reduce((s, p, i) => s + t.lots[i] * Math.abs(p - sls[i]) * cv, 0);
             t.totalLot = totalLot;
             t.avgEntry = avg;
-            t.plannedRisk = totalLot * dRisk * cv;
+            t.sl = sls.reduce((s, x, i) => s + t.lots[i] * x, 0) / totalLot;   // SL médio representativo
+            t.plannedRisk = risk;
             t.plannedGain = totalLot * Math.abs(t.tp - avg) * cv;
-            t.rr = dRisk > 0 ? Math.abs(t.tp - avg) / dRisk : 0;
+            t.rr = risk > 0 ? t.plannedGain / risk : 0;
         }
         // Editar as entradas REAIS (lista livre: adicionar/remover/editar preço e lote).
         // A calculadora é só um guia — aqui regista-se o que realmente aconteceu.
         async function editEntries(id) {
             const journal = getJournal(); const t = journal.find(x => x.id === id); if (!t) return;
             if (t.cValue == null) t.cValue = getCValue(t);   // captura antes de mexer nos valores
-            const initial = t.entries.map((p, i) => ({ price: String(p), lot: String(t.lots[i] != null ? t.lots[i] : '') }));
+            const slOf = i => (t.sls && t.sls[i] != null) ? t.sls[i] : t.sl;
+            const initial = t.entries.map((p, i) => ({ price: String(p), sl: String(slOf(i) != null ? slOf(i) : ''), lot: String(t.lots[i] != null ? t.lots[i] : '') }));
             const res = await showModal({
                 title: `${t.symbol} · ${tr('edit_entries')}`, okText: tr('m_save'),
                 fields: [{ key: 'entries', type: 'entries', value: initial }]
             });
             if (!res) return;
             const rows = res.entries
-                .map(e => ({ price: parseFloat(String(e.price).replace(',', '.')), lot: parseFloat(String(e.lot).replace(',', '.')) }))
-                .filter(r => !isNaN(r.price) && !isNaN(r.lot) && r.lot > 0);
+                .map(e => ({ price: parseFloat(String(e.price).replace(',', '.')), sl: parseFloat(String(e.sl).replace(',', '.')), lot: parseFloat(String(e.lot).replace(',', '.')) }))
+                .filter(r => !isNaN(r.price) && !isNaN(r.sl) && !isNaN(r.lot) && r.lot > 0);
             if (!rows.length) { showAlert(tr('invalid_value')); return; }
             t.entries = rows.map(r => r.price);
+            t.sls = rows.map(r => r.sl);
             t.lots = rows.map(r => r.lot);
             delete t.executed;   // modelo antigo — já não usamos
             const tot = t.lots.reduce((s, l) => s + l, 0);
@@ -2193,7 +2210,7 @@
                 const entriesToggle = (t.entries && t.entries.length)
                     ? `<div class="flex items-center gap-1 flex-wrap mt-2 text-xs">
                             <span class="text-gray-400 mr-1">${tr('entries_short')}:</span>
-                            ${t.entries.map((e, i) => `<span class="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-gray-600 font-semibold">${formatPrice(e)}${t.lots[i] != null ? ' · ' + (+t.lots[i]).toFixed(2) : ''}</span>`).join('')}
+                            ${t.entries.map((e, i) => { const slv = (t.sls && t.sls[i] != null) ? t.sls[i] : t.sl; return `<span class="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-gray-600 font-semibold">${formatPrice(e)}${slv != null ? ' <span class="text-red-400">' + tr('sl_short') + ' ' + formatPrice(slv) + '</span>' : ''}${t.lots[i] != null ? ' · ' + (+t.lots[i]).toFixed(2) : ''}</span>`; }).join('')}
                             <button onclick="event.stopPropagation();editEntries(${t.id})" title="${tr('edit_entries')}" class="text-blue-600 hover:underline font-semibold ml-1">✏️</button>
                         </div>` : '';
                 const open = expandedTrades.has(t.id);
@@ -2278,7 +2295,7 @@
                 fmtDate(t.ts), t.symbol, t.assetType, t.direction,
                 t.priority ? 'P' + t.priority : '', t.style || '',
                 t.entries.join(' '), t.pcts.join(' '), t.avgEntry,
-                t.sl, t.tp, t.totalLot, t.plannedRisk.toFixed(2), t.plannedGain.toFixed(2),
+                (t.sls && t.sls.length ? t.sls.join(' ') : t.sl), t.tp, t.totalLot, t.plannedRisk.toFixed(2), t.plannedGain.toFixed(2),
                 t.rr.toFixed(2), t.riskPct.toFixed(2), t.status,
                 t.resultUSD != null ? t.resultUSD : '', t.exitType || '', partialsStr(t), clean(t.notExecReason), clean(t.review), clean(t.notes)
             ]);
