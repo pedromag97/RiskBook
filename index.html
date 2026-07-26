@@ -637,6 +637,7 @@
                 journal_title: 'Trade Log', toggle: 'Show / Hide', month_summary_btn: 'Month Summary', year_summary_btn: 'Year Summary',
                 st_trades: 'Trades', st_open: 'Open', st_notexec: 'Not Taken', st_winrate: 'Win Rate', st_pnl: 'Total P&L', st_pf: 'Profit Factor', st_expect: 'Expectancy',
                 charts_title: 'Charts', charts_nodata: 'Not enough data', chart_equity: 'Equity curve', chart_pertrade: 'P&L per trade', chart_permonth: 'P&L per month', chart_avg: 'Avg win vs avg loss', avg_win: 'Avg win', avg_loss: 'Avg loss',
+                st_gross_win: 'Gross profit', st_gross_loss: 'Gross loss', st_best: 'Best trade', st_worst: 'Worst trade',
                 bd_priority: 'By Priority', bd_style: 'By Style', bd_group: 'Group', bd_n: 'N', bd_hit: 'Win%', bd_pnl: 'P&L',
                 f_all: 'All', f_open: 'Open', f_closed: 'Closed', f_won: 'Won', f_lost: 'Lost', f_notexec: 'Not taken',
                 csv_btn: 'CSV month', backup_btn: 'Backup', restore_btn: 'Restore', clear_btn: 'Clear',
@@ -700,6 +701,7 @@
                 journal_title: 'Journal de Trades', toggle: 'Afficher / Masquer', month_summary_btn: 'Résumé du Mois', year_summary_btn: 'Résumé Annuel',
                 st_trades: 'Trades', st_open: 'Ouverts', st_notexec: 'Non pris', st_winrate: 'Taux Réussite', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Espérance',
                 charts_title: 'Graphiques', charts_nodata: 'Données insuffisantes', chart_equity: 'Courbe de capital', chart_pertrade: 'P&L par trade', chart_permonth: 'P&L par mois', chart_avg: 'Gain moy. vs perte moy.', avg_win: 'Gain moy.', avg_loss: 'Perte moy.',
+                st_gross_win: 'Gain brut', st_gross_loss: 'Perte brute', st_best: 'Meilleur trade', st_worst: 'Pire trade',
                 bd_priority: 'Par Priorité', bd_style: 'Par Style', bd_group: 'Groupe', bd_n: 'N', bd_hit: 'Réus.%', bd_pnl: 'P&L',
                 f_all: 'Tous', f_open: 'Ouverts', f_closed: 'Fermés', f_won: 'Gagnés', f_lost: 'Perdus', f_notexec: 'Non pris',
                 csv_btn: 'CSV mois', backup_btn: 'Backup', restore_btn: 'Restaurer', clear_btn: 'Effacer',
@@ -763,6 +765,7 @@
                 journal_title: 'Registro de Trades', toggle: 'Ver / Ocultar', month_summary_btn: 'Resumen del Mes', year_summary_btn: 'Resumen Anual',
                 st_trades: 'Trades', st_open: 'Abiertos', st_notexec: 'No ejec.', st_winrate: 'Aciertos', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Esperanza',
                 charts_title: 'Gráficos', charts_nodata: 'Datos insuficientes', chart_equity: 'Curva de capital', chart_pertrade: 'P&L por trade', chart_permonth: 'P&L por mes', chart_avg: 'Ganancia media vs pérdida media', avg_win: 'Gan. media', avg_loss: 'Pérd. media',
+                st_gross_win: 'Ganancia bruta', st_gross_loss: 'Pérdida bruta', st_best: 'Mejor trade', st_worst: 'Peor trade',
                 bd_priority: 'Por Prioridad', bd_style: 'Por Estilo', bd_group: 'Grupo', bd_n: 'N', bd_hit: 'Acier.%', bd_pnl: 'P&L',
                 f_all: 'Todas', f_open: 'Abiertas', f_closed: 'Cerradas', f_won: 'Ganadas', f_lost: 'Perdidas', f_notexec: 'No ejecutadas',
                 csv_btn: 'CSV mes', backup_btn: 'Backup', restore_btn: 'Restaurar', clear_btn: 'Borrar',
@@ -826,6 +829,7 @@
                 journal_title: 'Log de Trades', toggle: 'Ver / Ocultar', month_summary_btn: 'Resumo do Mês', year_summary_btn: 'Resumo Anual',
                 st_trades: 'Trades', st_open: 'Abertas', st_notexec: 'Não Exec.', st_winrate: 'Taxa Acerto', st_pnl: 'P&L Total', st_pf: 'Profit Factor', st_expect: 'Expectância',
                 charts_title: 'Gráficos', charts_nodata: 'Dados insuficientes', chart_equity: 'Curva de capital', chart_pertrade: 'P&L por trade', chart_permonth: 'P&L por mês', chart_avg: 'Ganho médio vs perda média', avg_win: 'Ganho médio', avg_loss: 'Perda média',
+                st_gross_win: 'Ganho bruto', st_gross_loss: 'Perda bruta', st_best: 'Melhor trade', st_worst: 'Pior trade',
                 bd_priority: 'Por Prioridade', bd_style: 'Por Estilo', bd_group: 'Grupo', bd_n: 'N', bd_hit: 'Acerto', bd_pnl: 'P&L',
                 f_all: 'Todas', f_open: 'Abertas', f_closed: 'Fechadas', f_won: 'Ganhas', f_lost: 'Perdidas', f_notexec: 'Não executadas',
                 csv_btn: 'CSV mês', backup_btn: 'Backup', restore_btn: 'Restaurar', clear_btn: 'Limpar',
@@ -1995,6 +1999,10 @@
             // P&L Total = tudo o que já foi realizado, incluindo saídas parciais de trades ainda abertas.
             const pnl = journal.reduce((s, t) => s + (typeof t.resultUSD === 'number' ? t.resultUSD : 0), 0);
             const decided = wins.length + losses.length;          // exclui breakeven da taxa de acerto
+            // Melhor/pior trade sobre tudo o que já foi realizado (fechadas + parciais).
+            const realized = journal.filter(t => typeof t.resultUSD === 'number').map(t => t.resultUSD);
+            const bestTrade = realized.length ? Math.max(...realized) : 0;
+            const worstTrade = realized.length ? Math.min(...realized) : 0;
             return {
                 total: journal.length,
                 open: journal.filter(t => t.status === 'aberto' || t.status === 'parcial').length,
@@ -2005,7 +2013,12 @@
                 profitFactor: grossLoss > 0 ? grossWin / grossLoss : (grossWin > 0 ? Infinity : 0),
                 avgWin: wins.length ? grossWin / wins.length : 0,
                 avgLoss: losses.length ? grossLoss / losses.length : 0,
-                expectancy: closed.length ? closedPnl / closed.length : 0
+                expectancy: closed.length ? closedPnl / closed.length : 0,
+                grossProfit: grossWin,
+                grossLoss: grossLoss,
+                bestTrade,
+                worstTrade,
+                hasRealized: realized.length > 0
             };
         }
 
@@ -2486,7 +2499,21 @@
                 statTile(tr('st_winrate'), s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
                 statTile(tr('st_pnl'), formatSigned(s.pnl), pnlColor) +
                 statTile(tr('st_pf'), pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
+                `</div>` +
+                `<div class="grid grid-cols-2 gap-2 mb-3">` +
+                statTile(tr('st_gross_win'), s.grossProfit ? '+' + formatCurrency(s.grossProfit) : '—', '#059669') +
+                statTile(tr('st_gross_loss'), s.grossLoss ? '−' + formatCurrency(s.grossLoss) : '—', '#dc2626') +
+                statTile(tr('st_best'), s.hasRealized ? formatSigned(s.bestTrade) : '—', s.bestTrade >= 0 ? '#059669' : '#dc2626') +
+                statTile(tr('st_worst'), s.hasRealized ? formatSigned(s.worstTrade) : '—', s.worstTrade >= 0 ? '#059669' : '#dc2626') +
                 `</div>`;
+            // Gráficos do mês: curva de capital + P&L por trade + ganho médio vs perda média.
+            const chartsHTML = `<div class="grid grid-cols-1 gap-2 mb-3">
+                    ${chartCard(tr('chart_equity'), svgEquity(trades))}
+                    <div class="grid grid-cols-2 gap-2">
+                        ${chartCard(tr('chart_pertrade'), svgPerTrade(trades))}
+                        ${chartCard(tr('chart_avg'), svgAvg(s))}
+                    </div>
+                </div>`;
             const rows = trades.map(reportRowHTML).join('');
             return `
                 <div style="border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline">
@@ -2494,6 +2521,7 @@
                     <span style="font-size:15px;font-weight:700;color:#3b82f6">${fmtMonth(selectedMonth)}</span>
                 </div>
                 ${statsHTML}
+                ${chartsHTML}
                 <div class="grid grid-cols-1 gap-3 mb-3">${breakdownHTML(trades)}</div>
                 <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin-bottom:6px">${tr('trades_of_month')}</div>
                 <div style="display:flex;flex-direction:column;gap:6px">${rows}</div>
@@ -2583,6 +2611,12 @@
                 statTile(tr('st_pf'), yearS.profitFactor === Infinity ? '∞' : yearS.profitFactor.toFixed(2), yearS.profitFactor >= 1 ? '#059669' : '#dc2626') +
                 statTile(tr('best_month'), best < 0 ? '—' : monthsArr()[best].slice(0, 3), '#059669') +
                 statTile(tr('worst_month'), worst < 0 ? '—' : monthsArr()[worst].slice(0, 3), '#dc2626') +
+                `</div>` +
+                `<div class="grid grid-cols-2 gap-2 mb-3">` +
+                statTile(tr('st_gross_win'), yearS.grossProfit ? '+' + formatCurrency(yearS.grossProfit) : '—', '#059669') +
+                statTile(tr('st_gross_loss'), yearS.grossLoss ? '−' + formatCurrency(yearS.grossLoss) : '—', '#dc2626') +
+                statTile(tr('st_best'), yearS.hasRealized ? formatSigned(yearS.bestTrade) : '—', yearS.bestTrade >= 0 ? '#059669' : '#dc2626') +
+                statTile(tr('st_worst'), yearS.hasRealized ? formatSigned(yearS.worstTrade) : '—', yearS.worstTrade >= 0 ? '#059669' : '#dc2626') +
                 `</div>`;
             // Tabela mensal (só meses com trades)
             const tableRows = monthly.map((m, i) => {
@@ -2605,6 +2639,8 @@
                 ${svgMonthlyBars(vals)}
                 <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin:8px 0 2px">${tr('equity_cum')} (${formatSigned(totalPnl)})</div>
                 ${svgEquityLine(cum)}
+                <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin:8px 0 2px">${tr('chart_avg')}</div>
+                ${svgAvg(yearS)}
                 <table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:10px">
                     <thead><tr style="font-size:9px;color:#9ca3af;text-transform:uppercase">
                         <th style="text-align:left;padding:2px 4px">${tr('month_word')}</th>
