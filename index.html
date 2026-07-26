@@ -500,6 +500,7 @@
                     <select id="journalFilter" onchange="renderJournal()" class="input-field text-sm py-2 px-2 col-span-2">
                         <option value="todos" data-i18n="f_all">Todas</option>
                         <option value="aberto" data-i18n="f_open">Abertas</option>
+                        <option value="parcial" data-i18n="f_partial">Parciais</option>
                         <option value="fechado" data-i18n="f_closed">Fechadas</option>
                         <option value="ganho" data-i18n="f_won">Ganhas</option>
                         <option value="perdido" data-i18n="f_lost">Perdidas</option>
@@ -600,7 +601,7 @@
                 m_cancel: 'Cancel', m_save: 'Save', m_ok: 'OK', m_confirm: 'Confirm',
                 m_result: 'Realized Result ($)', m_result_hint: 'Positive = win · negative = loss · 0 = breakeven',
                 m_plan: 'Plan: target +{gain} / risk -{risk}', m_exit: 'How did it close?', m_manual: 'Manual',
-                m_exits: 'Exits (partial)', m_add_exit: 'Add partial exit', m_total: 'Total', m_price: 'Price', edit_class: 'Click to change', exec_entries: 'Executed', edit_entries: 'Edit entries', entries_short: 'Entries', m_add_entry: 'Add entry', m_qty: 'Qty', m_fee: 'Fee', m_net: 'Net',
+                m_exits: 'Exits (partial)', m_add_exit: 'Add partial exit', m_total: 'Total', m_price: 'Price', edit_class: 'Click to change', exec_entries: 'Executed', edit_entries: 'Edit entries', entries_short: 'Entries', m_add_entry: 'Add entry', m_qty: 'Qty', m_fee: 'Fee', m_net: 'Net', b_partial: 'PARTIAL', remaining: 'To sell', f_partial: 'Partial',
                 collapse_all: 'Collapse all', expand_all: 'Expand all',
                 m_notexec: 'Why not taken?', m_review: 'What went wrong / lesson', m_notes: 'Notes', m_date: 'Trade date', m_year: 'Year',
                 wallet_label: 'Account ($)', wallet_lock_title: 'Lock the account', maxloss_label: 'Max Loss ($)',
@@ -662,7 +663,7 @@
                 m_cancel: 'Annuler', m_save: 'Enregistrer', m_ok: 'OK', m_confirm: 'Confirmer',
                 m_result: 'Résultat réalisé ($)', m_result_hint: 'Positif = gain · négatif = perte · 0 = neutre',
                 m_plan: 'Plan : cible +{gain} / risque -{risk}', m_exit: 'Comment ça a fermé ?', m_manual: 'Manuel',
-                m_exits: 'Sorties (partielles)', m_add_exit: 'Ajouter une sortie', m_total: 'Total', m_price: 'Prix', edit_class: 'Cliquer pour changer', exec_entries: 'Exécutées', edit_entries: 'Modifier les entrées', entries_short: 'Entrées', m_add_entry: 'Ajouter une entrée', m_qty: 'Qté', m_fee: 'Frais', m_net: 'Net',
+                m_exits: 'Sorties (partielles)', m_add_exit: 'Ajouter une sortie', m_total: 'Total', m_price: 'Prix', edit_class: 'Cliquer pour changer', exec_entries: 'Exécutées', edit_entries: 'Modifier les entrées', entries_short: 'Entrées', m_add_entry: 'Ajouter une entrée', m_qty: 'Qté', m_fee: 'Frais', m_net: 'Net', b_partial: 'PARTIEL', remaining: 'À vendre', f_partial: 'Partiels',
                 collapse_all: 'Tout réduire', expand_all: 'Tout ouvrir',
                 m_notexec: 'Raison de non-prise', m_review: 'Ce qui a mal tourné / leçon', m_notes: 'Notes', m_date: 'Date du trade', m_year: 'Année',
                 wallet_label: 'Compte ($)', wallet_lock_title: 'Verrouiller le compte', maxloss_label: 'Perte Max ($)',
@@ -724,7 +725,7 @@
                 m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
                 m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganancia · negativo = pérdida · 0 = neutro',
                 m_plan: 'Plan: objetivo +{gain} / riesgo -{risk}', m_exit: '¿Cómo cerró?', m_manual: 'Manual',
-                m_exits: 'Salidas (parciales)', m_add_exit: 'Añadir salida', m_total: 'Total', m_price: 'Precio', edit_class: 'Clic para cambiar', exec_entries: 'Ejecutadas', edit_entries: 'Editar entradas', entries_short: 'Entradas', m_add_entry: 'Añadir entrada', m_qty: 'Cant.', m_fee: 'Comisión', m_net: 'Neto',
+                m_exits: 'Salidas (parciales)', m_add_exit: 'Añadir salida', m_total: 'Total', m_price: 'Precio', edit_class: 'Clic para cambiar', exec_entries: 'Ejecutadas', edit_entries: 'Editar entradas', entries_short: 'Entradas', m_add_entry: 'Añadir entrada', m_qty: 'Cant.', m_fee: 'Comisión', m_net: 'Neto', b_partial: 'PARCIAL', remaining: 'Por vender', f_partial: 'Parciales',
                 collapse_all: 'Minimizar todas', expand_all: 'Expandir todas',
                 m_notexec: 'Motivo de no ejecutar', m_review: 'Qué salió mal / lección', m_notes: 'Notas', m_date: 'Fecha del trade', m_year: 'Año',
                 wallet_label: 'Cuenta ($)', wallet_lock_title: 'Bloquear la cuenta', maxloss_label: 'Pérdida Máx ($)',
@@ -786,7 +787,7 @@
                 m_cancel: 'Cancelar', m_save: 'Guardar', m_ok: 'OK', m_confirm: 'Confirmar',
                 m_result: 'Resultado realizado ($)', m_result_hint: 'Positivo = ganho · negativo = perda · 0 = nulo',
                 m_plan: 'Plano: alvo +{gain} / risco -{risk}', m_exit: 'Como fechou?', m_manual: 'Manual',
-                m_exits: 'Saídas (parciais)', m_add_exit: 'Adicionar saída', m_total: 'Total', m_price: 'Preço', edit_class: 'Clicar para mudar', exec_entries: 'Executadas', edit_entries: 'Editar entradas', entries_short: 'Entradas', m_add_entry: 'Adicionar entrada', m_qty: 'Qtd', m_fee: 'Comissão', m_net: 'Líquido',
+                m_exits: 'Saídas (parciais)', m_add_exit: 'Adicionar saída', m_total: 'Total', m_price: 'Preço', edit_class: 'Clicar para mudar', exec_entries: 'Executadas', edit_entries: 'Editar entradas', entries_short: 'Entradas', m_add_entry: 'Adicionar entrada', m_qty: 'Qtd', m_fee: 'Comissão', m_net: 'Líquido', b_partial: 'PARCIAL', remaining: 'Por vender', f_partial: 'Parciais',
                 collapse_all: 'Minimizar todas', expand_all: 'Expandir todas',
                 m_notexec: 'Motivo de não executar', m_review: 'O que correu mal / lição', m_notes: 'Notas', m_date: 'Data da trade', m_year: 'Ano',
                 wallet_label: 'Carteira ($)', wallet_lock_title: 'Trancar a carteira', maxloss_label: 'Perda Máx ($)',
@@ -1822,9 +1823,10 @@
             if (!t) return;
             // Estado inicial das saídas: usa as existentes, ou converte o resultado antigo,
             // ou uma linha vazia (compatível com trades registadas antes desta feature).
+            const S = v => (v != null ? String(v) : '');
             const initial = (t.exits && t.exits.length)
-                ? t.exits.map(e => ({ usd: String(e.usd), type: e.type || 'Manual', price: e.price != null ? String(e.price) : '' }))
-                : (t.resultUSD != null ? [{ usd: String(t.resultUSD), type: t.exitType || 'Manual', price: '' }] : [{ usd: '', type: 'Manual', price: '' }]);
+                ? t.exits.map(e => ({ usd: S(e.usd), type: e.type || 'Manual', price: S(e.price), qty: S(e.qty), fee: S(e.fee) }))
+                : (t.resultUSD != null ? [{ usd: S(t.resultUSD), type: t.exitType || 'Manual', price: '', qty: '', fee: '' }] : [{ usd: '', type: 'Manual', price: '', qty: '', fee: '' }]);
             const res = await showModal({
                 title: `${t.symbol} · ${dirLabel(t.direction)}`,
                 subtitle: tr('m_plan', { gain: formatCurrency(t.plannedGain), risk: formatCurrency(t.plannedRisk) }),
@@ -1853,10 +1855,16 @@
             const gross = exits.reduce((s, e) => s + e.usd, 0);
             const fees = exits.reduce((s, e) => s + (e.fee || 0), 0);
             const net = gross - fees;                            // resultado líquido (P&L − comissões)
+            // Fechada só se a quantidade vendida cobrir o lote total. Se houver quantidades
+            // e ainda faltar vender, fica PARCIAL (continua aberta).
+            const soldQty = exits.reduce((s, e) => s + (e.qty || 0), 0);
+            const hasQty = exits.some(e => e.qty != null);
+            const eps = Math.max(1e-6, t.totalLot * 1e-4);
+            const stillOpen = hasQty && (t.totalLot - soldQty) > eps;
             t.exits = exits;
             t.resultUSD = net;
             t.exitType = exits.length > 1 ? 'Parcial' : exits[0].type;
-            t.status = net > 0 ? 'ganho' : net < 0 ? 'perdido' : 'nulo';
+            t.status = stillOpen ? 'parcial' : (net > 0 ? 'ganho' : net < 0 ? 'perdido' : 'nulo');
             saveJournal(journal);
             renderJournal();
         }
@@ -1950,9 +1958,10 @@
             renderJournal();
         }
 
-        // Estatísticas agregadas das trades FECHADAS.
+        // Estatísticas agregadas das trades FECHADAS (parcial/aberta não contam).
+        const CLOSED_ST = ['ganho', 'perdido', 'nulo'];
         function computeStats(journal) {
-            const closed = journal.filter(t => t.resultUSD != null);
+            const closed = journal.filter(t => CLOSED_ST.includes(t.status));
             const wins = closed.filter(t => t.resultUSD > 0);
             const losses = closed.filter(t => t.resultUSD < 0);
             const grossWin = wins.reduce((s, t) => s + t.resultUSD, 0);
@@ -1961,7 +1970,7 @@
             const decided = wins.length + losses.length;          // exclui breakeven da taxa de acerto
             return {
                 total: journal.length,
-                open: journal.filter(t => t.status === 'aberto').length,
+                open: journal.filter(t => t.status === 'aberto' || t.status === 'parcial').length,
                 notExec: journal.filter(t => t.status === 'nao_exec').length,
                 closed: closed.length,
                 winRate: decided ? (wins.length / decided) * 100 : 0,
@@ -1987,6 +1996,7 @@
                 ganho:    ['b_won',  '#065f46', '#d1fae5'],
                 perdido:  ['b_lost', '#991b1b', '#fee2e2'],
                 nulo:     ['b_be',   '#92400e', '#fef3c7'],
+                parcial:  ['b_partial', '#9a3412', '#ffedd5'],
                 nao_exec: ['b_notexec', '#4b5563', '#e5e7eb'],
             };
             const [key, fg, bg] = map[t.status] || map.aberto;
@@ -2140,8 +2150,8 @@
             // Lista: trades do mês + filtro de estado.
             const shown = monthTrades.filter(t => {
                 if (filter === 'todos') return true;
-                if (filter === 'fechado') return t.resultUSD != null;
-                if (filter === 'aberto') return t.status === 'aberto';
+                if (filter === 'fechado') return CLOSED_ST.includes(t.status);
+                if (filter === 'aberto') return t.status === 'aberto' || t.status === 'parcial';
                 return t.status === filter;
             });
 
@@ -2158,9 +2168,13 @@
                         ? `<span class="font-bold" style="color:${t.resultUSD >= 0 ? '#059669' : '#dc2626'}">${formatSigned(t.resultUSD)}</span>`
                         : `<span class="text-gray-400">—</span>`;
                 const notes = t.notes ? `<p class="text-xs text-gray-500 mt-1 italic">📝 ${t.notes}</p>` : '';
-                // Detalhe das saídas (tipo · $ · preço) — mostrado só ao expandir.
+                // Detalhe das saídas (tipo · $ · qtd · preço · comissão) — só ao expandir.
                 const exitsLine = (t.exits && t.exits.length)
                     ? `<p class="text-xs mt-1" style="color:#6b7280">💰 ${tr('m_exits')}: ${t.exits.map(e => `${e.type} ${formatSigned(e.usd)}${e.qty != null ? ' ×' + (+e.qty).toFixed(2) : ''}${e.price != null ? ' @' + formatPrice(e.price) : ''}${e.fee ? ' −' + tr('m_fee') + formatCurrency(e.fee) : ''}`).join(' · ')}</p>` : '';
+                // Quantidade por vender (só quando parcial).
+                const soldQty = (t.exits || []).reduce((s, e) => s + (e.qty || 0), 0);
+                const remainingLine = (t.status === 'parcial')
+                    ? `<p class="text-xs mt-1 font-bold" style="color:#9a3412">⏳ ${tr('remaining')}: ${(t.totalLot - soldQty).toFixed(2)} / ${t.totalLot.toFixed(2)} ${tr('r_lot')}</p>` : '';
                 const reviewLine = t.review
                     ? `<p class="text-xs mt-1 italic" style="color:#b45309">🔍 ${t.review}</p>` : '';
                 const reasonLine = t.status === 'nao_exec'
@@ -2207,7 +2221,7 @@
                             <span>${tr('r_rr')} ${t.rr.toFixed(2)}</span>
                         </div>
                         ${entriesToggle}
-                        ${exitsLine}${notes}${reviewLine}${reasonLine}
+                        ${remainingLine}${exitsLine}${notes}${reviewLine}${reasonLine}
                         <div class="flex gap-2 mt-2 flex-wrap items-center">${actions.join('')}</div>
                     </div>
                 </div>`;
