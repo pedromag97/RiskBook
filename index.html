@@ -2314,7 +2314,9 @@
                 statTile(tr('st_winrate'), s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
                 statTile(tr('st_pnl'), formatSigned(s.pnl), pnlColor) +
                 statTile(tr('st_pf'), pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
-                statTile(tr('st_expect'), formatSigned(s.expectancy), s.expectancy >= 0 ? '#059669' : '#dc2626');
+                statTile(tr('st_expect'), formatSigned(s.expectancy), s.expectancy >= 0 ? '#059669' : '#dc2626') +
+                statTile(tr('st_best'), s.hasRealized ? formatSigned(s.bestTrade) : '—', s.bestTrade >= 0 ? '#059669' : '#dc2626') +
+                statTile(tr('st_worst'), s.hasRealized ? formatSigned(s.worstTrade) : '—', s.worstTrade >= 0 ? '#059669' : '#dc2626');
 
             renderBreakdown(monthTrades);
             renderCharts(monthTrades, journal);
