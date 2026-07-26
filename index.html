@@ -2263,7 +2263,7 @@
                     <td class="py-0.5 pr-2 font-semibold text-gray-700">${g.label}</td>
                     <td class="py-0.5 px-1 text-right text-gray-500">${g.subset.length}</td>
                     <td class="py-0.5 px-1 text-right" style="color:${wrColor}">${s.closed ? s.winRate.toFixed(0) + '%' : '—'}</td>
-                    <td class="py-0.5 pl-1 text-right font-semibold whitespace-nowrap" style="color:${pnlColor}">${s.closed ? formatSigned(s.pnl) : '—'}</td>
+                    <td class="py-0.5 pl-1 text-right font-semibold whitespace-nowrap" style="color:${pnlColor}">${s.hasRealized ? formatSigned(s.pnl) : '—'}</td>
                 </tr>`;
             }).join('');
             if (!rows) return '';
@@ -2282,7 +2282,7 @@
         }
 
         function breakdownHTML(journal) {
-            const byPriority = [1, 2, 3].map(p => ({ label: 'P' + p, subset: journal.filter(t => t.priority === p) }));
+            const byPriority = [1, 2, 3].map(p => ({ label: tr(PRIO_KEY[p]), subset: journal.filter(t => t.priority === p) }));
             const byStyle = [['day', 'Day'], ['swing', 'Swing']].map(([k, l]) => ({ label: l, subset: journal.filter(t => t.style === k) }));
             return groupStatsTable(tr('bd_priority'), byPriority) + groupStatsTable(tr('bd_style'), byStyle);
         }
@@ -2628,7 +2628,7 @@
                     <td style="padding:2px 4px;color:#374151;font-weight:600">${monthsArr()[i]}</td>
                     <td style="padding:2px 4px;text-align:right;color:#6b7280">${m.trades}</td>
                     <td style="padding:2px 4px;text-align:right;color:${m.s.closed ? (m.s.winRate >= 50 ? '#059669' : '#dc2626') : '#9ca3af'}">${m.s.closed ? m.s.winRate.toFixed(0) + '%' : '—'}</td>
-                    <td style="padding:2px 4px;text-align:right;font-weight:700;color:${c}">${m.s.closed ? formatSigned(m.s.pnl) : '—'}</td>
+                    <td style="padding:2px 4px;text-align:right;font-weight:700;color:${c}">${m.s.hasRealized ? formatSigned(m.s.pnl) : '—'}</td>
                 </tr>`;
             }).join('');
             return `
