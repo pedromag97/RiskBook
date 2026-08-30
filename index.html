@@ -417,7 +417,7 @@
                 <!-- Detalhe das tranches + risco acumulado -->
                 <div id="trancheBreakdown" class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <p class="text-[10px] text-gray-400 uppercase font-bold mb-2" data-i18n="entries_cumrisk">Entradas & Risco Acumulado</p>
-                    <div class="overflow-x-auto"><table id="trancheTable" class="w-full text-xs" style="min-width:290px"></table></div>
+                    <div id="trancheLines" class="space-y-2"></div>
                     <div id="cumRiskLine" class="mt-2 pt-2 border-t border-gray-100 text-sm font-semibold text-gray-700"></div>
                 </div>
 
@@ -1636,38 +1636,32 @@
             document.getElementById('resSL').textContent = slDisplay;
             document.getElementById('resTP').textContent = formatPrice(tp);
 
-            // Tabela por tranche: nº/peso · entrada · SL · TP · lote · risco.
+            // Detalhe por tranche: cabeçalho (nº · peso | risco) + campos rotulados
+            // que quebram linha sozinhos — sem scroll horizontal em ecrãs estreitos.
             const ordinals = ['1ª', '2ª', '3ª'];
-            let tRows = '';
+            const field = (label, value, color) =>
+                `<span class="whitespace-nowrap"><span class="text-gray-400">${label}</span> <span class="font-bold" style="color:${color}">${value}</span></span>`;
+            let tHTML = '';
             for (let i = 0; i < trancheCount; i++) {
                 // Peso da entrada: % do lote total, ou $ investido (conforme o modo).
                 const weightTxt = sizingMode === 'amt'
                     ? formatCurrency(pcts[i])
                     : `${(weights[i] * 100).toFixed(0)}%`;
-                tRows += `<tr class="border-t border-gray-200">
-                    <td class="py-1 pr-1 align-top">
-                        <span class="font-bold text-gray-700">${ordinals[i]}</span>
-                        <span class="block text-[10px] text-gray-400 font-semibold">${weightTxt}</span>
-                    </td>
-                    <td class="py-1 px-1 text-right align-top font-semibold text-gray-800">${formatPrice(entries[i])}</td>
-                    <td class="py-1 px-1 text-right align-top font-semibold" style="color:#dc2626">${formatPrice(sls[i])}</td>
-                    <td class="py-1 px-1 text-right align-top font-semibold" style="color:#059669">${formatPrice(tp)}</td>
-                    <td class="py-1 px-1 text-right align-top">
-                        <span class="font-bold text-gray-800">${formatLot(lots[i])}</span>
-                        <span class="block text-[10px] text-gray-400">${formatLotExact(lotsExact[i])}</span>
-                    </td>
-                    <td class="py-1 pl-1 text-right align-top font-bold" style="color:#dc2626">${formatCurrency(trancheRisks[i])}</td>
-                </tr>`;
+                tHTML += `<div class="pt-2 border-t border-gray-200 first:border-0 first:pt-0">
+                    <div class="flex items-baseline justify-between gap-2">
+                        <span class="text-xs"><span class="font-bold text-gray-700">${ordinals[i]}</span>
+                            <span class="text-gray-400 font-semibold">· ${weightTxt}</span></span>
+                        <span class="text-sm font-extrabold" style="color:#dc2626">${formatCurrency(trancheRisks[i])}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs mt-0.5">
+                        ${field(t('th_entry'), formatPrice(entries[i]), '#1f2937')}
+                        ${field(t('sl_short'), formatPrice(sls[i]), '#dc2626')}
+                        ${field(t('th_tp'), formatPrice(tp), '#059669')}
+                        ${field(t('th_lot'), formatLot(lots[i]) + ` <span class="font-normal text-gray-400">(${formatLotExact(lotsExact[i])})</span>`, '#1f2937')}
+                    </div>
+                </div>`;
             }
-            document.getElementById('trancheTable').innerHTML =
-                `<thead><tr class="text-[9px] text-gray-400 uppercase font-bold">
-                    <th class="text-left pb-1">#</th>
-                    <th class="text-right pb-1 px-1">${t('th_entry')}</th>
-                    <th class="text-right pb-1 px-1">${t('sl_short')}</th>
-                    <th class="text-right pb-1 px-1">${t('th_tp')}</th>
-                    <th class="text-right pb-1 px-1">${t('th_lot')}</th>
-                    <th class="text-right pb-1 pl-1">${t('th_risk')}</th>
-                </tr></thead><tbody>${tRows}</tbody>`;
+            document.getElementById('trancheLines').innerHTML = tHTML;
 
             // Risco acumulado: "1ª: $104 | +2ª: $188 | +3ª: $250"
             const labels = ['1ª', '2ª', '3ª'];
