@@ -305,16 +305,16 @@
                 </div>
             </div>
 
-            <!-- Modo de distribuição: % do lote total OU montante investido ($) -->
+            <!-- Modo de distribuição: % do lote total OU $ de risco por entrada -->
             <div class="pt-3">
                 <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="sizing_label">Distribuir por</label>
                 <div id="sizingModeSelector" class="grid grid-cols-2 gap-2">
                     <button type="button" class="seg-btn" data-mode="pct" data-i18n="sizing_pct">% do lote</button>
-                    <button type="button" class="seg-btn" data-mode="amt" data-i18n="sizing_amt">$ investido</button>
+                    <button type="button" class="seg-btn" data-mode="amt" data-i18n="sizing_amt">$ em risco</button>
                 </div>
             </div>
 
-            <!-- Preços de entrada + % da quantidade (ou $ investido) por tranche -->
+            <!-- Preços de entrada + % da quantidade (ou $ de risco) por tranche -->
             <p class="text-xs text-gray-400 -mb-1">
                 <span id="pctHelp" data-i18n="pct_help">Defines a <b>% do lote total</b> em cada entrada.</span>
                 <span id="pctSumHint" class="font-semibold"></span>
@@ -633,9 +633,9 @@
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
                 th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
-                sizing_label: 'Split by', sizing_pct: '% of lot', sizing_amt: '$ invested',
-                amt_help: 'Set the <b>amount invested</b> at each entry — lots come from your money. Max Loss only warns you.',
-                sum_invested: 'Invested: {sum}',
+                sizing_label: 'Split by', sizing_pct: '% of lot', sizing_amt: '$ at risk',
+                amt_help: 'Set the <b>$ you risk</b> at each entry (e.g. Max Loss $250 → 1st $100, 2nd $150). Lots are computed so each entry loses exactly that at its stop.',
+                sum_risk: 'Risk: {sum} of {max}',
                 pl1: '% of Lot 1', pl2: '% of Lot 2', pl3: '% of Lot 3', e1: 'Entry 1', e2: 'Entry 2', e3: 'Entry 3',
                 sl_label: 'Stop Loss (single)', tp_label: 'Take Profit (single)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Trade Date (for the log)',
                 calc_btn: 'Calculate', reg_btn: 'Register in Log', calc_hint: 'Review the summary below, then register the trade in the log.',
@@ -701,9 +701,9 @@
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
                 th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
-                sizing_label: 'Répartir par', sizing_pct: '% du lot', sizing_amt: '$ investi',
-                amt_help: 'Définis le <b>montant investi</b> à chaque entrée — les lots viennent de ton argent. La Perte Max ne fait qu\'avertir.',
-                sum_invested: 'Investi : {sum}',
+                sizing_label: 'Répartir par', sizing_pct: '% du lot', sizing_amt: '$ risqué',
+                amt_help: 'Définis le <b>$ risqué</b> à chaque entrée (ex. Perte Max 250$ → 1re 100$, 2e 150$). Les lots sont calculés pour perdre exactement ça au stop.',
+                sum_risk: 'Risque : {sum} sur {max}',
                 pl1: '% du Lot 1', pl2: '% du Lot 2', pl3: '% du Lot 3', e1: 'Entrée 1', e2: 'Entrée 2', e3: 'Entrée 3',
                 sl_label: 'Stop Loss (unique)', tp_label: 'Take Profit (unique)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Date du trade (pour le journal)',
                 calc_btn: 'Calculer', reg_btn: 'Journaliser', calc_hint: 'Analyse le résumé ci-dessous, puis journalise le trade.',
@@ -769,9 +769,9 @@
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
-                sizing_label: 'Repartir por', sizing_pct: '% del lote', sizing_amt: '$ invertido',
-                amt_help: 'Define el <b>importe invertido</b> en cada entrada — los lotes salen de tu dinero. La Pérdida Máx solo avisa.',
-                sum_invested: 'Invertido: {sum}',
+                sizing_label: 'Repartir por', sizing_pct: '% del lote', sizing_amt: '$ en riesgo',
+                amt_help: 'Define el <b>$ que arriesgas</b> en cada entrada (ej. Pérdida Máx $250 → 1ª $100, 2ª $150). Los lotes se calculan para perder exactamente eso en su stop.',
+                sum_risk: 'Riesgo: {sum} de {max}',
                 pl1: '% del Lote 1', pl2: '% del Lote 2', pl3: '% del Lote 3', e1: 'Entrada 1', e2: 'Entrada 2', e3: 'Entrada 3',
                 sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Fecha del trade (para el registro)',
                 calc_btn: 'Calcular', reg_btn: 'Registrar en el diario', calc_hint: 'Revisa el resumen y luego regístralo en el diario.',
@@ -837,9 +837,9 @@
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
-                sizing_label: 'Distribuir por', sizing_pct: '% do lote', sizing_amt: '$ investido',
-                amt_help: 'Defines o <b>montante investido</b> em cada entrada — os lotes saem do teu dinheiro. A Perda Máx só avisa.',
-                sum_invested: 'Investido: {sum}',
+                sizing_label: 'Distribuir por', sizing_pct: '% do lote', sizing_amt: '$ em risco',
+                amt_help: 'Defines o <b>$ que arriscas</b> em cada entrada (ex. Perda Máx $250 → 1ª $100, 2ª $150). Os lotes são calculados para perder exatamente isso no respetivo stop.',
+                sum_risk: 'Risco: {sum} de {max}',
                 pl1: '% do Lote 1', pl2: '% do Lote 2', pl3: '% do Lote 3', e1: 'Entrada 1', e2: 'Entrada 2', e3: 'Entrada 3',
                 sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Data da Trade (para o log)',
                 calc_btn: 'Calcular Resumo', reg_btn: 'Registar no Log', calc_hint: 'Analisa o resumo e depois regista a trade no log.',
@@ -1169,7 +1169,7 @@
         let currentPriority = 2;      // 1 = +prioritária/+confiança … 3 = -prioritária
         let currentStyle = 'day';     // 'day' | 'swing'
         // Distribuição das entradas: 'pct' = % do lote total (Perda Máx manda no lote)
-        //                            'amt' = $ investido por entrada (Perda Máx só avisa)
+        //                            'amt' = $ de risco por entrada (soma = risco total)
         const SIZING_MODE_KEY = 'riskcalc_sizing_mode';
         let sizingMode = localStorage.getItem(SIZING_MODE_KEY) === 'amt' ? 'amt' : 'pct';
 
@@ -1415,7 +1415,7 @@
                 row.classList.toggle('hidden', idx >= count);
             });
             // Repõe as percentagens por defeito para este nº de tranches.
-            // Em modo "$ investido" os valores são montantes — não os substituímos por %.
+            // Em modo "$ em risco" os valores são montantes — não os substituímos por %.
             const defs = DEFAULT_PCTS[count] || [];
             for (let i = 0; i < 3; i++) {
                 const inp = document.getElementById('pct' + (i + 1));
@@ -1425,7 +1425,7 @@
             calculateTradeSummary();
         }
 
-        // Alterna entre distribuir por "% do lote total" e por "$ investido" em cada entrada.
+        // Alterna entre distribuir por "% do lote total" e por "$ de risco" em cada entrada.
         function applySizingMode(mode, silent) {
             const prev = sizingMode;
             sizingMode = (mode === 'amt') ? 'amt' : 'pct';
@@ -1444,14 +1444,15 @@
             // Ao TROCAR de modo, semeia valores coerentes para não ficar 40 a valer $40.
             if (!silent && prev !== sizingMode) {
                 if (sizingMode === 'amt') {
-                    // Converte os lotes atuais no $ investido equivalente (qᵢ · cValue · Eᵢ).
+                    // Converte os lotes atuais no $ de risco equivalente (qᵢ · |Eᵢ−SLᵢ| · cValue).
                     const cv = parseFloat(document.getElementById('contractSize').value);
                     for (let i = 0; i < trancheCount; i++) {
                         const inp = document.getElementById('pct' + (i + 1));
                         const e = parseFloat(document.getElementById('entry' + (i + 1)).value);
+                        const s = parseFloat(document.getElementById('sl' + (i + 1)).value);
                         const lot = lastCalc && lastCalc.lots ? lastCalc.lots[i] : null;
-                        inp.value = (lot != null && !isNaN(e) && !isNaN(cv))
-                            ? Math.round(lot * cv * e * 100) / 100 : '';
+                        inp.value = (lot != null && !isNaN(e) && !isNaN(s) && !isNaN(cv))
+                            ? Math.round(lot * Math.abs(e - s) * cv * 100) / 100 : '';
                     }
                 } else {
                     const defs = DEFAULT_PCTS[trancheCount] || [];
@@ -1547,7 +1548,7 @@
             //     P = maxLoss / ( cValue · Σ( wᵢ·|Eᵢ−SL| ) )
             // => o teto é sempre respeitado, seja qual for a repartição (40/30/30, 50/50…).
             // -------------------------------------------------------------------
-            // Valores da 3ª coluna: % do lote total (modo 'pct') OU $ investido (modo 'amt').
+            // Valores da 3ª coluna: % do lote total (modo 'pct') OU $ de risco (modo 'amt').
             const pcts = [];
             for (let i = 0; i < trancheCount; i++) {
                 const p = parseFloat(document.getElementById('pct' + (i + 1)).value);
@@ -1561,18 +1562,19 @@
 
             if (sizingMode === 'amt') {
                 // -------------------------------------------------------------------
-                // MODO "$ INVESTIDO": escreves quanto dinheiro metes em cada entrada.
-                // O valor nominal de 1 lote ao preço Eᵢ é cValue·Eᵢ, logo:
-                //     qᵢ = montanteᵢ / (cValue · Eᵢ)
-                // Aqui a Perda Máx NÃO comanda o lote — passa a ser só um aviso
-                // (o risco resultante pode ficar acima ou abaixo do teto).
+                // MODO "$ EM RISCO": escreves quanto queres arriscar em CADA entrada
+                // (ex. Perda Máx $250 → 1ª $100, 2ª $150). Como o risco de uma tranche é
+                //     riscoᵢ = qᵢ · |Eᵢ − SLᵢ| · cValue
+                // o lote sai diretamente de:
+                //     qᵢ = riscoᵢ / (|Eᵢ − SLᵢ| · cValue)
+                // O risco total é a soma do que escreveste — a dica compara-o com a
+                // Perda Máx (verde se bate certo, laranja se não).
                 // -------------------------------------------------------------------
-                lotsExact = pcts.map((amt, i) => (cValue * entries[i] > 0) ? amt / (cValue * entries[i]) : 0);
+                lotsExact = pcts.map((amt, i) => (riskPoints[i] * cValue > 0) ? amt / (riskPoints[i] * cValue) : 0);
                 const sumExact = lotsExact.reduce((a, b) => a + b, 0);
                 weights = sumExact > 0 ? lotsExact.map(q => q / sumExact) : lotsExact.map(() => 0);
-                // Dica: total investido.
-                hint.textContent = t('sum_invested', { sum: formatCurrency(sumPct) });
-                hint.style.color = '#6b7280';
+                hint.textContent = t('sum_risk', { sum: formatCurrency(sumPct), max: formatCurrency(maxLoss) });
+                hint.style.color = Math.abs(sumPct - maxLoss) < 0.01 ? '#059669' : '#d97706';
             } else {
                 // Modo "% do lote": pesos normalizados; o lote total sai da Perda Máx.
                 weights = pcts.map(p => p / sumPct);
@@ -1643,10 +1645,9 @@
                 `<span class="whitespace-nowrap"><span class="text-gray-400">${label}</span> <span class="font-bold" style="color:${color}">${value}</span></span>`;
             let tHTML = '';
             for (let i = 0; i < trancheCount; i++) {
-                // Peso da entrada: % do lote total, ou $ investido (conforme o modo).
-                const weightTxt = sizingMode === 'amt'
-                    ? formatCurrency(pcts[i])
-                    : `${(weights[i] * 100).toFixed(0)}%`;
+                // Peso da entrada em % do lote total (em modo "$ em risco" é derivado,
+                // porque o valor que escreveste já aparece como risco à direita).
+                const weightTxt = `${(weights[i] * 100).toFixed(0)}%`;
                 tHTML += `<div class="pt-2 border-t border-gray-200 first:border-0 first:pt-0">
                     <div class="flex items-baseline justify-between gap-2">
                         <span class="text-xs"><span class="font-bold text-gray-700">${ordinals[i]}</span>
@@ -1695,7 +1696,7 @@
                 direction: isBuy ? 'COMPRA' : 'VENDA',
                 entries: entries.slice(),
                 pcts: pcts.slice(),
-                sizingMode,               // 'pct' (% do lote) ou 'amt' ($ investido)
+                sizingMode,               // 'pct' (% do lote) ou 'amt' ($ de risco)
                 avgEntry, sl: avgSL, sls: sls.slice(), tp,
                 lots: lots.slice(),
                 totalLot: totalQty,
