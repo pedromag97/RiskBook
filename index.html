@@ -82,7 +82,7 @@
         }
         .input-field:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
             outline: none;
             background-color: white;
         }
@@ -156,12 +156,32 @@
         .act-btn {
             display: inline-flex; align-items: center; gap: 5px;
             min-height: 28px; padding: 3px 9px;
-            border-radius: 7px; border: 1px solid #d1d5db; background: #fff; color: #4b5563;
+            border-radius: 8px; border: 1px solid #d1d5db; background: #fff; color: #4b5563;
             font-size: 12px; font-weight: 600; line-height: 1.15;
             transition: background 0.15s;
         }
         .act-btn:hover { background: #f3f4f6; }
         .act-btn svg { flex: none; }
+
+        /* Chips de entradas/saídas no log (mesmo estilo nos dois) */
+        .chip {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 2px 9px; border-radius: 9999px;
+            border: 1px solid #e5e7eb; background: #f9fafb;
+            font-size: 11px; font-weight: 600; color: #4b5563; line-height: 1.5;
+        }
+        /* Tiles de estatísticas — .hero dá peso aos que interessam */
+        .stat-tile {
+            padding: 7px 4px 8px; background: #fff;
+            border: 1px solid #e5e7eb; border-radius: 10px; text-align: center;
+        }
+        .stat-tile .stat-label {
+            font-size: 9px; letter-spacing: 0.07em; text-transform: uppercase;
+            font-weight: 700; color: #9ca3af; margin-bottom: 1px;
+        }
+        .stat-tile .stat-value { font-weight: 800; font-size: 13px; color: #1f2937; }
+        .stat-tile.hero { border-color: #d1d5db; box-shadow: 0 1px 3px rgba(17, 24, 39, 0.07); }
+        .stat-tile.hero .stat-value { font-size: 17px; letter-spacing: -0.01em; }
 
         /* Cadeados (carteira / metas) */
         .lock-btn {
@@ -175,15 +195,20 @@
         /* Banner de alerta grande (lote anómalo / risco acima do teto) */
         .alert-banner {
             display: none;
-            background-color: #fef2f2;
-            color: #b91c1c;
-            border: 1px solid #fca5a5;
+            background-color: #fffbeb;
+            color: #92400e;
+            border: 1px solid #fde68a;
             border-radius: 12px;
             padding: 12px 16px;
             text-align: center;
             font-weight: 800;
-            font-size: 15px;
-            line-height: 1.35;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .alert-banner.danger {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border-color: #fecaca;
         }
         .alert-banner.show { display: block; animation: alertIn 0.22s ease-out; }
         @keyframes alertIn {
@@ -388,7 +413,7 @@
         <!-- Alertas grandes (fora da área de captura para não sujar o export) -->
         <div id="zeroLotAlert" class="alert-banner mb-4"></div>
         <div id="lotAnomalyAlert" class="alert-banner mb-4"></div>
-        <div id="overCapAlert" class="alert-banner mb-4"></div>
+        <div id="overCapAlert" class="alert-banner danger mb-4"></div>
 
         <!-- Secção de Resultados -->
         <section id="captureArea">
@@ -399,7 +424,7 @@
                 </div>
 
                 <!-- Níveis de Preço -->
-                <div class="grid grid-cols-3 gap-2 mb-4 p-2 bg-gray-50 rounded-lg border border-gray-200 text-center">
+                <div class="grid grid-cols-3 gap-2 mb-4 p-2.5 bg-gray-50 rounded-xl border border-gray-200 text-center">
                     <div>
                         <p class="text-[10px] text-gray-400 uppercase font-bold" data-i18n="mean_price">Preço Médio</p>
                         <p id="resEntry" class="font-bold text-gray-800 text-sm">--</p>
@@ -415,15 +440,15 @@
                 </div>
 
                 <!-- Detalhe das tranches + risco acumulado -->
-                <div id="trancheBreakdown" class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <p class="text-[10px] text-gray-400 uppercase font-bold mb-2" data-i18n="entries_cumrisk">Entradas & Risco Acumulado</p>
-                    <div id="trancheLines" class="space-y-2"></div>
-                    <div id="cumRiskLine" class="mt-2 pt-2 border-t border-gray-100 text-sm font-semibold text-gray-700"></div>
+                <div id="trancheBreakdown" class="mb-4 p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-2" data-i18n="entries_cumrisk">Entradas & Risco Acumulado</p>
+                    <div id="trancheLines" class="space-y-1.5"></div>
+                    <div id="cumRiskLine" class="mt-2.5 pt-2 border-t border-gray-200"></div>
                 </div>
 
                 <div id="results" class="space-y-3">
-                    <div class="flex flex-col p-3 bg-emerald-100 rounded-lg border-2 border-emerald-400">
-                        <span class="font-bold text-emerald-800 text-xs mb-1 uppercase" data-i18n="total_lot">Lote Total a Negociar:</span>
+                    <div class="flex flex-col p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+                        <span class="font-bold text-emerald-700 text-[10px] tracking-wider mb-1 uppercase" data-i18n="total_lot">Lote Total a Negociar:</span>
                         <span id="quantityToTrade" class="font-extrabold text-2xl text-emerald-900 break-all leading-tight">0.0000</span>
                     </div>
 
@@ -1648,13 +1673,13 @@
                 // Peso da entrada em % do lote total (em modo "$ em risco" é derivado,
                 // porque o valor que escreveste já aparece como risco à direita).
                 const weightTxt = `${(weights[i] * 100).toFixed(0)}%`;
-                tHTML += `<div class="pt-2 border-t border-gray-200 first:border-0 first:pt-0">
+                tHTML += `<div class="bg-white rounded-lg border border-gray-200 px-2.5 py-2">
                     <div class="flex items-baseline justify-between gap-2">
-                        <span class="text-xs"><span class="font-bold text-gray-700">${ordinals[i]}</span>
+                        <span class="text-xs"><span class="font-extrabold text-gray-800">${ordinals[i]}</span>
                             <span class="text-gray-400 font-semibold">· ${weightTxt}</span></span>
                         <span class="text-sm font-extrabold" style="color:#dc2626">${formatCurrency(trancheRisks[i])}</span>
                     </div>
-                    <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs mt-0.5">
+                    <div class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs mt-1">
                         ${field(t('th_entry'), formatPrice(entries[i]), '#1f2937')}
                         ${field(t('sl_short'), formatPrice(sls[i]), '#dc2626')}
                         ${field(t('th_tp'), formatPrice(tp), '#059669')}
@@ -1670,7 +1695,7 @@
                 (i === 0 ? '' : '+') + labels[i] + ': ' + formatCurrency(c)
             ).join('  |  ');
             document.getElementById('cumRiskLine').innerHTML =
-                `${t('cum_risk_label')} &nbsp; <span class="text-gray-900">${cumStr}</span>`;
+                `<span class="text-[10px] uppercase font-bold tracking-wider text-gray-400">${t('cum_risk_label')}</span><span class="block mt-0.5 text-[13px] font-bold text-gray-800">${cumStr}</span>`;
 
             // Número grande = lote TRADEABLE (2 casas). Linha pequena = valor EXATO (4 casas).
             document.getElementById('quantityToTrade').innerHTML =
@@ -2136,8 +2161,8 @@
         const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         // Card branco com título para envolver um gráfico.
         function chartCard(title, inner) {
-            return `<div class="p-3 bg-white rounded-lg border border-gray-200">
-                        <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-2">${esc(title)}</p>
+            return `<div class="p-3 bg-white rounded-xl border border-gray-200">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">${esc(title)}</p>
                         ${inner}
                     </div>`;
         }
@@ -2204,7 +2229,7 @@
                 const cx = pL + gap * i + gap / 2, col = d.v >= 0 ? '#059669' : '#dc2626';
                 const top = Math.min(zeroY, y(d.v)), h = Math.max(1, Math.abs(y(d.v) - zeroY));
                 bars += `<rect x="${(cx - bw / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="1" fill="${col}"><title>${esc(d.label)}: ${formatSigned(d.v)}</title></rect>`;
-                if (showLabels) bars += `<text x="${cx.toFixed(1)}" y="${H - 6}" font-size="8" fill="#9ca3af" text-anchor="middle" transform="rotate(0 ${cx.toFixed(1)} ${H - 6})">${esc(String(d.label).slice(0, 4))}</text>`;
+                if (showLabels) bars += `<text x="${cx.toFixed(1)}" y="${H - 6}" font-size="9" fill="#9ca3af" text-anchor="middle">${esc(String(d.label).slice(0, 4))}</text>`;
             });
             return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-height:150px" preserveAspectRatio="xMidYMid meet">
                 <line x1="${pL}" y1="${zeroY.toFixed(1)}" x2="${W - pR}" y2="${zeroY.toFixed(1)}" stroke="#e5e7eb" stroke-width="1"/>
@@ -2252,10 +2277,10 @@
                 chartCard(tr('chart_avg'), svgAvg(s));
         }
 
-        function statTile(label, value, color) {
-            return `<div class="p-2 bg-gray-50 rounded-lg border border-gray-200 text-center">
-                        <p class="text-[10px] text-gray-400 uppercase font-bold">${label}</p>
-                        <p class="font-extrabold text-sm" style="color:${color || '#1f2937'}">${value}</p>
+        function statTile(label, value, color, hero) {
+            return `<div class="stat-tile${hero ? ' hero' : ''}">
+                        <p class="stat-label">${label}</p>
+                        <p class="stat-value" style="color:${color || '#1f2937'}">${value}</p>
                     </div>`;
         }
 
@@ -2371,8 +2396,8 @@
                 </tr>`;
             }).join('');
             if (!rows) return '';
-            return `<div class="p-2 bg-gray-50 rounded-lg border border-gray-200 overflow-x-auto">
-                <p class="text-[10px] text-gray-400 uppercase font-bold mb-1">${title}</p>
+            return `<div class="p-2.5 bg-white rounded-xl border border-gray-200 overflow-x-auto">
+                <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1.5">${title}</p>
                 <table class="w-full text-xs" style="min-width:220px">
                     <thead><tr class="text-[9px] text-gray-400 uppercase">
                         <th class="text-left font-bold">${tr('bd_group')}</th>
@@ -2415,8 +2440,8 @@
                 statTile(tr('st_trades'), s.total) +
                 statTile(tr('st_open'), s.open) +
                 statTile(tr('st_notexec'), s.notExec, s.notExec ? '#6b7280' : '#1f2937') +
-                statTile(tr('st_winrate'), s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
-                statTile(tr('st_pnl'), formatSigned(s.pnl), pnlColor) +
+                statTile(tr('st_winrate'), s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626', true) +
+                statTile(tr('st_pnl'), formatSigned(s.pnl), pnlColor, true) +
                 statTile(tr('st_pf'), pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
                 statTile(tr('st_expect'), formatSigned(s.expectancy), s.expectancy >= 0 ? '#059669' : '#dc2626') +
                 statTile(tr('st_best'), s.hasRealized ? formatSigned(s.bestTrade) : '—', s.bestTrade >= 0 ? '#059669' : '#dc2626') +
@@ -2450,7 +2475,7 @@
                 const exitsLine = (t.exits && t.exits.length)
                     ? `<div class="flex items-center gap-1 flex-wrap mt-2 text-xs">
                             <span class="text-gray-400 mr-1">💰 ${tr('m_exits')}:</span>
-                            ${t.exits.map(e => `<span class="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-gray-600 font-semibold">${e.type ? e.type + ' ' : ''}<span style="color:${e.usd >= 0 ? '#059669' : '#dc2626'}">${formatSigned(e.usd)}</span>${e.qty != null ? ' ×' + (+e.qty).toFixed(2) : ''}${e.price != null ? ' @' + formatPrice(e.price) : ''}${e.fee ? ' <span class="text-red-400">−' + tr('m_fee') + formatCurrency(e.fee) + '</span>' : ''}</span>`).join('')}
+                            ${t.exits.map(e => `<span class="chip">${e.type ? e.type + ' ' : ''}<span style="color:${e.usd >= 0 ? '#059669' : '#dc2626'}">${formatSigned(e.usd)}</span>${e.qty != null ? ' ×' + (+e.qty).toFixed(2) : ''}${e.price != null ? ' @' + formatPrice(e.price) : ''}${e.fee ? ' <span class="text-red-400">−' + tr('m_fee') + formatCurrency(e.fee) + '</span>' : ''}</span>`).join('')}
                         </div>` : '';
                 // Quantidade por vender (só quando parcial).
                 const soldQty = (t.exits || []).reduce((s, e) => s + (e.qty || 0), 0);
@@ -2474,13 +2499,13 @@
                 const entriesToggle = (t.entries && t.entries.length)
                     ? `<div class="flex items-center gap-1 flex-wrap mt-2 text-xs">
                             <span class="text-gray-400 mr-1">${tr('entries_short')}:</span>
-                            ${t.entries.map((e, i) => { const slv = (t.sls && t.sls[i] != null) ? t.sls[i] : t.sl; return `<span class="px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-gray-600 font-semibold">${formatPrice(e)}${slv != null ? ' <span class="text-red-400">' + tr('sl_short') + ' ' + formatPrice(slv) + '</span>' : ''}${t.lots[i] != null ? ' · ' + (+t.lots[i]).toFixed(2) : ''}</span>`; }).join('')}
+                            ${t.entries.map((e, i) => { const slv = (t.sls && t.sls[i] != null) ? t.sls[i] : t.sl; return `<span class="chip">${formatPrice(e)}${slv != null ? ' <span class="text-red-400">' + tr('sl_short') + ' ' + formatPrice(slv) + '</span>' : ''}${t.lots[i] != null ? ' · ' + (+t.lots[i]).toFixed(2) : ''}</span>`; }).join('')}
                             <button onclick="event.stopPropagation();editEntries(${t.id})" title="${tr('edit_entries')}" class="text-blue-600 hover:underline font-semibold ml-1">✏️</button>
                         </div>` : '';
                 const open = expandedTrades.has(t.id);
                 // Linha minimizada: só ativo · compra/venda · resultado.
                 return `<div class="rounded-lg border border-gray-200 bg-white">
-                    <div onclick="toggleTradeDetails(${t.id}, this)" class="p-3 flex items-center justify-between gap-2 cursor-pointer select-none">
+                    <div onclick="toggleTradeDetails(${t.id}, this)" class="p-3 flex items-center justify-between gap-2 cursor-pointer select-none rounded-lg hover:bg-gray-50 transition">
                         <div class="flex items-center gap-2 min-w-0">
                             <span class="chev text-gray-400 text-xs transition-transform shrink-0" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>
                             <span class="font-bold text-gray-800 truncate">${t.symbol}</span>
@@ -2511,7 +2536,7 @@
             sorted.forEach(t => {
                 const day = fmtDay(t.ts);
                 if (day !== lastDay) {
-                    listHTML += `<div class="text-[11px] font-bold text-gray-400 uppercase tracking-wide pt-3 pb-1">${day}</div>`;
+                    listHTML += `<div class="flex items-center gap-2 pt-3 pb-1"><span class="text-[11px] font-bold text-gray-400 uppercase tracking-wide whitespace-nowrap">${day}</span><span class="flex-1 h-px bg-gray-200"></span></div>`;
                     lastDay = day;
                 }
                 listHTML += cardHTML(t);
@@ -2605,8 +2630,8 @@
                 statTile(tr('st_trades'), s.total) +
                 statTile(tr('st_open'), s.open) +
                 statTile(tr('st_notexec'), s.notExec, s.notExec ? '#6b7280' : '#1f2937') +
-                statTile(tr('st_winrate'), s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626') +
-                statTile(tr('st_pnl'), formatSigned(s.pnl), pnlColor) +
+                statTile(tr('st_winrate'), s.winRate.toFixed(0) + '%', s.winRate >= 50 ? '#059669' : '#dc2626', true) +
+                statTile(tr('st_pnl'), formatSigned(s.pnl), pnlColor, true) +
                 statTile(tr('st_pf'), pf, s.profitFactor >= 1 ? '#059669' : '#dc2626') +
                 `</div>` +
                 `<div class="grid grid-cols-2 gap-2 mb-3">` +
@@ -2625,16 +2650,16 @@
                 </div>`;
             const rows = trades.map(reportRowHTML).join('');
             return `
-                <div style="border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline">
-                    <span style="font-size:22px;font-weight:800;color:#1f2937">${ownerReportTitle()}</span>
-                    <span style="font-size:15px;font-weight:700;color:#3b82f6">${fmtMonth(selectedMonth)}</span>
+                <div style="border-bottom:2px solid #1f2937;padding-bottom:10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+                    <span style="display:flex;align-items:center;gap:7px"><svg width="21" height="21" viewBox="0 0 192 192"><rect width="192" height="192" rx="42" fill="#2563eb"/><path fill="#ffffff" fill-rule="evenodd" d="M66 38h60c8.8 0 16 7.2 16 16v96c0 3.3-3.7 5.2-6.4 3.2L96 125.5 56.4 153.2c-2.7 1.9-6.4 0-6.4-3.2V54c0-8.8 7.2-16 16-16zM74 70h44c5 0 9 4 9 9s-4 9-9 9H74c-5 0-9-4-9-9s4-9 9-9z"/></svg><span style="font-size:19px;font-weight:800;color:#1f2937">${ownerReportTitle()}</span></span>
+                    <span style="font-size:12px;font-weight:700;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;padding:3px 10px;border-radius:9999px;white-space:nowrap">${fmtMonth(selectedMonth)}</span>
                 </div>
                 ${statsHTML}
                 ${chartsHTML}
                 <div class="grid grid-cols-1 gap-3 mb-3">${breakdownHTML(trades)}</div>
                 <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin-bottom:6px">${tr('trades_of_month')}</div>
                 <div style="display:flex;flex-direction:column;gap:6px">${rows}</div>
-                <div style="text-align:right;font-size:10px;color:#9ca3af;margin-top:12px">${tr('gen_on')} ${fmtDate(Date.now())}</div>`;
+                <div style="border-top:1px solid #e5e7eb;margin-top:14px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#9ca3af"><span style="font-weight:700">RiskBook</span><span>${tr('gen_on')} ${fmtDate(Date.now())}</span></div>`;
         }
 
         // Gera e descarrega a imagem do resumo mensal.
@@ -2714,9 +2739,9 @@
             });
             const pnlColor = totalPnl > 0 ? '#059669' : totalPnl < 0 ? '#dc2626' : '#1f2937';
             const statsHTML = `<div class="grid grid-cols-3 gap-2 mb-3">` +
-                statTile(tr('st_pnl'), formatSigned(totalPnl), pnlColor) +
+                statTile(tr('st_pnl'), formatSigned(totalPnl), pnlColor, true) +
                 statTile(tr('st_trades'), yearS.total) +
-                statTile(tr('st_winrate'), yearS.winRate.toFixed(0) + '%', yearS.winRate >= 50 ? '#059669' : '#dc2626') +
+                statTile(tr('st_winrate'), yearS.winRate.toFixed(0) + '%', yearS.winRate >= 50 ? '#059669' : '#dc2626', true) +
                 statTile(tr('st_pf'), yearS.profitFactor === Infinity ? '∞' : yearS.profitFactor.toFixed(2), yearS.profitFactor >= 1 ? '#059669' : '#dc2626') +
                 statTile(tr('best_month'), best < 0 ? '—' : monthsArr()[best].slice(0, 3), '#059669') +
                 statTile(tr('worst_month'), worst < 0 ? '—' : monthsArr()[worst].slice(0, 3), '#dc2626') +
@@ -2739,9 +2764,9 @@
                 </tr>`;
             }).join('');
             return `
-                <div style="border-bottom:2px solid #e5e7eb;padding-bottom:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline">
-                    <span style="font-size:22px;font-weight:800;color:#1f2937">${ownerReportTitle()}</span>
-                    <span style="font-size:15px;font-weight:700;color:#6366f1">${tr('year_word')} ${year}</span>
+                <div style="border-bottom:2px solid #1f2937;padding-bottom:10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+                    <span style="display:flex;align-items:center;gap:7px"><svg width="21" height="21" viewBox="0 0 192 192"><rect width="192" height="192" rx="42" fill="#2563eb"/><path fill="#ffffff" fill-rule="evenodd" d="M66 38h60c8.8 0 16 7.2 16 16v96c0 3.3-3.7 5.2-6.4 3.2L96 125.5 56.4 153.2c-2.7 1.9-6.4 0-6.4-3.2V54c0-8.8 7.2-16 16-16zM74 70h44c5 0 9 4 9 9s-4 9-9 9H74c-5 0-9-4-9-9s4-9 9-9z"/></svg><span style="font-size:19px;font-weight:800;color:#1f2937">${ownerReportTitle()}</span></span>
+                    <span style="font-size:12px;font-weight:700;color:#4f46e5;background:#eef2ff;border:1px solid #c7d2fe;padding:3px 10px;border-radius:9999px;white-space:nowrap">${tr('year_word')} ${year}</span>
                 </div>
                 ${statsHTML}
                 <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#9ca3af;margin-bottom:2px">${tr('pnl_monthly')}</div>
@@ -2759,7 +2784,7 @@
                     </tr></thead>
                     <tbody>${tableRows}</tbody>
                 </table>
-                <div style="text-align:right;font-size:10px;color:#9ca3af;margin-top:12px">${tr('gen_on')} ${fmtDate(Date.now())}</div>`;
+                <div style="border-top:1px solid #e5e7eb;margin-top:14px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#9ca3af"><span style="font-weight:700">RiskBook</span><span>${tr('gen_on')} ${fmtDate(Date.now())}</span></div>`;
         }
 
         // Gera e descarrega a imagem do resumo anual.
