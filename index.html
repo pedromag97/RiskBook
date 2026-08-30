@@ -305,9 +305,18 @@
                 </div>
             </div>
 
-            <!-- Preços de entrada + % da quantidade por tranche -->
+            <!-- Modo de distribuição: % do lote total OU montante investido ($) -->
+            <div class="pt-3">
+                <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="sizing_label">Distribuir por</label>
+                <div id="sizingModeSelector" class="grid grid-cols-2 gap-2">
+                    <button type="button" class="seg-btn" data-mode="pct" data-i18n="sizing_pct">% do lote</button>
+                    <button type="button" class="seg-btn" data-mode="amt" data-i18n="sizing_amt">$ investido</button>
+                </div>
+            </div>
+
+            <!-- Preços de entrada + % da quantidade (ou $ investido) por tranche -->
             <p class="text-xs text-gray-400 -mb-1">
-                <span data-i18n="pct_help">Defines a <b>% do lote total</b> em cada entrada.</span>
+                <span id="pctHelp" data-i18n="pct_help">Defines a <b>% do lote total</b> em cada entrada.</span>
                 <span id="pctSumHint" class="font-semibold"></span>
             </p>
             <div class="space-y-2">
@@ -321,7 +330,7 @@
                         <input type="number" id="sl1" value="1.0750" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                     <div class="col-span-4">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pct_short">%</label>
+                        <label id="pctLabel1" class="block text-xs font-bold text-gray-600 mb-1 uppercase">%</label>
                         <input type="number" id="pct1" value="40" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                 </div>
@@ -335,7 +344,7 @@
                         <input type="number" id="sl2" value="1.0750" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                     <div class="col-span-4">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pct_short">%</label>
+                        <label id="pctLabel2" class="block text-xs font-bold text-gray-600 mb-1 uppercase">%</label>
                         <input type="number" id="pct2" value="30" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                 </div>
@@ -349,7 +358,7 @@
                         <input type="number" id="sl3" value="1.0750" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                     <div class="col-span-4">
-                        <label class="block text-xs font-bold text-gray-600 mb-1 uppercase" data-i18n="pct_short">%</label>
+                        <label id="pctLabel3" class="block text-xs font-bold text-gray-600 mb-1 uppercase">%</label>
                         <input type="number" id="pct3" value="30" min="0" step="any" class="input-field w-full text-sm tranche-input">
                     </div>
                 </div>
@@ -408,7 +417,7 @@
                 <!-- Detalhe das tranches + risco acumulado -->
                 <div id="trancheBreakdown" class="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <p class="text-[10px] text-gray-400 uppercase font-bold mb-2" data-i18n="entries_cumrisk">Entradas & Risco Acumulado</p>
-                    <div id="trancheLines" class="space-y-1 text-sm"></div>
+                    <div class="overflow-x-auto"><table id="trancheTable" class="w-full text-xs" style="min-width:290px"></table></div>
                     <div id="cumRiskLine" class="mt-2 pt-2 border-t border-gray-100 text-sm font-semibold text-gray-700"></div>
                 </div>
 
@@ -623,6 +632,10 @@
                 contract_label: 'Contract Value (per 1.0 of price, per lot)', contract_hint: '— filled by asset type, editable',
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
+                th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
+                sizing_label: 'Split by', sizing_pct: '% of lot', sizing_amt: '$ invested',
+                amt_help: 'Set the <b>amount invested</b> at each entry — lots come from your money. Max Loss only warns you.',
+                sum_invested: 'Invested: {sum}',
                 pl1: '% of Lot 1', pl2: '% of Lot 2', pl3: '% of Lot 3', e1: 'Entry 1', e2: 'Entry 2', e3: 'Entry 3',
                 sl_label: 'Stop Loss (single)', tp_label: 'Take Profit (single)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Trade Date (for the log)',
                 calc_btn: 'Calculate', reg_btn: 'Register in Log', calc_hint: 'Review the summary below, then register the trade in the log.',
@@ -687,6 +700,10 @@
                 contract_label: 'Valeur du contrat (par 1.0 de prix, par lot)', contract_hint: '— rempli selon le type d\'actif, modifiable',
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
+                th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
+                sizing_label: 'Répartir par', sizing_pct: '% du lot', sizing_amt: '$ investi',
+                amt_help: 'Définis le <b>montant investi</b> à chaque entrée — les lots viennent de ton argent. La Perte Max ne fait qu\'avertir.',
+                sum_invested: 'Investi : {sum}',
                 pl1: '% du Lot 1', pl2: '% du Lot 2', pl3: '% du Lot 3', e1: 'Entrée 1', e2: 'Entrée 2', e3: 'Entrée 3',
                 sl_label: 'Stop Loss (unique)', tp_label: 'Take Profit (unique)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Date du trade (pour le journal)',
                 calc_btn: 'Calculer', reg_btn: 'Journaliser', calc_hint: 'Analyse le résumé ci-dessous, puis journalise le trade.',
@@ -751,6 +768,10 @@
                 contract_label: 'Valor del Contrato (por 1.0 de precio, por lote)', contract_hint: '— rellenado por el tipo de activo, editable',
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
+                th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
+                sizing_label: 'Repartir por', sizing_pct: '% del lote', sizing_amt: '$ invertido',
+                amt_help: 'Define el <b>importe invertido</b> en cada entrada — los lotes salen de tu dinero. La Pérdida Máx solo avisa.',
+                sum_invested: 'Invertido: {sum}',
                 pl1: '% del Lote 1', pl2: '% del Lote 2', pl3: '% del Lote 3', e1: 'Entrada 1', e2: 'Entrada 2', e3: 'Entrada 3',
                 sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Fecha del trade (para el registro)',
                 calc_btn: 'Calcular', reg_btn: 'Registrar en el diario', calc_hint: 'Revisa el resumen y luego regístralo en el diario.',
@@ -815,6 +836,10 @@
                 contract_label: 'Valor do Contrato (por 1.0 de preço, por lote)', contract_hint: '— preenchido pelo tipo de ativo, editável',
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
+                th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
+                sizing_label: 'Distribuir por', sizing_pct: '% do lote', sizing_amt: '$ investido',
+                amt_help: 'Defines o <b>montante investido</b> em cada entrada — os lotes saem do teu dinheiro. A Perda Máx só avisa.',
+                sum_invested: 'Investido: {sum}',
                 pl1: '% do Lote 1', pl2: '% do Lote 2', pl3: '% do Lote 3', e1: 'Entrada 1', e2: 'Entrada 2', e3: 'Entrada 3',
                 sl_label: 'Stop Loss (único)', tp_label: 'Take Profit (único)', sl_short: 'SL', pct_short: '%', tradedate_label: 'Data da Trade (para o log)',
                 calc_btn: 'Calcular Resumo', reg_btn: 'Registar no Log', calc_hint: 'Analisa o resumo e depois regista a trade no log.',
@@ -1143,6 +1168,10 @@
         let trancheCount = 3;
         let currentPriority = 2;      // 1 = +prioritária/+confiança … 3 = -prioritária
         let currentStyle = 'day';     // 'day' | 'swing'
+        // Distribuição das entradas: 'pct' = % do lote total (Perda Máx manda no lote)
+        //                            'amt' = $ investido por entrada (Perda Máx só avisa)
+        const SIZING_MODE_KEY = 'riskcalc_sizing_mode';
+        let sizingMode = localStorage.getItem(SIZING_MODE_KEY) === 'amt' ? 'amt' : 'pct';
 
         // Percentagens por defeito do lote total, por nº de tranches.
         const DEFAULT_PCTS = { 1: [100], 2: [50, 50], 3: [40, 30, 30] };
@@ -1386,10 +1415,50 @@
                 row.classList.toggle('hidden', idx >= count);
             });
             // Repõe as percentagens por defeito para este nº de tranches.
+            // Em modo "$ investido" os valores são montantes — não os substituímos por %.
             const defs = DEFAULT_PCTS[count] || [];
             for (let i = 0; i < 3; i++) {
                 const inp = document.getElementById('pct' + (i + 1));
-                inp.value = i < count ? defs[i] : '';
+                if (sizingMode === 'amt') { if (i >= count) inp.value = ''; }
+                else inp.value = i < count ? defs[i] : '';
+            }
+            calculateTradeSummary();
+        }
+
+        // Alterna entre distribuir por "% do lote total" e por "$ investido" em cada entrada.
+        function applySizingMode(mode, silent) {
+            const prev = sizingMode;
+            sizingMode = (mode === 'amt') ? 'amt' : 'pct';
+            localStorage.setItem(SIZING_MODE_KEY, sizingMode);
+            document.querySelectorAll('#sizingModeSelector .seg-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.mode === sizingMode);
+            });
+            // Label da 3ª coluna: % ou $.
+            for (let i = 1; i <= 3; i++) {
+                const l = document.getElementById('pctLabel' + i);
+                if (l) l.textContent = sizingMode === 'amt' ? '$' : '%';
+            }
+            const help = document.getElementById('pctHelp');
+            if (help) help.innerHTML = t(sizingMode === 'amt' ? 'amt_help' : 'pct_help');
+
+            // Ao TROCAR de modo, semeia valores coerentes para não ficar 40 a valer $40.
+            if (!silent && prev !== sizingMode) {
+                if (sizingMode === 'amt') {
+                    // Converte os lotes atuais no $ investido equivalente (qᵢ · cValue · Eᵢ).
+                    const cv = parseFloat(document.getElementById('contractSize').value);
+                    for (let i = 0; i < trancheCount; i++) {
+                        const inp = document.getElementById('pct' + (i + 1));
+                        const e = parseFloat(document.getElementById('entry' + (i + 1)).value);
+                        const lot = lastCalc && lastCalc.lots ? lastCalc.lots[i] : null;
+                        inp.value = (lot != null && !isNaN(e) && !isNaN(cv))
+                            ? Math.round(lot * cv * e * 100) / 100 : '';
+                    }
+                } else {
+                    const defs = DEFAULT_PCTS[trancheCount] || [];
+                    for (let i = 0; i < 3; i++) {
+                        document.getElementById('pct' + (i + 1)).value = i < trancheCount ? defs[i] : '';
+                    }
+                }
             }
             calculateTradeSummary();
         }
@@ -1478,29 +1547,48 @@
             //     P = maxLoss / ( cValue · Σ( wᵢ·|Eᵢ−SL| ) )
             // => o teto é sempre respeitado, seja qual for a repartição (40/30/30, 50/50…).
             // -------------------------------------------------------------------
+            // Valores da 3ª coluna: % do lote total (modo 'pct') OU $ investido (modo 'amt').
             const pcts = [];
             for (let i = 0; i < trancheCount; i++) {
                 const p = parseFloat(document.getElementById('pct' + (i + 1)).value);
                 pcts.push(isNaN(p) || p < 0 ? 0 : p);
             }
             const sumPct = pcts.reduce((a, b) => a + b, 0);
-
-            // Dica da soma das % (verde se ~100%, laranja caso contrário — funciona à mesma).
-            const hint = document.getElementById('pctSumHint');
-            if (trancheCount > 1) {
-                hint.textContent = t('sum_label', { sum: sumPct.toFixed(0) });
-                hint.style.color = Math.abs(sumPct - 100) < 0.01 ? '#059669' : '#d97706';
-            } else {
-                hint.textContent = '';
-            }
             if (sumPct <= 0) { error.classList.remove('hidden'); return; }
 
-            const weights = pcts.map(p => p / sumPct);              // pesos normalizados
+            const hint = document.getElementById('pctSumHint');
+            let weights, lotsExact;
+
+            if (sizingMode === 'amt') {
+                // -------------------------------------------------------------------
+                // MODO "$ INVESTIDO": escreves quanto dinheiro metes em cada entrada.
+                // O valor nominal de 1 lote ao preço Eᵢ é cValue·Eᵢ, logo:
+                //     qᵢ = montanteᵢ / (cValue · Eᵢ)
+                // Aqui a Perda Máx NÃO comanda o lote — passa a ser só um aviso
+                // (o risco resultante pode ficar acima ou abaixo do teto).
+                // -------------------------------------------------------------------
+                lotsExact = pcts.map((amt, i) => (cValue * entries[i] > 0) ? amt / (cValue * entries[i]) : 0);
+                const sumExact = lotsExact.reduce((a, b) => a + b, 0);
+                weights = sumExact > 0 ? lotsExact.map(q => q / sumExact) : lotsExact.map(() => 0);
+                // Dica: total investido.
+                hint.textContent = t('sum_invested', { sum: formatCurrency(sumPct) });
+                hint.style.color = '#6b7280';
+            } else {
+                // Modo "% do lote": pesos normalizados; o lote total sai da Perda Máx.
+                weights = pcts.map(p => p / sumPct);
+                const weightedRPtmp = weights.reduce((s, w, i) => s + w * riskPoints[i], 0);
+                const totalRaw = maxLoss / (cValue * weightedRPtmp);   // lote total teórico
+                lotsExact = weights.map(w => totalRaw * w);
+                // Dica da soma das % (verde se ~100%, laranja caso contrário — funciona à mesma).
+                if (trancheCount > 1) {
+                    hint.textContent = t('sum_label', { sum: sumPct.toFixed(0) });
+                    hint.style.color = Math.abs(sumPct - 100) < 0.01 ? '#059669' : '#d97706';
+                } else {
+                    hint.textContent = '';
+                }
+            }
             const weightedRP = weights.reduce((s, w, i) => s + w * riskPoints[i], 0);
-            const totalRaw = maxLoss / (cValue * weightedRP);      // lote total teórico
-            // Lote EXATO por tranche (valor teórico, 4 casas) e lote TRADEABLE
-            // (arredondado para baixo ao step do ativo — ex. Forex 0.01, 2 casas).
-            const lotsExact = weights.map(w => totalRaw * w);
+            // Lote TRADEABLE (arredondado para baixo ao step do ativo — ex. Forex 0.01, 2 casas).
             const lots = lotsExact.map(q => floorToStep(q, currentStep()));
             const totalQty = lots.reduce((a, b) => a + b, 0);
             const totalExact = lotsExact.reduce((a, b) => a + b, 0);
@@ -1548,19 +1636,38 @@
             document.getElementById('resSL').textContent = slDisplay;
             document.getElementById('resTP').textContent = formatPrice(tp);
 
-            // Linhas por tranche
-            const linesEl = document.getElementById('trancheLines');
-            linesEl.innerHTML = '';
+            // Tabela por tranche: nº/peso · entrada · SL · TP · lote · risco.
+            const ordinals = ['1ª', '2ª', '3ª'];
+            let tRows = '';
             for (let i = 0; i < trancheCount; i++) {
-                const row = document.createElement('div');
-                row.className = 'flex justify-between';
-                const pctTxt = trancheCount > 1 ? ` · ${(weights[i] * 100).toFixed(0)}%` : '';
-                // Lote tradeable (2 casas) + valor exato calculado (4 casas) entre parênteses.
-                const lotTxt = `${formatLot(lots[i])} <span class="text-gray-400">(${formatLotExact(lotsExact[i])})</span> ${t('lot_word')}`;
-                row.innerHTML = `<span class="text-gray-600">${t('e' + (i + 1))} @ ${formatPrice(entries[i])} <span class="text-red-400">${t('sl_short')} ${formatPrice(sls[i])}</span>${pctTxt} · ${lotTxt}</span>`
-                    + `<span class="font-semibold text-red-600">${formatCurrency(trancheRisks[i])}</span>`;
-                linesEl.appendChild(row);
+                // Peso da entrada: % do lote total, ou $ investido (conforme o modo).
+                const weightTxt = sizingMode === 'amt'
+                    ? formatCurrency(pcts[i])
+                    : `${(weights[i] * 100).toFixed(0)}%`;
+                tRows += `<tr class="border-t border-gray-200">
+                    <td class="py-1 pr-1 align-top">
+                        <span class="font-bold text-gray-700">${ordinals[i]}</span>
+                        <span class="block text-[10px] text-gray-400 font-semibold">${weightTxt}</span>
+                    </td>
+                    <td class="py-1 px-1 text-right align-top font-semibold text-gray-800">${formatPrice(entries[i])}</td>
+                    <td class="py-1 px-1 text-right align-top font-semibold" style="color:#dc2626">${formatPrice(sls[i])}</td>
+                    <td class="py-1 px-1 text-right align-top font-semibold" style="color:#059669">${formatPrice(tp)}</td>
+                    <td class="py-1 px-1 text-right align-top">
+                        <span class="font-bold text-gray-800">${formatLot(lots[i])}</span>
+                        <span class="block text-[10px] text-gray-400">${formatLotExact(lotsExact[i])}</span>
+                    </td>
+                    <td class="py-1 pl-1 text-right align-top font-bold" style="color:#dc2626">${formatCurrency(trancheRisks[i])}</td>
+                </tr>`;
             }
+            document.getElementById('trancheTable').innerHTML =
+                `<thead><tr class="text-[9px] text-gray-400 uppercase font-bold">
+                    <th class="text-left pb-1">#</th>
+                    <th class="text-right pb-1 px-1">${t('th_entry')}</th>
+                    <th class="text-right pb-1 px-1">${t('sl_short')}</th>
+                    <th class="text-right pb-1 px-1">${t('th_tp')}</th>
+                    <th class="text-right pb-1 px-1">${t('th_lot')}</th>
+                    <th class="text-right pb-1 pl-1">${t('th_risk')}</th>
+                </tr></thead><tbody>${tRows}</tbody>`;
 
             // Risco acumulado: "1ª: $104 | +2ª: $188 | +3ª: $250"
             const labels = ['1ª', '2ª', '3ª'];
@@ -1594,6 +1701,7 @@
                 direction: isBuy ? 'COMPRA' : 'VENDA',
                 entries: entries.slice(),
                 pcts: pcts.slice(),
+                sizingMode,               // 'pct' (% do lote) ou 'amt' ($ investido)
                 avgEntry, sl: avgSL, sls: sls.slice(), tp,
                 lots: lots.slice(),
                 totalLot: totalQty,
@@ -1765,6 +1873,7 @@
                 direction: lastCalc.direction,
                 entries: lastCalc.entries,
                 pcts: lastCalc.pcts,
+                sizingMode: lastCalc.sizingMode || 'pct',   // como foi distribuído (% ou $)
                 lots: lastCalc.lots,
                 avgEntry: lastCalc.avgEntry,
                 sl: lastCalc.sl,
@@ -2446,7 +2555,7 @@
             const trades = getMonthTrades();
             if (!trades.length) { showAlert(tr('csv_empty')); return; }
             const cols = ['data', 'simbolo', 'tipo', 'direcao', 'prioridade', 'estilo',
-                'entradas', 'pcts', 'preco_medio',
+                'entradas', 'distribuicao', 'modo_distribuicao', 'preco_medio',
                 'stop', 'take_profit', 'lote_total', 'risco_plan', 'ganho_plan', 'rr', 'risco_pct',
                 'estado', 'resultado_usd', 'tipo_saida', 'saidas_parciais', 'motivo_nao_exec', 'revisao', 'notas'];
             const clean = v => (v || '').replace(/[\n;]/g, ' ');
@@ -2454,7 +2563,7 @@
             const rows = trades.map(t => [
                 fmtDate(t.ts), t.symbol, t.assetType, t.direction,
                 t.priority ? 'P' + t.priority : '', t.style || '',
-                t.entries.join(' '), t.pcts.join(' '), t.avgEntry,
+                t.entries.join(' '), t.pcts.join(' '), (t.sizingMode === 'amt' ? '$' : '%'), t.avgEntry,
                 (t.sls && t.sls.length ? t.sls.join(' ') : t.sl), t.tp, t.totalLot, t.plannedRisk.toFixed(2), t.plannedGain.toFixed(2),
                 t.rr.toFixed(2), t.riskPct.toFixed(2), t.status,
                 t.resultUSD != null ? t.resultUSD : '', t.exitType || '', partialsStr(t), clean(t.notExecReason), clean(t.review), clean(t.notes)
@@ -2749,6 +2858,8 @@
                 .forEach(b => b.addEventListener('click', () => applyAssetType(b.dataset.asset)));
             document.querySelectorAll('#trancheCountSelector .seg-btn')
                 .forEach(b => b.addEventListener('click', () => applyTrancheCount(parseInt(b.dataset.count))));
+            document.querySelectorAll('#sizingModeSelector .seg-btn')
+                .forEach(b => b.addEventListener('click', () => applySizingMode(b.dataset.mode)));
             document.querySelectorAll('#prioritySelector .seg-btn')
                 .forEach(b => b.addEventListener('click', () => applyPriority(parseInt(b.dataset.priority))));
             document.querySelectorAll('#styleSelector .seg-btn')
@@ -2780,6 +2891,7 @@
             applyPriority(2);
             applyStyle('day');
             applyTrancheCount(3);
+            applySizingMode(sizingMode, true);   // repõe o modo guardado (sem semear valores)
             saveSymbolToHistory(document.getElementById('assetSymbol').value.trim() || '');
             calculateTradeSummary();
             // Arranca no mês mais recente com trades (ou "Todos" se vazio).
