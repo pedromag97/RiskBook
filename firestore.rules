@@ -1,9 +1,11 @@
 // Regras de segurança do Firestore para o RiskBook.
-// Cola isto em: Firebase Console → Firestore Database → Rules → Publish.
+// Cola isto em: Firebase Console → Firestore Database → separador Rules → Publish.
 //
-// Cada utilizador só consegue ler e escrever DENTRO da sua própria pasta
-// (users/{o seu uid}). Não há leitura pública, nem acesso cruzado entre contas.
-// É isto que protege os dados — a chave de API no HTML é pública por design.
+// Cada utilizador só lê e escreve DENTRO da sua própria pasta (users/{o seu uid}).
+// Tudo o que não é explicitamente permitido aqui fica negado por omissão — não é
+// preciso escrever um bloco a negar o resto.
+//
+// É isto que protege os dados. A chave de API no HTML é pública por design.
 
 rules_version = '2';
 
@@ -14,9 +16,5 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
-    // Tudo o resto fica fechado.
-    match /{document=**} {
-      allow read, write: if false;
-    }
   }
 }
