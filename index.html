@@ -3064,9 +3064,12 @@
             bar.classList.remove('hidden');
             window.RBCloud.configured = true;
 
-            function setStatus(key, extra) {
+            function setStatus(key, extra, detail) {
                 elStatus.textContent = extra ? T(key) + ' ' + extra : T(key);
+                if (detail !== undefined) elStatus.title = detail;   // erro visível no tooltip
             }
+            // O Firestore rejeita campos `undefined`; esta volta pelo JSON limpa-os.
+            const clean = o => JSON.parse(JSON.stringify(o));
 
             /* ---------------- Definições: carimbo local ---------------- */
             // Sobe o carimbo só quando as definições mudam mesmo.
@@ -3119,7 +3122,7 @@
                         const r = remoteTrades.get(t.id);
                         if (!r || (t.updatedAt || 0) > (r.updatedAt || 0)) {
                             batch.set(doc(db, 'users', uid, 'trades', String(t.id)),
-                                { updatedAt: t.updatedAt || Date.now(), deleted: false, trade: t });
+                                { updatedAt: t.updatedAt || Date.now(), deleted: false, trade: clean(t) });
                             n++;
                         }
                     });
@@ -3136,15 +3139,15 @@
                     const sts = +(localStorage.getItem(SET_TS_KEY) || 0);
                     if (!remoteSettings || sts > (remoteSettings.updatedAt || 0)) {
                         batch.set(doc(db, 'users', uid, 'meta', 'settings'),
-                            { updatedAt: sts || Date.now(), data: JSON.parse(snap) });
+                            { updatedAt: sts || Date.now(), data: clean(JSON.parse(snap)) });
                         n++;
                     }
                     if (n) await batch.commit();
                     dirty = false;
-                    setStatus('cloud_synced', new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                    setStatus('cloud_synced', new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), auth.currentUser ? auth.currentUser.email : '');
                 } catch (e) {
-                    console.warn('RiskBook sync:', e);
-                    setStatus(navigator.onLine ? 'cloud_error' : 'cloud_offline');
+                    console.warn('RiskBook sync (subida):', e);
+                    setStatus(navigator.onLine ? 'cloud_error' : 'cloud_offline', '', (e && (e.code || e.message)) || String(e));
                 } finally {
                     pushing = false;
                 }
@@ -3183,8 +3186,8 @@
                         else remoteTrades.set(id, d);
                     });
                     mergeDown();
-                    if (dirty) pushUp(); else setStatus('cloud_synced', new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-                }, e => { console.warn(e); setStatus('cloud_error'); });
+                    if (dirty) pushUp(); else setStatus('cloud_synced', new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), user.email || '');
+                }, e => { console.warn('RiskBook sync (descida):', e); setStatus('cloud_error', '', (e && (e.code || e.message)) || String(e)); });
 
                 unsubSettings = onSnapshot(doc(db, 'users', uid, 'meta', 'settings'), s => {
                     remoteSettings = s.exists() ? s.data() : null;
