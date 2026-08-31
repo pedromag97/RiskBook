@@ -4,7 +4,7 @@
 
 - 🌍 **4 idiomas** — Inglês, Francês, Espanhol, Português (troca ao vivo, deteta o browser).
 - 📲 **PWA** — instalável e **offline** quando servido por https (ex. GitHub Pages).
-- 🔒 **Privado** — todos os dados ficam no `localStorage` do teu dispositivo. Nada sai para a cloud.
+- 🔒 **Privado por omissão** — os dados ficam no `localStorage` do teu dispositivo. Só saem se **tu** escolheres entrar com a Google para sincronizar.
 
 ## O que faz
 
@@ -31,6 +31,19 @@ Abre o `index.html` em qualquer browser. Funciona offline (PWA). Também pode se
 
 ## Onde ficam os dados
 Tudo em **`localStorage`** do browser (chaves `riskcalc_journal`, `riskcalc_symbols`, `riskcalc_lots_*`). É local a este browser/origem — usa o **Backup JSON** para transportar o histórico entre dispositivos.
+
+### Sincronização opcional (Firebase)
+Se entrares com a Google, o log e as definições passam a sincronizar entre dispositivos.
+A app continua **local-first**: o `localStorage` manda, tudo funciona offline e sem login,
+e cada trade tem um carimbo de alteração (o mais recente ganha, com lápides para as apagadas).
+
+**Sobre a chave de API no `index.html`:** a chave web do Firebase **não é um segredo** —
+vai no HTML de qualquer app web e é visível a quem abrir o inspetor.
+[A própria Google documenta isto](https://firebase.google.com/docs/projects/api-keys):
+o acesso aos dados **não** é controlado pela chave, mas pelas regras de segurança
+(ver [`firestore.rules`](firestore.rules) — cada utilizador só acede a `users/{o seu uid}`).
+Os scanners de segredos assinalam-na na mesma por causa do padrão `AIza…`, por isso a chave
+está restringida no Google Cloud (referrers HTTP + apenas as APIs do Firebase).
 
 ## Stack
 HTML único + Tailwind CSS (CDN) + html2canvas (export de imagem). Sem framework, sem build.

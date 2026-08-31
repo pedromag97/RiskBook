@@ -3013,6 +3013,11 @@
          do Firestore (cada utilizador só lê/escreve em users/{o seu uid}).
     ============================================================================== -->
     <script type="module">
+        // NÃO é um segredo: a chave web do Firebase é pública por design (vai no HTML
+        // de qualquer app web). Não dá acesso a dados — isso são as regras do Firestore
+        // (firestore.rules). Está restringida no Google Cloud por referrer HTTP e às
+        // APIs do Firebase, para não poder ser usada noutros serviços do projeto.
+        // https://firebase.google.com/docs/projects/api-keys
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyBCJ9eUQlk9-p7i5ZMf40_NHbxDg94YjQM",
             authDomain: "riskbook-dec1b.firebaseapp.com",
