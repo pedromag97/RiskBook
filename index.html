@@ -3147,7 +3147,8 @@
                     setStatus('cloud_synced', new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), auth.currentUser ? auth.currentUser.email : '');
                 } catch (e) {
                     console.warn('RiskBook sync (subida):', e);
-                    setStatus(navigator.onLine ? 'cloud_error' : 'cloud_offline', '', (e && (e.code || e.message)) || String(e));
+                    const code = (e && (e.code || e.message)) || String(e);
+                    setStatus(navigator.onLine ? 'cloud_error' : 'cloud_offline', '· ' + code, code);
                 } finally {
                     pushing = false;
                 }
@@ -3187,7 +3188,11 @@
                     });
                     mergeDown();
                     if (dirty) pushUp(); else setStatus('cloud_synced', new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), user.email || '');
-                }, e => { console.warn('RiskBook sync (descida):', e); setStatus('cloud_error', '', (e && (e.code || e.message)) || String(e)); });
+                }, e => {
+                    console.warn('RiskBook sync (descida):', e);
+                    const code = (e && (e.code || e.message)) || String(e);
+                    setStatus('cloud_error', '· ' + code, code);
+                });
 
                 unsubSettings = onSnapshot(doc(db, 'users', uid, 'meta', 'settings'), s => {
                     remoteSettings = s.exists() ? s.data() : null;
@@ -3214,6 +3219,32 @@
 
             // Tenta outra vez quando a rede volta.
             window.addEventListener('online', () => { if (dirty) pushUp(); });
+
+            // Diagnóstico: escreve um documento mínimo. Se ISTO passar, as regras estão
+            // bem e o problema são os dados; se falhar, são as regras/base de dados.
+            window.RBCloud.diag = async () => {
+                if (!uid) return 'sem sessão — entra primeiro';
+                const r = { uid };
+                try {
+                    await setDoc(doc(db, 'users', uid, 'meta', 'ping'), { at: Date.now() });
+                    r.escritaMinima = 'OK — regras estão bem';
+                } catch (e) { r.escritaMinima = 'FALHOU: ' + (e.code || e.message); }
+                try {
+                    const local = getJournal();
+                    r.trades = local.length;
+                    if (local.length) {
+                        await setDoc(doc(db, 'users', uid, 'trades', String(local[0].id)),
+                            { updatedAt: local[0].updatedAt || Date.now(), deleted: false, trade: clean(local[0]) });
+                        r.escritaTrade = 'OK';
+                    } else r.escritaTrade = 'sem trades para testar';
+                } catch (e) { r.escritaTrade = 'FALHOU: ' + (e.code || e.message); }
+                try {
+                    const s = await getDoc(doc(db, 'users', uid, 'meta', 'ping'));
+                    r.leitura = s.exists() ? 'OK' : 'documento não encontrado';
+                } catch (e) { r.leitura = 'FALHOU: ' + (e.code || e.message); }
+                console.log('RiskBook diag:', r);
+                return JSON.stringify(r, null, 2);
+            };
         }
     </script>
 </body>
