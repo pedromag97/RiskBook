@@ -226,6 +226,18 @@
     <div class="app-container w-full p-6 rounded-xl">
         <header class="mb-6 text-center pb-4 border-b border-gray-200 relative">
             <a id="supportBtn" href="#" target="_blank" rel="noopener noreferrer" data-i18n-title="support_title" class="hidden absolute top-0 right-0 text-sm font-semibold text-gray-400 hover:text-pink-500 transition">♥ <span data-i18n="support_btn">Apoiar</span></a>
+
+            <!-- Sincronização na nuvem (opcional — a app funciona na mesma sem login) -->
+            <div id="cloudBar" class="hidden absolute top-0 left-0 flex items-center gap-2 text-sm">
+                <button id="cloudSignIn" class="font-semibold text-gray-400 hover:text-blue-600 transition flex items-center gap-1" data-i18n-title="cloud_signin_title">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                    <span data-i18n="cloud_signin">Sincronizar</span>
+                </button>
+                <div id="cloudUser" class="hidden items-center gap-2">
+                    <span id="cloudStatus" class="text-xs font-semibold text-gray-400" title=""></span>
+                    <button id="cloudSignOut" class="text-xs font-semibold text-gray-400 hover:text-red-500 transition" data-i18n="cloud_signout">Sair</button>
+                </div>
+            </div>
             <div class="flex items-center justify-center gap-3 mb-1">
                 <svg width="34" height="34" viewBox="0 0 192 192" aria-hidden="true"><rect width="192" height="192" rx="42" fill="#2563eb"/><path fill="#ffffff" fill-rule="evenodd" d="M66 38h60c8.8 0 16 7.2 16 16v96c0 3.3-3.7 5.2-6.4 3.2L96 125.5 56.4 153.2c-2.7 1.9-6.4 0-6.4-3.2V54c0-8.8 7.2-16 16-16zM74 70h44c5 0 9 4 9 9s-4 9-9 9H74c-5 0-9-4-9-9s4-9 9-9z"/></svg>
                 <h1 id="appTitle" onclick="editOwner()" class="text-3xl font-extrabold text-gray-800 cursor-pointer inline-block">RiskBook</h1>
@@ -658,6 +670,9 @@
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
                 th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
+                cloud_signin: 'Sync', cloud_signin_title: 'Sign in with Google to sync your log across devices', cloud_signout: 'Sign out',
+                cloud_syncing: 'syncing…', cloud_synced: 'synced', cloud_offline: 'offline', cloud_error: 'sync error',
+                cloud_signin_fail: 'Could not sign in. Try again.', cloud_signout_confirm: 'Sign out? Your data stays on this device.',
                 sizing_label: 'Split by', sizing_pct: '% of lot', sizing_amt: '$ at risk',
                 amt_help: 'Set the <b>$ you risk</b> at each entry (e.g. Max Loss $250 → 1st $100, 2nd $150). Lots are computed so each entry loses exactly that at its stop.',
                 sum_risk: 'Risk: {sum} of {max}',
@@ -726,6 +741,9 @@
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
                 th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
+                cloud_signin: 'Synchroniser', cloud_signin_title: 'Connecte-toi avec Google pour synchroniser ton journal', cloud_signout: 'Déconnexion',
+                cloud_syncing: 'synchronisation…', cloud_synced: 'synchronisé', cloud_offline: 'hors ligne', cloud_error: 'erreur de sync',
+                cloud_signin_fail: 'Connexion impossible. Réessaie.', cloud_signout_confirm: 'Se déconnecter ? Tes données restent sur cet appareil.',
                 sizing_label: 'Répartir par', sizing_pct: '% du lot', sizing_amt: '$ risqué',
                 amt_help: 'Définis le <b>$ risqué</b> à chaque entrée (ex. Perte Max 250$ → 1re 100$, 2e 150$). Les lots sont calculés pour perdre exactement ça au stop.',
                 sum_risk: 'Risque : {sum} sur {max}',
@@ -794,6 +812,9 @@
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
+                cloud_signin: 'Sincronizar', cloud_signin_title: 'Inicia sesión con Google para sincronizar tu registro', cloud_signout: 'Salir',
+                cloud_syncing: 'sincronizando…', cloud_synced: 'sincronizado', cloud_offline: 'sin conexión', cloud_error: 'error de sync',
+                cloud_signin_fail: 'No se pudo iniciar sesión. Inténtalo de nuevo.', cloud_signout_confirm: '¿Cerrar sesión? Tus datos siguen en este dispositivo.',
                 sizing_label: 'Repartir por', sizing_pct: '% del lote', sizing_amt: '$ en riesgo',
                 amt_help: 'Define el <b>$ que arriesgas</b> en cada entrada (ej. Pérdida Máx $250 → 1ª $100, 2ª $150). Los lotes se calculan para perder exactamente eso en su stop.',
                 sum_risk: 'Riesgo: {sum} de {max}',
@@ -862,6 +883,9 @@
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
+                cloud_signin: 'Sincronizar', cloud_signin_title: 'Entra com a Google para sincronizar o teu log entre dispositivos', cloud_signout: 'Sair',
+                cloud_syncing: 'a sincronizar…', cloud_synced: 'sincronizado', cloud_offline: 'sem ligação', cloud_error: 'erro de sync',
+                cloud_signin_fail: 'Não foi possível entrar. Tenta de novo.', cloud_signout_confirm: 'Terminar sessão? Os dados ficam neste dispositivo.',
                 sizing_label: 'Distribuir por', sizing_pct: '% do lote', sizing_amt: '$ em risco',
                 amt_help: 'Defines o <b>$ que arriscas</b> em cada entrada (ex. Perda Máx $250 → 1ª $100, 2ª $150). Os lotes são calculados para perder exatamente isso no respetivo stop.',
                 sum_risk: 'Risco: {sum} de {max}',
@@ -1790,8 +1814,63 @@
         function getJournal() {
             return JSON.parse(localStorage.getItem(JOURNAL_STORAGE_KEY) || "[]");
         }
-        function saveJournal(arr) {
+
+        // ---- Suporte à sincronização -------------------------------------
+        // Cada trade leva um carimbo `updatedAt` (só muda quando o conteúdo muda) e
+        // as apagadas deixam uma "lápide", para a nuvem não as ressuscitar.
+        const TOMBSTONE_KEY = "riskcalc_tombstones";
+        function getTombstones() {
+            try { return JSON.parse(localStorage.getItem(TOMBSTONE_KEY) || "{}"); } catch (e) { return {}; }
+        }
+        function saveTombstones(o) { localStorage.setItem(TOMBSTONE_KEY, JSON.stringify(o)); }
+        // Assinatura do conteúdo, ignorando o próprio carimbo.
+        function tradeSig(t) {
+            const c = Object.assign({}, t); delete c.updatedAt;
+            return JSON.stringify(c);
+        }
+
+        // opts.fromCloud = está a aplicar o que veio da nuvem: não recarimba nem reenvia.
+        function saveJournal(arr, opts) {
+            const fromCloud = !!(opts && opts.fromCloud);
+            if (!fromCloud) {
+                const prev = getJournal();
+                const prevById = new Map(prev.map(t => [t.id, t]));
+                const now = Date.now();
+                arr.forEach(t => {
+                    const old = prevById.get(t.id);
+                    if (!old) t.updatedAt = t.updatedAt || now;              // nova
+                    else if (tradeSig(old) !== tradeSig(t)) t.updatedAt = now; // alterada
+                    else if (!t.updatedAt) t.updatedAt = old.updatedAt || now; // inalterada
+                });
+                // Lápides: o que existia e deixou de existir; e limpa as que voltaram (restauro).
+                const ids = new Set(arr.map(t => t.id));
+                const tomb = getTombstones(); let dirty = false;
+                prev.forEach(t => { if (!ids.has(t.id)) { tomb[t.id] = now; dirty = true; } });
+                arr.forEach(t => { if (tomb[t.id] != null) { delete tomb[t.id]; dirty = true; } });
+                if (dirty) saveTombstones(tomb);
+            }
             localStorage.setItem(JOURNAL_STORAGE_KEY, JSON.stringify(arr));
+            if (!fromCloud && window.RBCloud) window.RBCloud.onLocalChange();
+        }
+
+        // Definições sincronizáveis (carteira, metas, idioma, nome do dono).
+        const SYNCED_SETTING_KEYS = [BALANCE_KEY, BALANCE_LOCK_KEY, RRGOAL_KEY, WALLETRISK_KEY, GOALS_LOCK_KEY, OWNER_KEY, LANG_KEY];
+        function getSettingsSnapshot() {
+            const o = {};
+            SYNCED_SETTING_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) o[k] = v; });
+            return o;
+        }
+        function applySettingsSnapshot(o) {
+            if (!o) return;
+            SYNCED_SETTING_KEYS.forEach(k => {
+                if (o[k] != null) localStorage.setItem(k, o[k]); else localStorage.removeItem(k);
+            });
+            // Repõe a UI a partir do que acabou de chegar.
+            if (o[LANG_KEY] && o[LANG_KEY] !== LANG) setLang(o[LANG_KEY]);
+            applyOwner();
+            setupBalanceLock();
+            setupGoals();
+            calculateTradeSummary();
         }
 
         // Data legível a partir de um timestamp (ex. "18/07/2026 14:30").
@@ -2924,6 +3003,206 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').catch(() => {});
             });
+        }
+    </script>
+
+    <!-- ===================== SINCRONIZAÇÃO NA NUVEM (opcional) =====================
+         A app é local-first: o localStorage manda. Isto é só um canal de sincronização.
+         Sem configuração, sem login ou sem rede, tudo continua a funcionar na mesma.
+         As chaves abaixo são públicas por design — quem protege os dados são as regras
+         do Firestore (cada utilizador só lê/escreve em users/{o seu uid}).
+    ============================================================================== -->
+    <script type="module">
+        const FIREBASE_CONFIG = {
+            // Cola aqui o firebaseConfig do teu projeto Firebase.
+            // apiKey: "...", authDomain: "...", projectId: "...",
+            // storageBucket: "...", messagingSenderId: "...", appId: "..."
+        };
+
+        const bar = document.getElementById('cloudBar');
+        const btnIn = document.getElementById('cloudSignIn');
+        const btnOut = document.getElementById('cloudSignOut');
+        const boxUser = document.getElementById('cloudUser');
+        const elStatus = document.getElementById('cloudStatus');
+        const T = (k, p) => (window.t ? window.t(k, p) : k);
+
+        window.RBCloud = { onLocalChange() {}, configured: false };
+
+        if (!FIREBASE_CONFIG.apiKey) {
+            // Sem configuração: a barra de nuvem nem aparece.
+            console.info('RiskBook: sincronização não configurada (a app funciona só localmente).');
+        } else {
+            const V = 'https://www.gstatic.com/firebasejs/10.12.2/';
+            const [{ initializeApp }, authMod, fsMod] = await Promise.all([
+                import(V + 'firebase-app.js'),
+                import(V + 'firebase-auth.js'),
+                import(V + 'firebase-firestore.js')
+            ]);
+            const { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged } = authMod;
+            const { getFirestore, doc, collection, onSnapshot, writeBatch, getDoc, setDoc } = fsMod;
+
+            const app = initializeApp(FIREBASE_CONFIG);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+
+            let uid = null, unsubTrades = null, unsubSettings = null;
+            let remoteTrades = new Map();      // id -> {updatedAt, deleted, trade}
+            let remoteSettings = null;         // {updatedAt, data}
+            let dirty = false, pushTimer = null, pushing = false;
+
+            const SET_TS_KEY = 'riskcalc_settings_updated';
+            const SET_LAST_KEY = 'riskcalc_settings_last';
+
+            bar.classList.remove('hidden');
+            window.RBCloud.configured = true;
+
+            function setStatus(key, extra) {
+                elStatus.textContent = extra ? T(key) + ' ' + extra : T(key);
+            }
+
+            /* ---------------- Definições: carimbo local ---------------- */
+            // Sobe o carimbo só quando as definições mudam mesmo.
+            function stampSettings() {
+                const snap = JSON.stringify(getSettingsSnapshot());
+                if (localStorage.getItem(SET_LAST_KEY) !== snap) {
+                    localStorage.setItem(SET_LAST_KEY, snap);
+                    localStorage.setItem(SET_TS_KEY, String(Date.now()));
+                }
+                return snap;
+            }
+
+            /* ---------------- Nuvem → local ---------------- */
+            function mergeDown() {
+                const local = getJournal();
+                const byId = new Map(local.map(t => [t.id, t]));
+                let changed = false;
+                remoteTrades.forEach((r, id) => {
+                    const mine = byId.get(id);
+                    const rts = r.updatedAt || 0;
+                    if (r.deleted) {
+                        if (mine && rts >= (mine.updatedAt || 0)) { byId.delete(id); changed = true; }
+                    } else if (!mine || rts > (mine.updatedAt || 0)) {
+                        byId.set(id, r.trade); changed = true;
+                    }
+                });
+                if (changed) {
+                    const arr = [...byId.values()];
+                    saveJournal(arr, { fromCloud: true });   // não recarimba nem reenvia
+                    if (window.renderJournal) renderJournal();
+                }
+                // Definições: a mais recente ganha.
+                if (remoteSettings && (remoteSettings.updatedAt || 0) > +(localStorage.getItem(SET_TS_KEY) || 0)) {
+                    localStorage.setItem(SET_TS_KEY, String(remoteSettings.updatedAt));
+                    localStorage.setItem(SET_LAST_KEY, JSON.stringify(remoteSettings.data || {}));
+                    applySettingsSnapshot(remoteSettings.data);
+                }
+            }
+
+            /* ---------------- Local → nuvem ---------------- */
+            async function pushUp() {
+                if (!uid || pushing) return;
+                pushing = true;
+                try {
+                    setStatus('cloud_syncing');
+                    const batch = writeBatch(db);
+                    let n = 0;
+                    const local = getJournal();
+                    local.forEach(t => {
+                        const r = remoteTrades.get(t.id);
+                        if (!r || (t.updatedAt || 0) > (r.updatedAt || 0)) {
+                            batch.set(doc(db, 'users', uid, 'trades', String(t.id)),
+                                { updatedAt: t.updatedAt || Date.now(), deleted: false, trade: t });
+                            n++;
+                        }
+                    });
+                    const tomb = getTombstones();
+                    Object.keys(tomb).forEach(id => {
+                        const r = remoteTrades.get(isNaN(+id) ? id : +id);
+                        if (!r || !r.deleted) {
+                            batch.set(doc(db, 'users', uid, 'trades', String(id)),
+                                { updatedAt: tomb[id], deleted: true });
+                            n++;
+                        }
+                    });
+                    const snap = stampSettings();
+                    const sts = +(localStorage.getItem(SET_TS_KEY) || 0);
+                    if (!remoteSettings || sts > (remoteSettings.updatedAt || 0)) {
+                        batch.set(doc(db, 'users', uid, 'meta', 'settings'),
+                            { updatedAt: sts || Date.now(), data: JSON.parse(snap) });
+                        n++;
+                    }
+                    if (n) await batch.commit();
+                    dirty = false;
+                    setStatus('cloud_synced', new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                } catch (e) {
+                    console.warn('RiskBook sync:', e);
+                    setStatus(navigator.onLine ? 'cloud_error' : 'cloud_offline');
+                } finally {
+                    pushing = false;
+                }
+            }
+
+            function schedulePush() {
+                dirty = true;
+                clearTimeout(pushTimer);
+                pushTimer = setTimeout(pushUp, 1200);   // agrupa rajadas de edições
+            }
+            window.RBCloud.onLocalChange = schedulePush;
+
+            /* ---------------- Sessão ---------------- */
+            onAuthStateChanged(auth, user => {
+                if (unsubTrades) { unsubTrades(); unsubTrades = null; }
+                if (unsubSettings) { unsubSettings(); unsubSettings = null; }
+                remoteTrades = new Map(); remoteSettings = null;
+
+                if (!user) {
+                    uid = null;
+                    btnIn.classList.remove('hidden');
+                    boxUser.classList.add('hidden'); boxUser.classList.remove('flex');
+                    return;
+                }
+                uid = user.uid;
+                btnIn.classList.add('hidden');
+                boxUser.classList.remove('hidden'); boxUser.classList.add('flex');
+                elStatus.title = user.email || '';
+                setStatus('cloud_syncing');
+
+                unsubTrades = onSnapshot(collection(db, 'users', uid, 'trades'), s => {
+                    s.docChanges().forEach(c => {
+                        const d = c.doc.data();
+                        const id = d.trade ? d.trade.id : (isNaN(+c.doc.id) ? c.doc.id : +c.doc.id);
+                        if (c.type === 'removed') remoteTrades.delete(id);
+                        else remoteTrades.set(id, d);
+                    });
+                    mergeDown();
+                    if (dirty) pushUp(); else setStatus('cloud_synced', new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                }, e => { console.warn(e); setStatus('cloud_error'); });
+
+                unsubSettings = onSnapshot(doc(db, 'users', uid, 'meta', 'settings'), s => {
+                    remoteSettings = s.exists() ? s.data() : null;
+                    mergeDown();
+                }, e => console.warn(e));
+
+                stampSettings();
+                setTimeout(pushUp, 800);   // primeira subida depois de receber o que já lá está
+            });
+
+            btnIn.addEventListener('click', async () => {
+                const provider = new GoogleAuthProvider();
+                try { await signInWithPopup(auth, provider); }
+                catch (e) {
+                    if (e && /popup/i.test(e.code || '')) { try { await signInWithRedirect(auth, provider); return; } catch (_) {} }
+                    console.warn(e);
+                    if (window.showAlert) showAlert(T('cloud_signin_fail'));
+                }
+            });
+            btnOut.addEventListener('click', async () => {
+                if (window.showConfirm && !(await showConfirm(T('cloud_signout_confirm')))) return;
+                try { await signOut(auth); } catch (e) { console.warn(e); }
+            });
+
+            // Tenta outra vez quando a rede volta.
+            window.addEventListener('online', () => { if (dirty) pushUp(); });
         }
     </script>
 </body>
