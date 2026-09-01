@@ -173,6 +173,12 @@
         }
         .lot-btn:hover { background: #d1fae5; border-color: #6ee7b7; }
         .lot-btn:active { transform: scale(0.94); }
+        /* Versão miniatura, para dentro do bloco de cada entrada */
+        .lot-btn-xs {
+            width: 17px; height: 17px; border-radius: 5px; font-size: 11px;
+            border-color: #e5e7eb; color: #6b7280;
+        }
+        .lot-btn-xs:hover { background: #f3f4f6; border-color: #d1d5db; }
 
         /* Chips de entradas/saídas no log (mesmo estilo nos dois) */
         .chip {
@@ -691,7 +697,7 @@
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
                 th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
                 lot_tuned: 'tuned', lot_reset_title: 'Back to the calculated lot', lot_minus_title: 'One step down', lot_plus_title: 'One step up',
-                lot_edit_title: 'Fine-tune the total lot', lot_edit_invalid: 'Invalid lot.', lot_calc_was: 'calculated:',
+                lot_edit_title: 'Fine-tune the total lot', lot_entry_edit_title: 'Fine-tune entry {n} lot', lot_edit_invalid: 'Invalid lot.', lot_calc_was: 'calculated:',
                 cloud_signin: 'Sync', cloud_signin_title: 'Sign in with Google to sync your log across devices', cloud_signout: 'Sign out',
                 cloud_syncing: 'syncing…', cloud_synced: 'synced', cloud_offline: 'offline', cloud_error: 'sync error',
                 cloud_signin_fail: 'Could not sign in. Try again.', cloud_signout_confirm: 'Sign out? Your data stays on this device.',
@@ -764,7 +770,7 @@
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
                 th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
                 lot_tuned: 'ajusté', lot_reset_title: 'Revenir au lot calculé', lot_minus_title: 'Un pas en moins', lot_plus_title: 'Un pas en plus',
-                lot_edit_title: 'Ajuster le lot total', lot_edit_invalid: 'Lot invalide.', lot_calc_was: 'calculé :',
+                lot_edit_title: 'Ajuster le lot total', lot_entry_edit_title: 'Ajuster le lot de l’entrée {n}', lot_edit_invalid: 'Lot invalide.', lot_calc_was: 'calculé :',
                 cloud_signin: 'Synchroniser', cloud_signin_title: 'Connecte-toi avec Google pour synchroniser ton journal', cloud_signout: 'Déconnexion',
                 cloud_syncing: 'synchronisation…', cloud_synced: 'synchronisé', cloud_offline: 'hors ligne', cloud_error: 'erreur de sync',
                 cloud_signin_fail: 'Connexion impossible. Réessaie.', cloud_signout_confirm: 'Se déconnecter ? Tes données restent sur cet appareil.',
@@ -837,7 +843,7 @@
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
                 lot_tuned: 'ajustado', lot_reset_title: 'Volver al lote calculado', lot_minus_title: 'Un paso menos', lot_plus_title: 'Un paso más',
-                lot_edit_title: 'Ajustar el lote total', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
+                lot_edit_title: 'Ajustar el lote total', lot_entry_edit_title: 'Ajustar el lote de la entrada {n}', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
                 cloud_signin: 'Sincronizar', cloud_signin_title: 'Inicia sesión con Google para sincronizar tu registro', cloud_signout: 'Salir',
                 cloud_syncing: 'sincronizando…', cloud_synced: 'sincronizado', cloud_offline: 'sin conexión', cloud_error: 'error de sync',
                 cloud_signin_fail: 'No se pudo iniciar sesión. Inténtalo de nuevo.', cloud_signout_confirm: '¿Cerrar sesión? Tus datos siguen en este dispositivo.',
@@ -910,7 +916,7 @@
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
                 lot_tuned: 'ajustado', lot_reset_title: 'Voltar ao lote calculado', lot_minus_title: 'Um passo abaixo', lot_plus_title: 'Um passo acima',
-                lot_edit_title: 'Afinar o lote total', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
+                lot_edit_title: 'Afinar o lote total', lot_entry_edit_title: 'Afinar o lote da {n}ª entrada', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
                 cloud_signin: 'Sincronizar', cloud_signin_title: 'Entra com a Google para sincronizar o teu log entre dispositivos', cloud_signout: 'Sair',
                 cloud_syncing: 'a sincronizar…', cloud_synced: 'sincronizado', cloud_offline: 'sem ligação', cloud_error: 'erro de sync',
                 cloud_signin_fail: 'Não foi possível entrar. Tenta de novo.', cloud_signout_confirm: 'Terminar sessão? Os dados ficam neste dispositivo.',
@@ -1305,10 +1311,11 @@
 
         function currentStep() { return ASSET_PRESETS[currentAssetType].step; }
 
-        // ---- Afinação manual do lote total -------------------------------
-        // null = usa o lote calculado. Qualquer alteração aos dados da trade repõe-o
-        // a null (o cálculo volta a mandar); só os botões −/+ e o campo o mantêm.
-        let lotOverride = null;
+        // ---- Afinação manual dos lotes ------------------------------------
+        // null = usa os lotes calculados. Caso contrário é o array de lotes por
+        // entrada (afinar o total reparte-o; afinar uma entrada mexe só nessa).
+        // Qualquer alteração aos dados da trade repõe-o a null.
+        let lotOverrides = null;
 
         // Reparte um lote total pelas entradas segundo os pesos, em passos do ativo,
         // e distribui o resto pelas entradas mais penalizadas pelo arredondamento —
@@ -1325,32 +1332,57 @@
             return base.map(u => +(u * step).toFixed(8));
         }
 
-        // Botões −/+ : mexem um passo do ativo a partir do lote atualmente mostrado.
+        // Botões −/+ do TOTAL: um passo do ativo, repartido pelas entradas.
         function nudgeLot(dir) {
             if (!lastCalc) return;
             const step = currentStep();
-            const base = lotOverride != null ? lotOverride : lastCalc.totalLot;
-            const next = +(Math.max(step, base + dir * step)).toFixed(8);
-            lotOverride = next;
+            const next = +(Math.max(step, lastCalc.totalLot + dir * step)).toFixed(8);
+            lotOverrides = distributeLots(next, lastCalc.weights, step);
             calculateTradeSummary({ keepOverride: true });
         }
-        // Escrever um lote exato à mão.
+        // Escrever o lote TOTAL exato à mão.
         async function editLot() {
             if (!lastCalc) return;
-            const cur = lotOverride != null ? lotOverride : lastCalc.totalLot;
             const res = await showModal({
                 title: t('lot_edit_title'), okText: t('m_ok'),
-                fields: [{ key: 'lot', type: 'number', label: t('total_lot'), value: String(cur) }]
+                fields: [{ key: 'lot', type: 'number', label: t('total_lot'), value: String(lastCalc.totalLot) }]
             });
             if (!res) return;
             const v = parseFloat(res.lot);
             if (isNaN(v) || v <= 0) { showAlert(t('lot_edit_invalid')); return; }
-            lotOverride = floorToStep(v, currentStep());
+            lotOverrides = distributeLots(floorToStep(v, currentStep()), lastCalc.weights, currentStep());
             calculateTradeSummary({ keepOverride: true });
         }
-        // Volta ao lote que o cálculo dá.
+
+        // Botões −/+ de UMA entrada: mexe só nessa, o total segue atrás.
+        // Deixa chegar a 0 — serve para calcular 3 entradas e executar só 2.
+        function nudgeEntryLot(i, dir) {
+            if (!lastCalc || lastCalc.lots[i] == null) return;
+            const step = currentStep();
+            const arr = lastCalc.lots.slice();
+            arr[i] = +(Math.max(0, arr[i] + dir * step)).toFixed(8);
+            lotOverrides = arr;
+            calculateTradeSummary({ keepOverride: true });
+        }
+        // Escrever o lote exato de uma entrada.
+        async function editEntryLot(i) {
+            if (!lastCalc || lastCalc.lots[i] == null) return;
+            const res = await showModal({
+                title: t('lot_entry_edit_title', { n: i + 1 }), okText: t('m_ok'),
+                fields: [{ key: 'lot', type: 'number', label: t('th_lot'), value: String(lastCalc.lots[i]) }]
+            });
+            if (!res) return;
+            const v = parseFloat(res.lot);
+            if (isNaN(v) || v < 0) { showAlert(t('lot_edit_invalid')); return; }
+            const arr = lastCalc.lots.slice();
+            arr[i] = floorToStep(v, currentStep());
+            lotOverrides = arr;
+            calculateTradeSummary({ keepOverride: true });
+        }
+
+        // Volta aos lotes que o cálculo dá.
         function resetLot() {
-            lotOverride = null;
+            lotOverrides = null;
             calculateTradeSummary();
         }
         function currentLotDecimals() { return ASSET_PRESETS[currentAssetType].lotDecimals; }
@@ -1608,7 +1640,7 @@
         // opts.keepOverride = veio dos botões de afinação; qualquer outra chamada
         // (incluindo o listener de input, que passa um Event) repõe o lote calculado.
         function calculateTradeSummary(opts) {
-            if (!(opts && opts.keepOverride === true)) lotOverride = null;
+            if (!(opts && opts.keepOverride === true)) lotOverrides = null;
             const symbol = document.getElementById('assetSymbol').value.trim();
             const balance = parseFloat(document.getElementById('accountBalance').value);
             const maxLoss = parseFloat(document.getElementById('maxLossAmount').value);
@@ -1721,13 +1753,14 @@
             const weightedRP = weights.reduce((s, w, i) => s + w * riskPoints[i], 0);
             // Lote TRADEABLE (arredondado para baixo ao step do ativo — ex. Forex 0.01, 2 casas).
             let lots = lotsExact.map(q => floorToStep(q, currentStep()));
-            const calcTotal = lots.reduce((a, b) => a + b, 0);   // o que o cálculo dá
-            // Afinação manual: se mexeste no lote total, as entradas escalam
-            // proporcionalmente e é o RISCO que passa a ser consequência.
-            if (lotOverride != null && lotOverride > 0) lots = distributeLots(lotOverride, weights, currentStep());
+            const calcLots = lots.slice();                       // o que o cálculo dá
+            const calcTotal = calcLots.reduce((a, b) => a + b, 0);
+            // Afinação manual: os lotes passam a ser os que definiste e é o RISCO
+            // que se torna consequência (deixa de ser o teto a mandar).
+            if (lotOverrides && lotOverrides.length === trancheCount) lots = lotOverrides.slice();
             const totalQty = lots.reduce((a, b) => a + b, 0);
             const totalExact = lotsExact.reduce((a, b) => a + b, 0);
-            const tuned = lotOverride != null && Math.abs(totalQty - calcTotal) > 1e-9;
+            const tuned = !!lotOverrides && lots.some((q, i) => Math.abs(q - calcLots[i]) > 1e-9);
 
             // -------------------------------------------------------------------
             // PREÇO MÉDIO PONDERADO pelos lotes:
@@ -1775,6 +1808,8 @@
             // Detalhe por tranche: cabeçalho (nº · peso | risco) + campos rotulados
             // que quebram linha sozinhos — sem scroll horizontal em ecrãs estreitos.
             const ordinals = ['1ª', '2ª', '3ª'];
+            // Esta entrada foi afinada à mão? (para realçar e mostrar o valor calculado)
+            const tunedEntry = i => !!lotOverrides && Math.abs(lots[i] - calcLots[i]) > 1e-9;
             const field = (label, value, color) =>
                 `<span class="whitespace-nowrap"><span class="text-gray-400">${label}</span> <span class="font-bold" style="color:${color}">${value}</span></span>`;
             let tHTML = '';
@@ -1792,7 +1827,13 @@
                         ${field(t('th_entry'), formatPrice(entries[i]), '#1f2937')}
                         ${field(t('sl_short'), formatPrice(sls[i]), '#dc2626')}
                         ${field(t('th_tp'), formatPrice(tp), '#059669')}
-                        ${field(t('th_lot'), formatLot(lots[i]) + ` <span class="font-normal text-gray-400">(${formatLotExact(lotsExact[i])})</span>`, '#1f2937')}
+                        <span class="inline-flex items-center gap-1 whitespace-nowrap">
+                            <span class="text-gray-400">${t('th_lot')}</span>
+                            <button type="button" onclick="nudgeEntryLot(${i},-1)" class="lot-btn lot-btn-xs" data-i18n-title="lot_minus_title">−</button>
+                            <span onclick="editEntryLot(${i})" title="${t('lot_entry_edit_title', { n: i + 1 })}" class="font-bold cursor-pointer hover:opacity-70" style="color:${tunedEntry(i) ? '#b45309' : '#1f2937'}">${formatLot(lots[i])}</span>
+                            <button type="button" onclick="nudgeEntryLot(${i},1)" class="lot-btn lot-btn-xs" data-i18n-title="lot_plus_title">+</button>
+                            <span class="font-normal text-gray-400">${tunedEntry(i) ? '(' + formatLot(calcLots[i]) + ')' : '(' + formatLotExact(lotsExact[i]) + ')'}</span>
+                        </span>
                     </div>
                 </div>`;
             }
@@ -1837,6 +1878,7 @@
                 pcts: pcts.slice(),
                 sizingMode,               // 'pct' (% do lote) ou 'amt' ($ de risco)
                 avgEntry, sl: avgSL, sls: sls.slice(), tp,
+                weights: weights.slice(),   // repartição, para os −/+ do lote total
                 lots: lots.slice(),
                 totalLot: totalQty,
                 plannedRisk: realRisk,
