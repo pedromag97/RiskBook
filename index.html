@@ -163,6 +163,21 @@
         .act-btn:hover { background: #f3f4f6; }
         .act-btn svg { flex: none; }
 
+        /* Ativos já usados, por baixo do campo do símbolo */
+        .sym-chip {
+            display: inline-flex; align-items: center;
+            border: 1px solid #e5e7eb; background: #f9fafb; border-radius: 9999px;
+            font-size: 11px; font-weight: 700; color: #4b5563; overflow: hidden;
+            transition: all 0.15s;
+        }
+        .sym-chip:hover { border-color: #93c5fd; background: #eff6ff; }
+        .sym-chip.on { border-color: #3b82f6; background: #dbeafe; color: #1e40af; }
+        .sym-chip > button { padding: 2px 7px; line-height: 1.5; }
+        .sym-chip .sym-x {
+            padding: 2px 6px 2px 3px; color: #9ca3af; font-size: 10px; font-weight: 700;
+        }
+        .sym-chip .sym-x:hover { color: #dc2626; }
+
         /* Botões de afinação do lote (−, +, repor) */
         .lot-btn {
             width: 24px; height: 24px; border-radius: 7px;
@@ -279,6 +294,8 @@
                 <label for="assetSymbol" class="block text-sm font-medium text-gray-700 mb-1" data-i18n="symbol_label">Símbolo (Ex: BTC, AAPL, SP500) *</label>
                 <input type="text" id="assetSymbol" list="symbolHistory" value="EURUSD" class="input-field w-full uppercase" placeholder="EURUSD" autocomplete="off">
                 <datalist id="symbolHistory"></datalist>
+                <!-- Ativos já usados: clicar preenche; o ✕ remove da lista -->
+                <div id="symbolChips" class="flex flex-wrap items-center gap-1 mt-1.5"></div>
             </div>
 
             <!-- Tipo de ativo: preenche o valor do contrato / lot step por defeito -->
@@ -696,7 +713,7 @@
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
                 th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
-                lot_tuned: 'tuned', lot_reset_title: 'Back to the calculated lot', lot_minus_title: 'One step down', lot_plus_title: 'One step up',
+                sym_forget: 'Remove from the list', lot_tuned: 'tuned', lot_reset_title: 'Back to the calculated lot', lot_minus_title: 'One step down', lot_plus_title: 'One step up',
                 lot_edit_title: 'Fine-tune the total lot', lot_entry_edit_title: 'Fine-tune entry {n} lot', lot_edit_invalid: 'Invalid lot.', lot_calc_was: 'calculated:',
                 cloud_signin: 'Sync', cloud_signin_title: 'Sign in with Google to sync your log across devices', cloud_signout: 'Sign out',
                 cloud_syncing: 'syncing…', cloud_synced: 'synced', cloud_offline: 'offline', cloud_error: 'sync error',
@@ -769,7 +786,7 @@
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
                 th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
-                lot_tuned: 'ajusté', lot_reset_title: 'Revenir au lot calculé', lot_minus_title: 'Un pas en moins', lot_plus_title: 'Un pas en plus',
+                sym_forget: 'Retirer de la liste', lot_tuned: 'ajusté', lot_reset_title: 'Revenir au lot calculé', lot_minus_title: 'Un pas en moins', lot_plus_title: 'Un pas en plus',
                 lot_edit_title: 'Ajuster le lot total', lot_entry_edit_title: 'Ajuster le lot de l’entrée {n}', lot_edit_invalid: 'Lot invalide.', lot_calc_was: 'calculé :',
                 cloud_signin: 'Synchroniser', cloud_signin_title: 'Connecte-toi avec Google pour synchroniser ton journal', cloud_signout: 'Déconnexion',
                 cloud_syncing: 'synchronisation…', cloud_synced: 'synchronisé', cloud_offline: 'hors ligne', cloud_error: 'erreur de sync',
@@ -842,7 +859,7 @@
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
-                lot_tuned: 'ajustado', lot_reset_title: 'Volver al lote calculado', lot_minus_title: 'Un paso menos', lot_plus_title: 'Un paso más',
+                sym_forget: 'Quitar de la lista', lot_tuned: 'ajustado', lot_reset_title: 'Volver al lote calculado', lot_minus_title: 'Un paso menos', lot_plus_title: 'Un paso más',
                 lot_edit_title: 'Ajustar el lote total', lot_entry_edit_title: 'Ajustar el lote de la entrada {n}', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
                 cloud_signin: 'Sincronizar', cloud_signin_title: 'Inicia sesión con Google para sincronizar tu registro', cloud_signout: 'Salir',
                 cloud_syncing: 'sincronizando…', cloud_synced: 'sincronizado', cloud_offline: 'sin conexión', cloud_error: 'error de sync',
@@ -915,7 +932,7 @@
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
-                lot_tuned: 'ajustado', lot_reset_title: 'Voltar ao lote calculado', lot_minus_title: 'Um passo abaixo', lot_plus_title: 'Um passo acima',
+                sym_forget: 'Remover da lista', lot_tuned: 'ajustado', lot_reset_title: 'Voltar ao lote calculado', lot_minus_title: 'Um passo abaixo', lot_plus_title: 'Um passo acima',
                 lot_edit_title: 'Afinar o lote total', lot_entry_edit_title: 'Afinar o lote da {n}ª entrada', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
                 cloud_signin: 'Sincronizar', cloud_signin_title: 'Entra com a Google para sincronizar o teu log entre dispositivos', cloud_signout: 'Sair',
                 cloud_syncing: 'a sincronizar…', cloud_synced: 'sincronizado', cloud_offline: 'sem ligação', cloud_error: 'erro de sync',
@@ -1404,8 +1421,12 @@
         }
 
         /* ----------------------- Histórico de símbolos ----------------------- */
+        function getSymbolHistory() {
+            try { return JSON.parse(localStorage.getItem(SYMBOL_STORAGE_KEY) || "[]"); } catch (e) { return []; }
+        }
+
         function loadSymbolHistory() {
-            const history = JSON.parse(localStorage.getItem(SYMBOL_STORAGE_KEY) || "[]");
+            const history = getSymbolHistory();
             const datalist = document.getElementById('symbolHistory');
             datalist.innerHTML = "";
             history.forEach(sym => {
@@ -1413,17 +1434,50 @@
                 option.value = sym;
                 datalist.appendChild(option);
             });
+            renderSymbolChips(history);
+        }
+
+        // Lista visível dos ativos já usados (o datalist sozinho passa despercebido).
+        function renderSymbolChips(history) {
+            const box = document.getElementById('symbolChips');
+            if (!box) return;
+            const list = history || getSymbolHistory();
+            if (!list.length) { box.innerHTML = ''; return; }
+            const atual = (document.getElementById('assetSymbol').value || '').toUpperCase().trim();
+            box.innerHTML = list.map(s => {
+                const on = s === atual;
+                return `<span class="sym-chip${on ? ' on' : ''}">
+                    <button type="button" onclick="pickSymbol('${s.replace(/'/g, "\\'")}')">${s}</button>
+                    <button type="button" class="sym-x" onclick="forgetSymbol('${s.replace(/'/g, "\\'")}')" title="${t('sym_forget')}">✕</button>
+                </span>`;
+            }).join('');
+        }
+
+        function pickSymbol(sym) {
+            const input = document.getElementById('assetSymbol');
+            input.value = sym;
+            calculateTradeSummary({ keepOverride: true });
+            renderSymbolChips();
+        }
+
+        function forgetSymbol(sym) {
+            const history = getSymbolHistory().filter(s => s !== sym);
+            localStorage.setItem(SYMBOL_STORAGE_KEY, JSON.stringify(history));
+            loadSymbolHistory();
+            if (window.RBCloud) RBCloud.onLocalChange();
         }
 
         function saveSymbolToHistory(symbol) {
             if (!symbol) return;
             const sym = symbol.toUpperCase().trim();
-            let history = JSON.parse(localStorage.getItem(SYMBOL_STORAGE_KEY) || "[]");
+            let history = getSymbolHistory();
+            const jaEstava = history[0] === sym;
             history = history.filter(s => s !== sym);
             history.unshift(sym);
             if (history.length > 15) history = history.slice(0, 15);
             localStorage.setItem(SYMBOL_STORAGE_KEY, JSON.stringify(history));
             loadSymbolHistory();
+            if (!jaEstava && window.RBCloud) RBCloud.onLocalChange();
         }
 
         /* ------------------- Histórico de lotes (anomalias) ------------------ */
@@ -1986,7 +2040,7 @@
         }
 
         // Definições sincronizáveis (carteira, metas, idioma, nome do dono).
-        const SYNCED_SETTING_KEYS = [BALANCE_KEY, BALANCE_LOCK_KEY, RRGOAL_KEY, WALLETRISK_KEY, GOALS_LOCK_KEY, OWNER_KEY, LANG_KEY];
+        const SYNCED_SETTING_KEYS = [BALANCE_KEY, BALANCE_LOCK_KEY, RRGOAL_KEY, WALLETRISK_KEY, GOALS_LOCK_KEY, OWNER_KEY, LANG_KEY, SYMBOL_STORAGE_KEY];
         function getSettingsSnapshot() {
             const o = {};
             SYNCED_SETTING_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) o[k] = v; });
@@ -2000,6 +2054,7 @@
             // Repõe a UI a partir do que acabou de chegar.
             if (o[LANG_KEY] && o[LANG_KEY] !== LANG) setLang(o[LANG_KEY]);
             applyOwner();
+            loadSymbolHistory();
             setupBalanceLock();
             setupGoals();
             calculateTradeSummary();
@@ -2158,6 +2213,7 @@
             }
             const t = baseTradeFromCalc();
             t.status = 'aberto';          // aberto | ganho | perdido | nulo | nao_exec
+            saveSymbolToHistory(t.symbol);   // o ativo passa a constar dos já usados
 
             // Proteção contra duplicados: trade idêntica registada nos últimos minutos?
             // Usa o id (timestamp real do registo), não a data da trade (pode ser backfill).
@@ -3102,6 +3158,8 @@
 
             // Recalcula em tempo real ao escrever (risco acumulado ao vivo).
             document.getElementById('inputs').addEventListener('input', calculateTradeSummary);
+            // Realça na lista o ativo que está escrito.
+            document.getElementById('assetSymbol').addEventListener('input', () => renderSymbolChips());
         }
 
         window.onload = () => {
