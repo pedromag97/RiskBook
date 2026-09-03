@@ -749,7 +749,7 @@
                 empty_none: 'No trades yet. Fill a trade and click "Calculate & Log".', empty_month: 'No trades this month/filter.',
                 r_mean: 'Avg', r_sl: 'SL', r_tp: 'TP', r_lot: 'lot', r_risk: 'Risk', r_gain: 'Gain',
                 trail_title: 'Move the stop (trailing)', trail_new_sl: 'New stop', sl_initial: 'entry stop',
-                risk_initial_short: '(initial)', risk_now: 'Risk now', risk_locked: 'Locked in', risk_be: 'Risk-free', r_rr: 'R:R',
+                risk_initial_short: '(initial)', budget_used: 'Using', budget_of: 'of the planned', budget_left: 'left', budget_over: 'over plan', risk_now: 'Risk now', risk_locked: 'Locked in', risk_be: 'Risk-free', r_rr: 'R:R',
                 b_open: 'OPEN', b_won: 'WON', b_lost: 'LOSS', b_be: 'BE', b_notexec: 'NOT TAKEN',
                 btn_result: 'Result', btn_notexec: 'Not taken', btn_reopen: 'Reopen', btn_review: 'Review', btn_date: 'Date', btn_notes: 'Notes',
                 cum_risk_label: 'Cumulative risk', buy: 'BUY', sell: 'SELL', all_months: 'All months',
@@ -828,7 +828,7 @@
                 empty_none: 'Aucun trade. Remplis un trade et clique "Calculer & Journaliser".', empty_month: 'Aucun trade ce mois/filtre.',
                 r_mean: 'Moy', r_sl: 'SL', r_tp: 'TP', r_lot: 'lot', r_risk: 'Risque', r_gain: 'Gain',
                 trail_title: 'Déplacer le stop (trailing)', trail_new_sl: 'Nouveau stop', sl_initial: 'stop d’entrée',
-                risk_initial_short: '(initial)', risk_now: 'Risque actuel', risk_locked: 'Sécurisé', risk_be: 'Sans risque', r_rr: 'R:R',
+                risk_initial_short: '(initial)', budget_used: 'Utilises', budget_of: 'des', budget_left: 'restant', budget_over: 'au-dessus du plan', risk_now: 'Risque actuel', risk_locked: 'Sécurisé', risk_be: 'Sans risque', r_rr: 'R:R',
                 b_open: 'OUVERT', b_won: 'GAGNÉ', b_lost: 'PERTE', b_be: 'BE', b_notexec: 'NON PRIS',
                 btn_result: 'Résultat', btn_notexec: 'Non pris', btn_reopen: 'Rouvrir', btn_review: 'Revue', btn_date: 'Date', btn_notes: 'Notes',
                 cum_risk_label: 'Risque cumulé', buy: 'ACHAT', sell: 'VENTE', all_months: 'Tous les mois',
@@ -907,7 +907,7 @@
                 empty_none: 'Sin trades. Calcula un trade y pulsa "Calcular y Registrar".', empty_month: 'Sin trades este mes/filtro.',
                 r_mean: 'Med', r_sl: 'SL', r_tp: 'TP', r_lot: 'lote', r_risk: 'Riesgo', r_gain: 'Ganancia',
                 trail_title: 'Mover el stop (trailing)', trail_new_sl: 'Nuevo stop', sl_initial: 'stop de entrada',
-                risk_initial_short: '(inicial)', risk_now: 'Riesgo actual', risk_locked: 'Asegurado', risk_be: 'Sin riesgo', r_rr: 'R:R',
+                risk_initial_short: '(inicial)', budget_used: 'Usas', budget_of: 'de los', budget_left: 'sobra', budget_over: 'por encima del plan', risk_now: 'Riesgo actual', risk_locked: 'Asegurado', risk_be: 'Sin riesgo', r_rr: 'R:R',
                 b_open: 'ABIERTA', b_won: 'GANADA', b_lost: 'PÉRDIDA', b_be: 'BE', b_notexec: 'NO EJEC',
                 btn_result: 'Resultado', btn_notexec: 'No ejec.', btn_reopen: 'Reabrir', btn_review: 'Revisión', btn_date: 'Fecha', btn_notes: 'Notas',
                 cum_risk_label: 'Riesgo acumulado', buy: 'COMPRA', sell: 'VENTA', all_months: 'Todos los meses',
@@ -986,7 +986,7 @@
                 empty_none: 'Sem trades registadas ainda. Calcula uma trade e carrega em "Calcular e Registar".', empty_month: 'Sem trades neste mês/filtro.',
                 r_mean: 'Méd', r_sl: 'SL', r_tp: 'TP', r_lot: 'lote', r_risk: 'Risco', r_gain: 'Ganho',
                 trail_title: 'Mover o stop (trailing)', trail_new_sl: 'Novo stop', sl_initial: 'stop de entrada',
-                risk_initial_short: '(inicial)', risk_now: 'Risco atual', risk_locked: 'Garantido', risk_be: 'Sem risco', r_rr: 'R:R',
+                risk_initial_short: '(inicial)', budget_used: 'Usas', budget_of: 'dos', budget_left: 'sobra', budget_over: 'acima do plano', risk_now: 'Risco atual', risk_locked: 'Garantido', risk_be: 'Sem risco', r_rr: 'R:R',
                 b_open: 'ABERTA', b_won: 'GANHO', b_lost: 'PERDA', b_be: 'NULO', b_notexec: 'NÃO EXEC',
                 btn_result: 'Resultado', btn_notexec: 'Não exec.', btn_reopen: 'Reabrir', btn_review: 'Revisão', btn_date: 'Data', btn_notes: 'Notas',
                 cum_risk_label: 'Risco acumulado', buy: 'COMPRA', sell: 'VENDA', all_months: 'Todos os meses',
@@ -2204,6 +2204,12 @@
                 entryStates: lastCalc.entries.map((_, i) => i === 0 ? 'done' : 'plan'),
                 plannedEntries: lastCalc.entries.slice(),   // preços planeados (para comparar)
                 plannedLots: lastCalc.lots.slice(),         // lotes planeados (para manter o risco)
+                // Fotografia do plano no momento do registo. Não muda mais — é a
+                // referência contra a qual se compara o que realmente aconteceu.
+                originalPlan: {
+                    totalLot: lastCalc.totalLot, avgEntry: lastCalc.avgEntry,
+                    plannedRisk: lastCalc.plannedRisk, plannedGain: lastCalc.plannedGain, rr: lastCalc.rr
+                },
                 avgEntry: lastCalc.avgEntry,
                 sl: lastCalc.sl,
                 sls: lastCalc.sls ? lastCalc.sls.slice() : null,          // SL atual (podes arrastá-lo)
@@ -2596,6 +2602,22 @@
                         <p class="stat-label">${label}</p>
                         <p class="stat-value" style="color:${color || '#1f2937'}">${value}</p>
                     </div>`;
+        }
+
+        // Orçamento de risco: quanto do plano original estás mesmo a usar.
+        // Só informa — não mexe em lotes. A decisão de usar o que sobra é tua.
+        function budgetLine(t) {
+            const p = t.originalPlan;
+            if (!p || !p.plannedRisk) return '';
+            if (CLOSED_ST.includes(t.status) || t.status === 'nao_exec') return '';
+            const usado = t.plannedRisk, sobra = p.plannedRisk - usado;
+            if (Math.abs(sobra) < 0.01) return '';
+            const acima = sobra < 0;
+            const cor = acima ? '#dc2626' : '#6b7280';
+            return `<div class="text-xs mt-1" style="color:${cor}">🧮 ${tr('budget_used')} `
+                + `<span class="font-semibold">${formatCurrency(usado)}</span> ${tr('budget_of')} `
+                + `<span class="font-semibold">${formatCurrency(p.plannedRisk)}</span> · `
+                + `<span class="font-semibold">${acima ? tr('budget_over') : tr('budget_left')} ${formatCurrency(Math.abs(sobra))}</span></div>`;
         }
 
         // O stop já foi arrastado? (SL atual diferente do SL de entrada)
@@ -3006,7 +3028,7 @@
                             <span>${tr('r_gain')} <span class="font-semibold" style="color:#059669">${formatCurrency(t.plannedGain)}</span></span>
                             <span>${tr('r_rr')} ${t.rr.toFixed(2)}</span>
                         </div>
-                        ${planLine(t)}
+                        ${planLine(t)}${budgetLine(t)}
                         ${entriesToggle}
                         ${remainingLine}${exitsLine}${notes}${reviewLine}${reasonLine}
                         <div class="flex gap-2 mt-2 flex-wrap items-center">${actions.join('')}</div>
