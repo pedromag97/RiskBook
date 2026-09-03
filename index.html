@@ -717,7 +717,7 @@
                 ve_title: 'Validate entry {n}', ve_ok: 'Save', ve_real_price: 'Price you actually got',
                 ve_state: 'This entry was', es_done: 'Filled', es_plan: 'Waiting', es_cancel: 'Cancelled',
                 ve_planned: 'planned', ve_bad_price: 'Invalid price.', ve_sl_equal: 'The price cannot equal the stop.',
-                badge_plan: 'plan', plan_word: 'Plan', lot_tuned: 'tuned', lot_reset_title: 'Back to the calculated lot', lot_minus_title: 'One step down', lot_plus_title: 'One step up',
+                badge_plan: 'plan', plan_word: 'Plan', tp_edit_title: 'Edit take profit', tp_label_short: 'Take profit', lot_tuned: 'tuned', lot_reset_title: 'Back to the calculated lot', lot_minus_title: 'One step down', lot_plus_title: 'One step up',
                 lot_edit_title: 'Fine-tune the total lot', lot_entry_edit_title: 'Fine-tune entry {n} lot', lot_edit_invalid: 'Invalid lot.', lot_calc_was: 'calculated:',
                 cloud_signin: 'Sync', cloud_signin_title: 'Sign in with Google to sync your log across devices', cloud_signout: 'Sign out',
                 cloud_syncing: 'syncing…', cloud_synced: 'synced', cloud_offline: 'offline', cloud_error: 'sync error',
@@ -794,7 +794,7 @@
                 ve_title: 'Valider l’entrée {n}', ve_ok: 'Enregistrer', ve_real_price: 'Prix réellement obtenu',
                 ve_state: 'Cette entrée a été', es_done: 'Exécutée', es_plan: 'En attente', es_cancel: 'Annulée',
                 ve_planned: 'prévu', ve_bad_price: 'Prix invalide.', ve_sl_equal: 'Le prix ne peut pas égaler le stop.',
-                badge_plan: 'plan', plan_word: 'Plan', lot_tuned: 'ajusté', lot_reset_title: 'Revenir au lot calculé', lot_minus_title: 'Un pas en moins', lot_plus_title: 'Un pas en plus',
+                badge_plan: 'plan', plan_word: 'Plan', tp_edit_title: 'Modifier le take profit', tp_label_short: 'Take profit', lot_tuned: 'ajusté', lot_reset_title: 'Revenir au lot calculé', lot_minus_title: 'Un pas en moins', lot_plus_title: 'Un pas en plus',
                 lot_edit_title: 'Ajuster le lot total', lot_entry_edit_title: 'Ajuster le lot de l’entrée {n}', lot_edit_invalid: 'Lot invalide.', lot_calc_was: 'calculé :',
                 cloud_signin: 'Synchroniser', cloud_signin_title: 'Connecte-toi avec Google pour synchroniser ton journal', cloud_signout: 'Déconnexion',
                 cloud_syncing: 'synchronisation…', cloud_synced: 'synchronisé', cloud_offline: 'hors ligne', cloud_error: 'erreur de sync',
@@ -871,7 +871,7 @@
                 ve_title: 'Validar entrada {n}', ve_ok: 'Guardar', ve_real_price: 'Precio realmente obtenido',
                 ve_state: 'Esta entrada fue', es_done: 'Ejecutada', es_plan: 'En espera', es_cancel: 'Cancelada',
                 ve_planned: 'previsto', ve_bad_price: 'Precio inválido.', ve_sl_equal: 'El precio no puede igualar al stop.',
-                badge_plan: 'plan', plan_word: 'Plan', lot_tuned: 'ajustado', lot_reset_title: 'Volver al lote calculado', lot_minus_title: 'Un paso menos', lot_plus_title: 'Un paso más',
+                badge_plan: 'plan', plan_word: 'Plan', tp_edit_title: 'Editar el take profit', tp_label_short: 'Take profit', lot_tuned: 'ajustado', lot_reset_title: 'Volver al lote calculado', lot_minus_title: 'Un paso menos', lot_plus_title: 'Un paso más',
                 lot_edit_title: 'Ajustar el lote total', lot_entry_edit_title: 'Ajustar el lote de la entrada {n}', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
                 cloud_signin: 'Sincronizar', cloud_signin_title: 'Inicia sesión con Google para sincronizar tu registro', cloud_signout: 'Salir',
                 cloud_syncing: 'sincronizando…', cloud_synced: 'sincronizado', cloud_offline: 'sin conexión', cloud_error: 'error de sync',
@@ -948,7 +948,7 @@
                 ve_title: 'Validar {n}ª entrada', ve_ok: 'Guardar', ve_real_price: 'Preço a que entraste mesmo',
                 ve_state: 'Esta entrada foi', es_done: 'Executada', es_plan: 'À espera', es_cancel: 'Cancelada',
                 ve_planned: 'planeado', ve_bad_price: 'Preço inválido.', ve_sl_equal: 'O preço não pode ser igual ao stop.',
-                badge_plan: 'plano', plan_word: 'Plano', lot_tuned: 'ajustado', lot_reset_title: 'Voltar ao lote calculado', lot_minus_title: 'Um passo abaixo', lot_plus_title: 'Um passo acima',
+                badge_plan: 'plano', plan_word: 'Plano', tp_edit_title: 'Editar o take profit', tp_label_short: 'Take profit', lot_tuned: 'ajustado', lot_reset_title: 'Voltar ao lote calculado', lot_minus_title: 'Um passo abaixo', lot_plus_title: 'Um passo acima',
                 lot_edit_title: 'Afinar o lote total', lot_entry_edit_title: 'Afinar o lote da {n}ª entrada', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
                 cloud_signin: 'Sincronizar', cloud_signin_title: 'Entra com a Google para sincronizar o teu log entre dispositivos', cloud_signout: 'Sair',
                 cloud_syncing: 'a sincronizar…', cloud_synced: 'sincronizado', cloud_offline: 'sem ligação', cloud_error: 'erro de sync',
@@ -2575,6 +2575,22 @@
                     </div>`;
         }
 
+        // Editar só o TP (é único e partilhado por todas as entradas).
+        async function editTP(id) {
+            const journal = getJournal(); const t = journal.find(x => x.id === id); if (!t) return;
+            const res = await showModal({
+                title: `${t.symbol} · ${tr('tp_edit_title')}`, okText: tr('m_save'),
+                subtitle: `${tr('r_mean')} ${formatPrice(t.avgEntry)} · ${tr('r_sl')} ${formatPrice(t.sl)}`,
+                fields: [{ key: 'tp', type: 'number', label: tr('tp_label_short'), value: String(t.tp) }]
+            });
+            if (!res) return;
+            const v = parseFloat(String(res.tp).replace(',', '.'));
+            if (isNaN(v) || v <= 0) { showAlert(tr('invalid_value')); return; }
+            t.tp = v;
+            recomputeTrade(t);
+            saveJournal(journal); renderJournal();
+        }
+
         // Linha "plano vs real": só aparece quando ainda há entradas por executar,
         // para veres onde chegas se as restantes encherem.
         function planLine(t) {
@@ -2735,9 +2751,17 @@
             const initial = t.entries.map((p, i) => ({ price: String(p), sl: String(slOf(i) != null ? slOf(i) : ''), lot: String(t.lots[i] != null ? t.lots[i] : '') }));
             const res = await showModal({
                 title: `${t.symbol} · ${tr('edit_entries')}`, okText: tr('m_save'),
-                fields: [{ key: 'entries', type: 'entries', value: initial }]
+                // O TP é único e é a referência que precisas de ter à frente enquanto
+                // acertas as entradas — fica visível E editável aqui.
+                subtitle: `🎯 ${tr('r_tp')} ${formatPrice(t.tp)}`,
+                fields: [
+                    { key: 'entries', type: 'entries', value: initial },
+                    { key: 'tp', type: 'number', label: tr('tp_label_short'), value: String(t.tp) }
+                ]
             });
             if (!res) return;
+            const novoTP = parseFloat(String(res.tp).replace(',', '.'));
+            if (!isNaN(novoTP) && novoTP > 0) t.tp = novoTP;
             const rows = res.entries
                 .map(e => ({ price: parseFloat(String(e.price).replace(',', '.')), sl: parseFloat(String(e.sl).replace(',', '.')), lot: parseFloat(String(e.lot).replace(',', '.')) }))
                 .filter(r => !isNaN(r.price) && !isNaN(r.sl) && !isNaN(r.lot) && r.lot > 0);
@@ -2891,6 +2915,8 @@
                             <span class="chev text-gray-400 text-xs transition-transform shrink-0" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>
                             <span class="font-bold text-gray-800 truncate">${t.symbol}</span>
                             <span class="text-[10px] font-bold shrink-0" style="color:${dirColor}">${dirLabel(t.direction)}</span>
+                            ${t.status === 'aberto' || t.status === 'parcial'
+                                ? `<span class="text-[10px] font-bold shrink-0 hidden sm:inline" style="color:#059669" title="${tr('r_tp')}">🎯 ${formatPrice(t.tp)}</span>` : ''}
                         </div>
                         <div class="shrink-0">${resTxt}</div>
                     </div>
@@ -2899,10 +2925,22 @@
                             ${statusBadge(t)}${priorityBadge(t, true)}${styleBadge(t, true)}${t.isPlanOnly ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:#b45309;background:#fef3c7">${tr('badge_plan')}</span>` : ''}
                             <span class="text-xs text-gray-400">🕒 ${fmtTime(t.ts)}</span>
                         </div>
+                        <!-- Níveis de preço em destaque: é o que se consulta a meio da trade -->
+                        <div class="grid grid-cols-3 gap-1.5 mb-2 p-1.5 bg-gray-50 rounded-lg border border-gray-200 text-center">
+                            <div>
+                                <p class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">${tr('r_mean')}</p>
+                                <p class="font-extrabold text-[13px] text-gray-800">${formatPrice(t.avgEntry)}</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] uppercase font-bold tracking-wider" style="color:#f87171">${tr('r_sl')}</p>
+                                <p class="font-extrabold text-[13px]" style="color:#dc2626">${formatPrice(t.sl)}</p>
+                            </div>
+                            <div onclick="event.stopPropagation();editTP(${t.id})" title="${tr('tp_edit_title')}" class="cursor-pointer hover:opacity-70 transition">
+                                <p class="text-[9px] uppercase font-bold tracking-wider" style="color:#34d399">${tr('r_tp')}</p>
+                                <p class="font-extrabold text-[13px]" style="color:#059669">${formatPrice(t.tp)}</p>
+                            </div>
+                        </div>
                         <div class="text-xs text-gray-600 flex flex-wrap gap-x-3">
-                            <span>${tr('r_mean')} ${formatPrice(t.avgEntry)}</span>
-                            <span>${tr('r_sl')} ${formatPrice(t.sl)}</span>
-                            <span>${tr('r_tp')} ${formatPrice(t.tp)}</span>
                             <span>${t.totalLot.toFixed(2)} ${tr('r_lot')}</span>
                             <span>${tr('r_risk')} ${formatCurrency(t.plannedRisk)}</span>
                             <span>${tr('r_rr')} ${t.rr.toFixed(2)}</span>
