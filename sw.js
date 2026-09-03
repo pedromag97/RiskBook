@@ -1,10 +1,11 @@
 /* RiskBook service worker — offline + instalável (PWA).
    HTML: network-first (apanha atualizações; cai para cache offline).
    CDN/fonte/ícone: cache-first (não mudam). Funciona em https, não em file://. */
-const CACHE = 'riskbook-v2';
+const CACHE = 'riskbook-v3';
 
 // App shell local + dependências externas (CDN/fonte).
-const LOCAL = ['./', './index.html', './manifest.json', './icon.svg'];
+const LOCAL = ['./', './index.html', './manifest.json', './icon.svg',
+               './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 const REMOTE = [
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
