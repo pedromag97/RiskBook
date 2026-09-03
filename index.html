@@ -713,7 +713,11 @@
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
                 th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
-                sym_forget: 'Remove from the list', lot_tuned: 'tuned', lot_reset_title: 'Back to the calculated lot', lot_minus_title: 'One step down', lot_plus_title: 'One step up',
+                sym_forget: 'Remove from the list',
+                ve_title: 'Validate entry {n}', ve_ok: 'Save', ve_real_price: 'Price you actually got',
+                ve_state: 'This entry was', es_done: 'Filled', es_plan: 'Waiting', es_cancel: 'Cancelled',
+                ve_planned: 'planned', ve_bad_price: 'Invalid price.', ve_sl_equal: 'The price cannot equal the stop.',
+                badge_plan: 'plan', plan_word: 'Plan', lot_tuned: 'tuned', lot_reset_title: 'Back to the calculated lot', lot_minus_title: 'One step down', lot_plus_title: 'One step up',
                 lot_edit_title: 'Fine-tune the total lot', lot_entry_edit_title: 'Fine-tune entry {n} lot', lot_edit_invalid: 'Invalid lot.', lot_calc_was: 'calculated:',
                 cloud_signin: 'Sync', cloud_signin_title: 'Sign in with Google to sync your log across devices', cloud_signout: 'Sign out',
                 cloud_syncing: 'syncing…', cloud_synced: 'synced', cloud_offline: 'offline', cloud_error: 'sync error',
@@ -786,7 +790,11 @@
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
                 th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
-                sym_forget: 'Retirer de la liste', lot_tuned: 'ajusté', lot_reset_title: 'Revenir au lot calculé', lot_minus_title: 'Un pas en moins', lot_plus_title: 'Un pas en plus',
+                sym_forget: 'Retirer de la liste',
+                ve_title: 'Valider l’entrée {n}', ve_ok: 'Enregistrer', ve_real_price: 'Prix réellement obtenu',
+                ve_state: 'Cette entrée a été', es_done: 'Exécutée', es_plan: 'En attente', es_cancel: 'Annulée',
+                ve_planned: 'prévu', ve_bad_price: 'Prix invalide.', ve_sl_equal: 'Le prix ne peut pas égaler le stop.',
+                badge_plan: 'plan', plan_word: 'Plan', lot_tuned: 'ajusté', lot_reset_title: 'Revenir au lot calculé', lot_minus_title: 'Un pas en moins', lot_plus_title: 'Un pas en plus',
                 lot_edit_title: 'Ajuster le lot total', lot_entry_edit_title: 'Ajuster le lot de l’entrée {n}', lot_edit_invalid: 'Lot invalide.', lot_calc_was: 'calculé :',
                 cloud_signin: 'Synchroniser', cloud_signin_title: 'Connecte-toi avec Google pour synchroniser ton journal', cloud_signout: 'Déconnexion',
                 cloud_syncing: 'synchronisation…', cloud_synced: 'synchronisé', cloud_offline: 'hors ligne', cloud_error: 'erreur de sync',
@@ -859,7 +867,11 @@
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
-                sym_forget: 'Quitar de la lista', lot_tuned: 'ajustado', lot_reset_title: 'Volver al lote calculado', lot_minus_title: 'Un paso menos', lot_plus_title: 'Un paso más',
+                sym_forget: 'Quitar de la lista',
+                ve_title: 'Validar entrada {n}', ve_ok: 'Guardar', ve_real_price: 'Precio realmente obtenido',
+                ve_state: 'Esta entrada fue', es_done: 'Ejecutada', es_plan: 'En espera', es_cancel: 'Cancelada',
+                ve_planned: 'previsto', ve_bad_price: 'Precio inválido.', ve_sl_equal: 'El precio no puede igualar al stop.',
+                badge_plan: 'plan', plan_word: 'Plan', lot_tuned: 'ajustado', lot_reset_title: 'Volver al lote calculado', lot_minus_title: 'Un paso menos', lot_plus_title: 'Un paso más',
                 lot_edit_title: 'Ajustar el lote total', lot_entry_edit_title: 'Ajustar el lote de la entrada {n}', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
                 cloud_signin: 'Sincronizar', cloud_signin_title: 'Inicia sesión con Google para sincronizar tu registro', cloud_signout: 'Salir',
                 cloud_syncing: 'sincronizando…', cloud_synced: 'sincronizado', cloud_offline: 'sin conexión', cloud_error: 'error de sync',
@@ -932,7 +944,11 @@
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
-                sym_forget: 'Remover da lista', lot_tuned: 'ajustado', lot_reset_title: 'Voltar ao lote calculado', lot_minus_title: 'Um passo abaixo', lot_plus_title: 'Um passo acima',
+                sym_forget: 'Remover da lista',
+                ve_title: 'Validar {n}ª entrada', ve_ok: 'Guardar', ve_real_price: 'Preço a que entraste mesmo',
+                ve_state: 'Esta entrada foi', es_done: 'Executada', es_plan: 'À espera', es_cancel: 'Cancelada',
+                ve_planned: 'planeado', ve_bad_price: 'Preço inválido.', ve_sl_equal: 'O preço não pode ser igual ao stop.',
+                badge_plan: 'plano', plan_word: 'Plano', lot_tuned: 'ajustado', lot_reset_title: 'Voltar ao lote calculado', lot_minus_title: 'Um passo abaixo', lot_plus_title: 'Um passo acima',
                 lot_edit_title: 'Afinar o lote total', lot_entry_edit_title: 'Afinar o lote da {n}ª entrada', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
                 cloud_signin: 'Sincronizar', cloud_signin_title: 'Entra com a Google para sincronizar o teu log entre dispositivos', cloud_signout: 'Sair',
                 cloud_syncing: 'a sincronizar…', cloud_synced: 'sincronizado', cloud_offline: 'sem ligação', cloud_error: 'erro de sync',
@@ -2161,6 +2177,11 @@
                 pcts: lastCalc.pcts,
                 sizingMode: lastCalc.sizingMode || 'pct',   // como foi distribuído (% ou $)
                 lots: lastCalc.lots,
+                // A 1ª entrada é a que disparou o registo; as seguintes ficam à espera
+                // de validação (o preço planeado raramente é o preço real).
+                entryStates: lastCalc.entries.map((_, i) => i === 0 ? 'done' : 'plan'),
+                plannedEntries: lastCalc.entries.slice(),   // preços planeados (para comparar)
+                plannedLots: lastCalc.lots.slice(),         // lotes planeados (para manter o risco)
                 avgEntry: lastCalc.avgEntry,
                 sl: lastCalc.sl,
                 sls: lastCalc.sls ? lastCalc.sls.slice() : null,   // SL por entrada
@@ -2213,6 +2234,7 @@
             }
             const t = baseTradeFromCalc();
             t.status = 'aberto';          // aberto | ganho | perdido | nulo | nao_exec
+            recomputeTrade(t);            // números refletem o que está executado, não o plano todo
             saveSymbolToHistory(t.symbol);   // o ativo passa a constar dos já usados
 
             // Proteção contra duplicados: trade idêntica registada nos últimos minutos?
@@ -2553,6 +2575,15 @@
                     </div>`;
         }
 
+        // Linha "plano vs real": só aparece quando ainda há entradas por executar,
+        // para veres onde chegas se as restantes encherem.
+        function planLine(t) {
+            const p = t.planSnapshot;
+            if (!p || Math.abs(p.totalLot - t.totalLot) < 1e-9) return '';
+            return `<div class="text-xs mt-1" style="color:#b45309">📐 ${tr('plan_word')}: `
+                + `${formatLot(p.totalLot)} ${tr('r_lot')} · ${tr('r_mean')} ${formatPrice(p.avgEntry)} · ${tr('r_risk')} ${formatCurrency(p.plannedRisk)}</div>`;
+        }
+
         // Badge de estado.
         function statusBadge(t) {
             const map = {
@@ -2609,21 +2640,92 @@
             return (d > 0 && t.totalLot > 0) ? t.plannedRisk / (t.totalLot * d) : 0;
         }
         // Recalcula lote/preço médio/risco/R:R a partir de TODAS as entradas reais.
-        function recomputeTrade(t) {
-            const cv = getCValue(t);
-            const totalLot = t.lots.reduce((s, l) => s + l, 0);
-            if (!totalLot) return;
-            const avg = t.entries.reduce((s, p, i) => s + p * t.lots[i], 0) / totalLot;
-            // SL por entrada (se existir e bater com o nº de entradas); senão o SL único.
-            const sls = (t.sls && t.sls.length === t.entries.length) ? t.sls : t.entries.map(() => t.sl);
-            const risk = t.entries.reduce((s, p, i) => s + t.lots[i] * Math.abs(p - sls[i]) * cv, 0);
-            t.totalLot = totalLot;
-            t.avgEntry = avg;
-            t.sl = sls.reduce((s, x, i) => s + t.lots[i] * x, 0) / totalLot;   // SL médio representativo
-            t.plannedRisk = risk;
-            t.plannedGain = totalLot * Math.abs(t.tp - avg) * cv;
-            t.rr = risk > 0 ? t.plannedGain / risk : 0;
+        // Estado de cada entrada: 'done' executada · 'plan' à espera · 'cancel' descartada.
+        // Trades antigas não têm estados — contam todas como executadas.
+        const ENTRY_STATES = ['done', 'plan', 'cancel'];
+        function entryStates(t) {
+            return (t.entryStates && t.entryStates.length === t.entries.length)
+                ? t.entryStates : t.entries.map(() => 'done');
         }
+        function slOfEntry(t, i) { return (t.sls && t.sls[i] != null) ? t.sls[i] : t.sl; }
+
+        // Números da trade a partir de um subconjunto de entradas.
+        function aggregate(t, keep) {
+            const cv = getCValue(t);
+            const st = entryStates(t);
+            const idx = t.entries.map((_, i) => i).filter(i => keep(st[i]));
+            const totalLot = idx.reduce((s, i) => s + (t.lots[i] || 0), 0);
+            if (!totalLot) return null;
+            const avg = idx.reduce((s, i) => s + t.entries[i] * t.lots[i], 0) / totalLot;
+            const sl = idx.reduce((s, i) => s + slOfEntry(t, i) * t.lots[i], 0) / totalLot;
+            const risk = idx.reduce((s, i) => s + t.lots[i] * Math.abs(t.entries[i] - slOfEntry(t, i)) * cv, 0);
+            const gain = totalLot * Math.abs(t.tp - avg) * cv;
+            return { totalLot, avgEntry: avg, sl, plannedRisk: risk, plannedGain: gain, rr: risk > 0 ? gain / risk : 0 };
+        }
+
+        function recomputeTrade(t) {
+            // O que está MESMO no mercado (executadas) e o PLANO (executadas + à espera).
+            const real = aggregate(t, s => s === 'done');
+            const plan = aggregate(t, s => s !== 'cancel');
+            const use = real || plan;              // sem nada executado, mostra o plano
+            if (!use) return;
+            Object.assign(t, use);
+            t.isPlanOnly = !real;                  // o cartão marca-o como plano
+            // Guarda o plano à parte, para comparares com o que realmente aconteceu.
+            t.planSnapshot = plan ? { totalLot: plan.totalLot, avgEntry: plan.avgEntry, plannedRisk: plan.plannedRisk } : null;
+        }
+        // Validar UMA entrada: dizes a que preço entraste mesmo e o lote é recalculado
+        // para o risco dessa entrada se manter igual ao planeado.
+        //   risco_planeado = lote_plan · |preço_plan − SL| · cValue
+        //   lote_novo      = risco_planeado / (|preço_real − SL| · cValue)
+        // Entras pior (mais longe do stop) → lote menor. Entras melhor → lote maior.
+        async function validateEntry(id, i) {
+            const journal = getJournal(); const t = journal.find(x => x.id === id); if (!t) return;
+            if (t.cValue == null) t.cValue = getCValue(t);
+            const cv = getCValue(t);
+            const st = entryStates(t).slice();
+            const sl = slOfEntry(t, i);
+            const planPrice = (t.plannedEntries && t.plannedEntries[i] != null) ? t.plannedEntries[i] : t.entries[i];
+            const planLot = (t.plannedLots && t.plannedLots[i] != null) ? t.plannedLots[i] : t.lots[i];
+            const planRisk = planLot * Math.abs(planPrice - sl) * cv;
+
+            const res = await showModal({
+                title: tr('ve_title', { n: i + 1 }),
+                okText: tr('ve_ok'), cancelText: tr('m_cancel'),
+                // SL e TP ficam à vista: é o que precisas de olhar ao validar a entrada.
+                subtitle: `${tr('r_sl')} ${formatPrice(sl)} · ${tr('r_tp')} ${formatPrice(t.tp)}`
+                    + ` · ${tr('ve_planned')} ${formatPrice(planPrice)} (${formatLot(planLot)}, ${formatCurrency(planRisk)})`,
+                fields: [
+                    { key: 'price', type: 'number', label: tr('ve_real_price'), value: String(t.entries[i]) },
+                    {
+                        key: 'state', type: 'choice', label: tr('ve_state'), value: st[i],
+                        options: [
+                            { value: 'done', label: tr('es_done') },
+                            { value: 'plan', label: tr('es_plan') },
+                            { value: 'cancel', label: tr('es_cancel') }
+                        ]
+                    }
+                ]
+            });
+            if (!res) return;
+            const p = parseFloat(res.price);
+            if (isNaN(p) || p <= 0) { showAlert(tr('ve_bad_price')); return; }
+            if (Math.abs(p - sl) < 1e-12) { showAlert(tr('ve_sl_equal')); return; }
+
+            t.entries[i] = p;
+            st[i] = res.state || 'done';
+            t.entryStates = st;
+            // Só faz sentido reajustar o lote de uma entrada que foi mesmo executada.
+            if (st[i] === 'done') {
+                const step = ASSET_PRESETS[currentAssetType] ? currentStep() : 0.01;
+                const novo = planRisk / (Math.abs(p - sl) * cv);
+                t.lots[i] = Math.max(step, floorToStep(novo, step));
+            }
+            recomputeTrade(t);
+            saveJournal(journal);
+            renderJournal();
+        }
+
         // Editar as entradas REAIS (lista livre: adicionar/remover/editar preço e lote).
         // A calculadora é só um guia — aqui regista-se o que realmente aconteceu.
         async function editEntries(id) {
@@ -2768,7 +2870,17 @@
                 const entriesToggle = (t.entries && t.entries.length)
                     ? `<div class="flex items-center gap-1 flex-wrap mt-2 text-xs">
                             <span class="text-gray-400 mr-1">${tr('entries_short')}:</span>
-                            ${t.entries.map((e, i) => { const slv = (t.sls && t.sls[i] != null) ? t.sls[i] : t.sl; return `<span class="chip">${formatPrice(e)}${slv != null ? ' <span class="text-red-400">' + tr('sl_short') + ' ' + formatPrice(slv) + '</span>' : ''}${t.lots[i] != null ? ' · ' + (+t.lots[i]).toFixed(2) : ''}</span>`; }).join('')}
+                            ${t.entries.map((e, i) => {
+                                const slv = slOfEntry(t, i);
+                                const st = entryStates(t)[i];
+                                const mark = st === 'done' ? '✅' : st === 'plan' ? '⏳' : '🚫';
+                                const style = st === 'plan' ? 'border-style:dashed;color:#b45309'
+                                            : st === 'cancel' ? 'opacity:.55;text-decoration:line-through' : '';
+                                const planP = (t.plannedEntries && t.plannedEntries[i] != null) ? t.plannedEntries[i] : null;
+                                const drift = (st === 'done' && planP != null && Math.abs(planP - e) > 1e-9)
+                                    ? ` <span class="font-normal text-gray-400">(${formatPrice(planP)})</span>` : '';
+                                return `<span class="chip" style="${style};cursor:pointer" onclick="event.stopPropagation();validateEntry(${t.id},${i})" title="${tr('ve_title', { n: i + 1 })}">${mark} ${formatPrice(e)}${drift}${slv != null ? ' <span class="text-red-400">' + tr('sl_short') + ' ' + formatPrice(slv) + '</span>' : ''}${t.lots[i] != null ? ' · ' + (+t.lots[i]).toFixed(2) : ''}</span>`;
+                            }).join('')}
                             <button onclick="event.stopPropagation();editEntries(${t.id})" title="${tr('edit_entries')}" class="text-blue-600 hover:underline font-semibold ml-1">✏️</button>
                         </div>` : '';
                 const open = expandedTrades.has(t.id);
@@ -2784,7 +2896,7 @@
                     </div>
                     <div id="td-${t.id}" class="px-3 pb-3 ${open ? '' : 'hidden'}">
                         <div class="flex items-center gap-2 flex-wrap mb-2">
-                            ${statusBadge(t)}${priorityBadge(t, true)}${styleBadge(t, true)}
+                            ${statusBadge(t)}${priorityBadge(t, true)}${styleBadge(t, true)}${t.isPlanOnly ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:#b45309;background:#fef3c7">${tr('badge_plan')}</span>` : ''}
                             <span class="text-xs text-gray-400">🕒 ${fmtTime(t.ts)}</span>
                         </div>
                         <div class="text-xs text-gray-600 flex flex-wrap gap-x-3">
@@ -2795,6 +2907,7 @@
                             <span>${tr('r_risk')} ${formatCurrency(t.plannedRisk)}</span>
                             <span>${tr('r_rr')} ${t.rr.toFixed(2)}</span>
                         </div>
+                        ${planLine(t)}
                         ${entriesToggle}
                         ${remainingLine}${exitsLine}${notes}${reviewLine}${reasonLine}
                         <div class="flex gap-2 mt-2 flex-wrap items-center">${actions.join('')}</div>
