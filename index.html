@@ -1091,6 +1091,7 @@
             localStorage.setItem(LANG_KEY, l);
             document.querySelectorAll('#langSelector .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
             applyStaticTranslations();
+            applyDocTitle();          // o título do separador segue o idioma
             applyOwner();
             calculateTradeSummary({ keepOverride: true });   // mudar de idioma não desfaz a afinação
             renderJournal();
@@ -1314,6 +1315,17 @@
             return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
         }
         // Mostra "RiskBook de {nome}" (ou só "RiskBook") + lápis de editar.
+        // Na app INSTALADA, o Chrome escreve na janela "nome do manifesto - título da
+        // página". Se ambos começarem por RiskBook fica duplicado, por isso aqui o
+        // título é só a frase — a marca já vem do manifesto. No browser mantém-se o
+        // título completo, que é o que interessa para partilhas e pesquisa.
+        function applyDocTitle() {
+            const instalada = window.matchMedia('(display-mode: standalone)').matches
+                || window.matchMedia('(display-mode: window-controls-overlay)').matches
+                || navigator.standalone === true;
+            document.title = instalada ? tr('tagline') : `RiskBook — ${tr('tagline')}`;
+        }
+
         function applyOwner() {
             const owner = (localStorage.getItem(OWNER_KEY) || '').trim();
             const el = document.getElementById('appTitle');
@@ -3576,6 +3588,7 @@
             LANG = LANGS.includes(saved) ? saved : (LANGS.includes(nav) ? nav : 'en');
             document.querySelectorAll('#langSelector .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === LANG));
             applyStaticTranslations();
+            applyDocTitle();
             applyOwner();
             setupSupport();
 

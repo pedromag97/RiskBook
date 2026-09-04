@@ -1,5 +1,5 @@
 {
-  "name": "RiskBook — The Simplest Trade Journal & Position Calculator",
+  "name": "RiskBook",
   "short_name": "RiskBook",
   "description": "The simplest trade journal and position-size calculator. Works offline, private by default, no signup required.",
   "start_url": "./index.html",
