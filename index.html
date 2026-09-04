@@ -716,7 +716,7 @@
                 th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
                 sym_forget: 'Remove from the list',
                 ve_title: 'Validate entry {n}', ve_ok: 'Save', ve_real_price: 'Price you actually got',
-                m_state: 'State', ve_state: 'This entry was', es_done: 'Filled', es_plan: 'Waiting', es_cancel: 'Cancelled',
+                m_state: 'State', m_state_short: 'St.', ve_state: 'This entry was', es_done: 'Filled', es_plan: 'Waiting', es_cancel: 'Cancelled',
                 ve_planned: 'planned', ve_bad_price: 'Invalid price.', ve_sl_equal: 'The price cannot equal the stop.',
                 badge_plan: 'plan', plan_word: 'Plan', tp_edit_title: 'Edit take profit', tp_label_short: 'Take profit', lot_tuned: 'tuned', lot_reset_title: 'Back to the calculated lot', lot_minus_title: 'One step down', lot_plus_title: 'One step up',
                 lot_edit_title: 'Fine-tune the total lot', lot_entry_edit_title: 'Fine-tune entry {n} lot', lot_edit_invalid: 'Invalid lot.', lot_calc_was: 'calculated:',
@@ -795,7 +795,7 @@
                 th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
                 sym_forget: 'Retirer de la liste',
                 ve_title: 'Valider l’entrée {n}', ve_ok: 'Enregistrer', ve_real_price: 'Prix réellement obtenu',
-                m_state: 'État', ve_state: 'Cette entrée a été', es_done: 'Exécutée', es_plan: 'En attente', es_cancel: 'Annulée',
+                m_state: 'État', m_state_short: 'Ét.', ve_state: 'Cette entrée a été', es_done: 'Exécutée', es_plan: 'En attente', es_cancel: 'Annulée',
                 ve_planned: 'prévu', ve_bad_price: 'Prix invalide.', ve_sl_equal: 'Le prix ne peut pas égaler le stop.',
                 badge_plan: 'plan', plan_word: 'Plan', tp_edit_title: 'Modifier le take profit', tp_label_short: 'Take profit', lot_tuned: 'ajusté', lot_reset_title: 'Revenir au lot calculé', lot_minus_title: 'Un pas en moins', lot_plus_title: 'Un pas en plus',
                 lot_edit_title: 'Ajuster le lot total', lot_entry_edit_title: 'Ajuster le lot de l’entrée {n}', lot_edit_invalid: 'Lot invalide.', lot_calc_was: 'calculé :',
@@ -874,7 +874,7 @@
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
                 sym_forget: 'Quitar de la lista',
                 ve_title: 'Validar entrada {n}', ve_ok: 'Guardar', ve_real_price: 'Precio realmente obtenido',
-                m_state: 'Estado', ve_state: 'Esta entrada fue', es_done: 'Ejecutada', es_plan: 'En espera', es_cancel: 'Cancelada',
+                m_state: 'Estado', m_state_short: 'Est.', ve_state: 'Esta entrada fue', es_done: 'Ejecutada', es_plan: 'En espera', es_cancel: 'Cancelada',
                 ve_planned: 'previsto', ve_bad_price: 'Precio inválido.', ve_sl_equal: 'El precio no puede igualar al stop.',
                 badge_plan: 'plan', plan_word: 'Plan', tp_edit_title: 'Editar el take profit', tp_label_short: 'Take profit', lot_tuned: 'ajustado', lot_reset_title: 'Volver al lote calculado', lot_minus_title: 'Un paso menos', lot_plus_title: 'Un paso más',
                 lot_edit_title: 'Ajustar el lote total', lot_entry_edit_title: 'Ajustar el lote de la entrada {n}', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
@@ -953,7 +953,7 @@
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
                 sym_forget: 'Remover da lista',
                 ve_title: 'Validar {n}ª entrada', ve_ok: 'Guardar', ve_real_price: 'Preço a que entraste mesmo',
-                m_state: 'Estado', ve_state: 'Esta entrada foi', es_done: 'Executada', es_plan: 'À espera', es_cancel: 'Cancelada',
+                m_state: 'Estado', m_state_short: 'Est.', ve_state: 'Esta entrada foi', es_done: 'Executada', es_plan: 'À espera', es_cancel: 'Cancelada',
                 ve_planned: 'planeado', ve_bad_price: 'Preço inválido.', ve_sl_equal: 'O preço não pode ser igual ao stop.',
                 badge_plan: 'plano', plan_word: 'Plano', tp_edit_title: 'Editar o take profit', tp_label_short: 'Take profit', lot_tuned: 'ajustado', lot_reset_title: 'Voltar ao lote calculado', lot_minus_title: 'Um passo abaixo', lot_plus_title: 'Um passo acima',
                 lot_edit_title: 'Afinar o lote total', lot_entry_edit_title: 'Afinar o lote da {n}ª entrada', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
@@ -1141,7 +1141,13 @@
                         state[f.key] = arr;
                         const hdr = document.createElement('div');
                         hdr.className = 'flex items-center gap-2 text-[10px] text-gray-400 uppercase font-bold mb-1';
-                        hdr.innerHTML = `<span style="width:26px">${tr('m_state')}</span><span style="flex:1">${tr('m_price')}</span><span style="flex:1">${tr('sl_short')}</span><span style="flex:1">${tr('r_lot')}</span><span style="width:22px"></span>`;
+                        // Larguras fixas (flex:0 0) na 1ª e última coluna e min-width:0 nas
+                        // do meio — senão os rótulos crescem e montam uns em cima dos outros.
+                        hdr.innerHTML = `<span style="flex:0 0 26px;overflow:hidden">${tr('m_state_short')}</span>`
+                            + `<span style="flex:1;min-width:0">${tr('m_price')}</span>`
+                            + `<span style="flex:1;min-width:0">${tr('sl_short')}</span>`
+                            + `<span style="flex:1;min-width:0">${tr('r_lot')}</span>`
+                            + `<span style="flex:0 0 22px"></span>`;
                         const list = document.createElement('div'); list.className = 'space-y-2';
                         // Estado da entrada no próprio sítio onde a editas: clicar cicla
                         // Executada → À espera → Cancelada.
@@ -1153,7 +1159,7 @@
                                 const row = document.createElement('div'); row.className = 'flex items-center gap-2';
                                 if (!e.st) e.st = 'done';
                                 const lab = document.createElement('button');
-                                lab.type = 'button'; lab.style.width = '26px';
+                                lab.type = 'button'; lab.style.flex = '0 0 26px';
                                 lab.className = 'text-base leading-none hover:opacity-70 transition';
                                 const paintState = () => { lab.textContent = ST_MARK[e.st]; lab.title = `${i + 1}: ${tr(ST_KEY[e.st])}`; };
                                 paintState();
