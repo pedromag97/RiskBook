@@ -631,10 +631,42 @@
                 <!-- Lista de trades -->
                 <div id="journalList" class="space-y-2"></div>
                 <p id="journalEmpty" class="text-center text-gray-400 text-sm py-6" data-i18n="empty_none">Sem trades registadas ainda.</p>
+                <!-- Sem login e sem backup há muito: o localStorage desaparece se limparem o browser -->
+                <div id="backupNudge" class="hidden mt-3 p-2.5 rounded-lg" style="background:#fffbeb;border:1px solid #fde68a">
+                    <p class="text-xs font-bold" style="color:#92400e">💾 <span data-i18n="nudge_title">Guarda uma cópia</span></p>
+                    <p class="text-[11px] mt-0.5" style="color:#92400e" data-i18n="nudge_text">As tuas trades vivem só neste browser. Se limpares os dados do browser, desaparecem.</p>
+                    <div class="flex flex-wrap gap-2 mt-1.5">
+                        <button type="button" onclick="exportJournalJSON()" class="text-[11px] font-bold text-blue-600 hover:underline" data-i18n="nudge_backup">Fazer backup</button>
+                        <button type="button" onclick="dismissBackupNudge()" class="text-[11px] font-bold text-gray-500 hover:underline ml-auto" data-i18n="nudge_later">Mais tarde</button>
+                    </div>
+                </div>
             </div>
         </section>
 
         </div><!-- /grelha de 3 colunas -->
+
+        <!-- Rodapé: privacidade e onde reportar problemas -->
+        <footer class="mt-6 pt-4 border-t border-gray-200 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-400">
+            <span class="font-bold">RiskBook</span>
+            <button type="button" onclick="showPrivacy()" class="hover:text-blue-600 hover:underline transition" data-i18n="privacy_link">Privacidade</button>
+            <a href="https://github.com/pedromag97/RiskBook/issues" target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 hover:underline transition" data-i18n="report_link">Reportar um problema</a>
+        </footer>
+    </div>
+
+    <!-- Aviso de erro: fica no dispositivo, com os detalhes prontos a copiar -->
+    <div id="errorBanner" class="hidden" style="position:fixed;left:12px;right:12px;bottom:12px;z-index:120;max-width:520px;margin:0 auto;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px -8px rgba(0,0,0,.25)">
+        <div class="flex items-start gap-2">
+            <span class="text-base leading-none">⚠️</span>
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold" style="color:#991b1b" data-i18n="err_title">Algo correu mal</p>
+                <p id="errorBannerMsg" class="text-[11px] mt-0.5 break-words" style="color:#b91c1c"></p>
+                <div class="flex flex-wrap gap-2 mt-1.5">
+                    <button type="button" onclick="copyLastError()" class="text-[11px] font-bold text-blue-600 hover:underline" data-i18n="err_copy">Copiar detalhes</button>
+                    <a href="https://github.com/pedromag97/RiskBook/issues" target="_blank" rel="noopener noreferrer" class="text-[11px] font-bold text-blue-600 hover:underline" data-i18n="err_report">Reportar</a>
+                    <button type="button" onclick="document.getElementById('errorBanner').classList.add('hidden')" class="text-[11px] font-bold text-gray-500 hover:underline ml-auto" data-i18n="err_dismiss">Fechar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal (prompt/confirm/alert bonitos) -->
@@ -716,7 +748,13 @@
                 th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
                 sym_forget: 'Remove from the list',
                 ve_title: 'Validate entry {n}', ve_ok: 'Save', ve_real_price: 'Price you actually got',
-                m_state: 'State', m_state_short: 'St.', ve_state: 'This entry was', es_done: 'Filled', es_plan: 'Waiting', es_cancel: 'Cancelled',
+                m_state: 'State', m_state_short: 'St.',
+                privacy_link: 'Privacy', report_link: 'Report a problem',
+                privacy_body: 'WITHOUT SIGNING IN: everything you type stays on this device, in your browser storage. No server, no account, nothing leaves.\n\nIF YOU SIGN IN WITH GOOGLE: your journal and settings are stored in Firebase (Google) so you can see them on other devices. They are tied to your Google account and only you can read them — the server rules block everyone else.\n\nWHAT NEVER HAPPENS: no ads, no tracking, nothing sold or shared. Your trading data is not sent anywhere else.\n\nDELETING: "Clear" wipes the local journal, and the cloud copy too if you are signed in. Signing out deletes nothing.\n\nERRORS: technical details stay on your device — you choose whether to send them.',
+                nudge_title: 'Keep a copy', nudge_text: 'Your trades live only in this browser. Clear your browser data and they are gone.',
+                nudge_backup: 'Back up now', nudge_later: 'Later',
+                err_title: 'Something went wrong', err_copy: 'Copy details', err_report: 'Report', err_dismiss: 'Close',
+                err_copied: 'Details copied. Paste them into the report.', ve_state: 'This entry was', es_done: 'Filled', es_plan: 'Waiting', es_cancel: 'Cancelled',
                 ve_planned: 'planned', ve_bad_price: 'Invalid price.', ve_sl_equal: 'The price cannot equal the stop.',
                 badge_plan: 'plan', plan_word: 'Plan', tp_edit_title: 'Edit take profit', tp_label_short: 'Take profit', lot_tuned: 'tuned', lot_reset_title: 'Back to the calculated lot', lot_minus_title: 'One step down', lot_plus_title: 'One step up',
                 lot_edit_title: 'Fine-tune the total lot', lot_entry_edit_title: 'Fine-tune entry {n} lot', lot_edit_invalid: 'Invalid lot.', lot_calc_was: 'calculated:',
@@ -795,7 +833,13 @@
                 th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
                 sym_forget: 'Retirer de la liste',
                 ve_title: 'Valider l’entrée {n}', ve_ok: 'Enregistrer', ve_real_price: 'Prix réellement obtenu',
-                m_state: 'État', m_state_short: 'Ét.', ve_state: 'Cette entrée a été', es_done: 'Exécutée', es_plan: 'En attente', es_cancel: 'Annulée',
+                m_state: 'État', m_state_short: 'Ét.',
+                privacy_link: 'Confidentialité', report_link: 'Signaler un problème',
+                privacy_body: 'SANS CONNEXION : tout ce que tu écris reste sur cet appareil, dans le stockage du navigateur. Aucun serveur, aucun compte, rien ne sort.\n\nAVEC LA CONNEXION GOOGLE : ton journal et tes réglages sont stockés dans Firebase (Google) pour les retrouver sur d’autres appareils. Ils sont liés à ton compte Google et toi seul peux les lire — les règles du serveur bloquent tout le monde.\n\nCE QUI N’ARRIVE JAMAIS : pas de publicité, pas de pistage, rien de vendu ni partagé. Tes données de trading ne partent nulle part ailleurs.\n\nSUPPRIMER : « Effacer » vide le journal local, et la copie en ligne si tu es connecté. Se déconnecter n’efface rien.\n\nERREURS : les détails techniques restent sur ton appareil — c’est toi qui décides de les envoyer.',
+                nudge_title: 'Garde une copie', nudge_text: 'Tes trades ne vivent que dans ce navigateur. Efface les données du navigateur et ils disparaissent.',
+                nudge_backup: 'Sauvegarder', nudge_later: 'Plus tard',
+                err_title: 'Quelque chose a mal tourné', err_copy: 'Copier les détails', err_report: 'Signaler', err_dismiss: 'Fermer',
+                err_copied: 'Détails copiés. Colle-les dans le signalement.', ve_state: 'Cette entrée a été', es_done: 'Exécutée', es_plan: 'En attente', es_cancel: 'Annulée',
                 ve_planned: 'prévu', ve_bad_price: 'Prix invalide.', ve_sl_equal: 'Le prix ne peut pas égaler le stop.',
                 badge_plan: 'plan', plan_word: 'Plan', tp_edit_title: 'Modifier le take profit', tp_label_short: 'Take profit', lot_tuned: 'ajusté', lot_reset_title: 'Revenir au lot calculé', lot_minus_title: 'Un pas en moins', lot_plus_title: 'Un pas en plus',
                 lot_edit_title: 'Ajuster le lot total', lot_entry_edit_title: 'Ajuster le lot de l’entrée {n}', lot_edit_invalid: 'Lot invalide.', lot_calc_was: 'calculé :',
@@ -874,7 +918,14 @@
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
                 sym_forget: 'Quitar de la lista',
                 ve_title: 'Validar entrada {n}', ve_ok: 'Guardar', ve_real_price: 'Precio realmente obtenido',
-                m_state: 'Estado', m_state_short: 'Est.', ve_state: 'Esta entrada fue', es_done: 'Ejecutada', es_plan: 'En espera', es_cancel: 'Cancelada',
+                m_state: 'Estado', m_state_short: 'Est.',
+                privacy_link: 'Privacidad', report_link: 'Reportar un problema',
+                privacy_body: 'SIN INICIAR SESIÓN: todo lo que escribes se queda en este dispositivo, en el almacenamiento del navegador. Sin servidor, sin cuenta, nada sale de aquí.\n\nCON LOGIN DE GOOGLE: tu diario y ajustes se guardan en Firebase (Google) para verlos en otros dispositivos. Van ligados a tu cuenta de Google y solo tú puedes leerlos — las reglas del servidor bloquean a los demás.\n\nLO QUE NUNCA PASA: sin publicidad, sin rastreo, nada vendido ni compartido. Tus datos de trading no van a ningún otro sitio.\n\nBORRAR: "Limpiar" borra el diario local, y la copia en la nube si has iniciado sesión. Cerrar sesión no borra nada.\n\nERRORES: los detalles técnicos se quedan en tu dispositivo — tú decides si los envías.',
+                nudge_title: 'Guarda una copia', nudge_text: 'Tus trades viven solo en este navegador. Si borras los datos del navegador, desaparecen.',
+                nudge_backup: 'Hacer copia', nudge_later: 'Más tarde',
+                err_title: 'Algo salió mal', err_copy: 'Copiar detalles', err_report: 'Reportar', err_dismiss: 'Cerrar',
+                err_copied: 'Detalles copiados. Pégalos en el reporte.',
+                ve_state: 'Esta entrada fue', es_done: 'Ejecutada', es_plan: 'En espera', es_cancel: 'Cancelada',
                 ve_planned: 'previsto', ve_bad_price: 'Precio inválido.', ve_sl_equal: 'El precio no puede igualar al stop.',
                 badge_plan: 'plan', plan_word: 'Plan', tp_edit_title: 'Editar el take profit', tp_label_short: 'Take profit', lot_tuned: 'ajustado', lot_reset_title: 'Volver al lote calculado', lot_minus_title: 'Un paso menos', lot_plus_title: 'Un paso más',
                 lot_edit_title: 'Ajustar el lote total', lot_entry_edit_title: 'Ajustar el lote de la entrada {n}', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
@@ -953,7 +1004,14 @@
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
                 sym_forget: 'Remover da lista',
                 ve_title: 'Validar {n}ª entrada', ve_ok: 'Guardar', ve_real_price: 'Preço a que entraste mesmo',
-                m_state: 'Estado', m_state_short: 'Est.', ve_state: 'Esta entrada foi', es_done: 'Executada', es_plan: 'À espera', es_cancel: 'Cancelada',
+                m_state: 'Estado', m_state_short: 'Est.',
+                privacy_link: 'Privacidade', report_link: 'Reportar um problema',
+                privacy_body: 'SEM LOGIN: tudo o que escreves fica só neste dispositivo, no armazenamento do browser. Não há servidor, não há conta, não sai nada daqui.\n\nCOM LOGIN GOOGLE: o teu diário e definições passam a ser guardados no Firebase (Google), para os veres noutros dispositivos. Ficam ligados à tua conta Google e só tu lhes acedes — as regras do servidor impedem toda a gente.\n\nO QUE NUNCA ACONTECE: não há publicidade, não há rastreio, não se vende nem partilha nada. Os teus dados de trading não vão para mais lado nenhum.\n\nAPAGAR: o "Limpar" apaga o diário local e também a cópia na nuvem se tiveres sessão iniciada. Terminar sessão não apaga nada.\n\nERROS: os detalhes técnicos ficam no teu dispositivo — és tu que decides se os envias.',
+                nudge_title: 'Guarda uma cópia', nudge_text: 'As tuas trades vivem só neste browser. Se limpares os dados do browser, desaparecem.',
+                nudge_backup: 'Fazer backup', nudge_later: 'Mais tarde',
+                err_title: 'Algo correu mal', err_copy: 'Copiar detalhes', err_report: 'Reportar', err_dismiss: 'Fechar',
+                err_copied: 'Detalhes copiados. Cola-os no reporte.',
+                ve_state: 'Esta entrada foi', es_done: 'Executada', es_plan: 'À espera', es_cancel: 'Cancelada',
                 ve_planned: 'planeado', ve_bad_price: 'Preço inválido.', ve_sl_equal: 'O preço não pode ser igual ao stop.',
                 badge_plan: 'plano', plan_word: 'Plano', tp_edit_title: 'Editar o take profit', tp_label_short: 'Take profit', lot_tuned: 'ajustado', lot_reset_title: 'Voltar ao lote calculado', lot_minus_title: 'Um passo abaixo', lot_plus_title: 'Um passo acima',
                 lot_edit_title: 'Afinar o lote total', lot_entry_edit_title: 'Afinar o lote da {n}ª entrada', lot_edit_invalid: 'Lote inválido.', lot_calc_was: 'calculado:',
@@ -2930,6 +2988,7 @@
 
             renderBreakdown(monthTrades);
             renderCharts(monthTrades, journal);
+            maybeShowBackupNudge(journal);
 
             // Lista: trades do mês + filtro de estado.
             const shown = monthTrades.filter(t => {
@@ -3391,6 +3450,9 @@
             link.href = URL.createObjectURL(blob);
             link.download = `${filePrefix()}-Backup-${new Date().getTime()}.json`;
             link.click();
+            localStorage.setItem(BACKUP_TS_KEY, String(Date.now()));   // deixa de avisar
+            const nudge = document.getElementById('backupNudge');
+            if (nudge) nudge.classList.add('hidden');
         }
 
         // Restaura de um backup JSON. JUNTA ao log atual sem duplicar (dedupe por id).
@@ -3428,6 +3490,63 @@
             };
             reader.readAsText(file);
         }
+
+        /* ------------- Privacidade, backup e erros (pré-divulgação) ------------ */
+
+        // Nota de privacidade. Diz o que acontece nos dois modos, sem rodeios.
+        function showPrivacy() {
+            showAlert(tr('privacy_body'), tr('privacy_link'));
+        }
+
+        // Sem login, o diário vive só no localStorage — que desaparece se limparem
+        // os dados do browser. Avisa quem tem trades e nunca fez backup.
+        const BACKUP_TS_KEY = 'riskcalc_last_backup';
+        const NUDGE_SNOOZE_KEY = 'riskcalc_nudge_snooze';
+        const NUDGE_MIN_TRADES = 3;
+        const NUDGE_AGE_MS = 7 * 24 * 3600 * 1000;    // relembra ao fim de uma semana
+
+        function dismissBackupNudge() {
+            localStorage.setItem(NUDGE_SNOOZE_KEY, String(Date.now()));
+            document.getElementById('backupNudge').classList.add('hidden');
+        }
+        function maybeShowBackupNudge(journal) {
+            const el = document.getElementById('backupNudge');
+            if (!el) return;
+            const comLogin = !!(window.RBCloud && window.RBCloud.signedIn);
+            const backup = +(localStorage.getItem(BACKUP_TS_KEY) || 0);
+            const snooze = +(localStorage.getItem(NUDGE_SNOOZE_KEY) || 0);
+            const agora = Date.now();
+            const mostrar = !comLogin
+                && journal.length >= NUDGE_MIN_TRADES
+                && (agora - backup) > NUDGE_AGE_MS
+                && (agora - snooze) > NUDGE_AGE_MS;
+            el.classList.toggle('hidden', !mostrar);
+        }
+
+        // Erros: ficam NO DISPOSITIVO. Nada é enviado para lado nenhum — seria
+        // contraditório com a promessa de privacidade. O utilizador copia e reporta.
+        const LAST_ERROR_KEY = 'riskcalc_last_error';
+        function recordError(origem, e) {
+            const det = {
+                quando: new Date().toISOString(),
+                origem,
+                msg: (e && (e.message || e.reason && e.reason.message)) || String(e && e.reason || e || ''),
+                stack: (e && (e.error && e.error.stack || e.reason && e.reason.stack)) || '',
+                onde: location.href,
+                agente: navigator.userAgent
+            };
+            try { localStorage.setItem(LAST_ERROR_KEY, JSON.stringify(det)); } catch (_) {}
+            const b = document.getElementById('errorBanner');
+            const m = document.getElementById('errorBannerMsg');
+            if (b && m) { m.textContent = det.msg.slice(0, 160); b.classList.remove('hidden'); }
+        }
+        async function copyLastError() {
+            const raw = localStorage.getItem(LAST_ERROR_KEY) || '{}';
+            try { await navigator.clipboard.writeText(raw); showAlert(tr('err_copied')); }
+            catch (_) { showAlert(raw); }   // sem clipboard: mostra para copiar à mão
+        }
+        window.addEventListener('error', e => recordError('error', e));
+        window.addEventListener('unhandledrejection', e => recordError('promise', e));
 
         /* ------------------------------ Listeners ---------------------------- */
         function setupListeners() {
@@ -3514,7 +3633,7 @@
         const elStatus = document.getElementById('cloudStatus');
         const T = (k, p) => (window.t ? window.t(k, p) : k);
 
-        window.RBCloud = { onLocalChange() {}, configured: false };
+        window.RBCloud = { onLocalChange() {}, configured: false, signedIn: false };
 
         if (!FIREBASE_CONFIG.apiKey) {
             // Sem configuração: a barra de nuvem nem aparece.
@@ -3647,6 +3766,8 @@
                 if (unsubSettings) { unsubSettings(); unsubSettings = null; }
                 remoteTrades = new Map(); remoteSettings = null;
 
+                window.RBCloud.signedIn = !!user;
+                if (window.renderJournal) renderJournal();   // atualiza o aviso de backup
                 if (!user) {
                     uid = null;
                     btnIn.classList.remove('hidden');
