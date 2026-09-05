@@ -2406,19 +2406,13 @@
                 })
                 .filter(e => !isNaN(e.usd));
             if (!exits.length) { showAlert(tr('invalid_value')); return; }
-            const gross = exits.reduce((s, e) => s + e.usd, 0);
-            const fees = exits.reduce((s, e) => s + (e.fee || 0), 0);
-            const net = gross - fees;                            // resultado líquido (P&L − comissões)
-            // Fechada só se a quantidade vendida cobrir o lote total. Se houver quantidades
-            // e ainda faltar vender, fica PARCIAL (continua aberta).
-            const soldQty = exits.reduce((s, e) => s + (e.qty || 0), 0);
-            const hasQty = exits.some(e => e.qty != null);
-            const eps = Math.max(1e-6, t.totalLot * 1e-4);
-            const stillOpen = hasQty && (t.totalLot - soldQty) > eps;
+            const net = exits.reduce((s, e) => s + e.usd - (e.fee || 0), 0);   // P&L − comissões
             t.exits = exits;
             t.resultUSD = net;
             t.exitType = exits.length > 1 ? 'Parcial' : exits[0].type;
-            t.status = stillOpen ? 'parcial' : (net > 0 ? 'ganho' : net < 0 ? 'perdido' : 'nulo');
+            // Sem quantidades não dá para saber se sobrou posição: fecha pelo sinal.
+            t.status = net > 0 ? 'ganho' : net < 0 ? 'perdido' : 'nulo';
+            refreshCompletion(t);   // com quantidades, decide entre fechada e parcial
             saveJournal(journal);
             renderJournal();
         }
@@ -2852,6 +2846,36 @@
             };
         }
 
+        // Fechada ou ainda parcial? Depende da quantidade vendida face ao lote que
+        // está em mercado — e esse lote MUDA quando validas ou cancelas entradas.
+        // Por isso isto tem de ser reavaliado a cada recálculo, não só ao fechar.
+        function refreshCompletion(t) {
+            const exits = t.exits || [];
+            if (!exits.length) return;                          // reaberta ou por fechar
+            if (!exits.some(e => e.qty != null)) return;        // sem quantidades, mandas tu
+            if (t.status === 'nao_exec') return;
+            const soldQty = exits.reduce((s, e) => s + (e.qty || 0), 0);
+            const net = exits.reduce((s, e) => s + (e.usd || 0) - (e.fee || 0), 0);
+            const eps = Math.max(1e-6, t.totalLot * 1e-4);
+            const porVender = t.totalLot - soldQty;
+            t.resultUSD = net;
+            t.status = porVender > eps ? 'parcial'
+                     : (net > 0 ? 'ganho' : net < 0 ? 'perdido' : 'nulo');
+        }
+
+        // Trades que ficaram presas em PARCIAL porque o lote mudou depois de fechares
+        // (validar/cancelar entradas) são acertadas no arranque. Não mexe em mais nada.
+        function normalizeJournal() {
+            const journal = getJournal();
+            let mudou = false;
+            journal.forEach(t => {
+                const antes = t.status + '|' + t.resultUSD;
+                refreshCompletion(t);
+                if (antes !== t.status + '|' + t.resultUSD) mudou = true;
+            });
+            if (mudou) saveJournal(journal);
+        }
+
         function recomputeTrade(t) {
             // O que está MESMO no mercado (executadas) e o PLANO (executadas + à espera).
             const real = aggregate(t, s => s === 'done');
@@ -2860,6 +2884,7 @@
             if (!use) return;
             Object.assign(t, use);
             t.isPlanOnly = !real;                  // o cartão marca-o como plano
+            refreshCompletion(t);                  // o lote mudou: ainda está parcial?
             // Guarda o plano à parte, para comparares com o que realmente aconteceu.
             t.planSnapshot = plan ? { totalLot: plan.totalLot, avgEntry: plan.avgEntry, plannedRisk: plan.plannedRisk, plannedGain: plan.plannedGain } : null;
         }
@@ -3606,6 +3631,7 @@
             saveSymbolToHistory(document.getElementById('assetSymbol').value.trim() || '');
             calculateTradeSummary();
             // Arranca no mês mais recente com trades (ou "Todos" se vazio).
+            normalizeJournal();   // acerta trades presas em PARCIAL
             selectedMonth = availableMonths(getJournal())[0] || 'all';
             renderJournal();
         };
