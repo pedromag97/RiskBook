@@ -2846,6 +2846,12 @@
             };
         }
 
+        // Lote mínimo negociável do ativo da trade (todas as classes usam 0.01).
+        function lotStep(t) {
+            const p = ASSET_PRESETS[t.assetType] || ASSET_PRESETS[String(t.assetType).toLowerCase()];
+            return (p && p.step) || 0.01;
+        }
+
         // Fechada ou ainda parcial? Depende da quantidade vendida face ao lote que
         // está em mercado — e esse lote MUDA quando validas ou cancelas entradas.
         // Por isso isto tem de ser reavaliado a cada recálculo, não só ao fechar.
@@ -2854,12 +2860,13 @@
             if (!exits.length) return;                          // reaberta ou por fechar
             if (!exits.some(e => e.qty != null)) return;        // sem quantidades, mandas tu
             if (t.status === 'nao_exec') return;
-            const soldQty = exits.reduce((s, e) => s + (e.qty || 0), 0);
-            const net = exits.reduce((s, e) => s + (e.usd || 0) - (e.fee || 0), 0);
-            const eps = Math.max(1e-6, t.totalLot * 1e-4);
+            const soldQty = exits.reduce((s, e) => s + (+e.qty || 0), 0);
+            const net = exits.reduce((s, e) => s + (+e.usd || 0) - (+e.fee || 0), 0);
             const porVender = t.totalLot - soldQty;
+            // Continua parcial só se o que sobra der para vender: um resto menor que
+            // o lote mínimo do ativo (0.01) não é posição, é pó de arredondamento.
             t.resultUSD = net;
-            t.status = porVender > eps ? 'parcial'
+            t.status = porVender >= lotStep(t) - 1e-9 ? 'parcial'
                      : (net > 0 ? 'ganho' : net < 0 ? 'perdido' : 'nulo');
         }
 
@@ -3080,8 +3087,11 @@
                     })() : '';
                 // Quantidade por vender (só quando parcial).
                 const soldQty = (t.exits || []).reduce((s, e) => s + (e.qty || 0), 0);
+                // Casas suficientes para o resto nunca aparecer como 0.00 sem o ser.
+                const porVender = t.totalLot - soldQty;
+                const casas = (porVender > 0 && porVender < 0.005) ? 4 : 2;
                 const remainingLine = (t.status === 'parcial')
-                    ? `<p class="text-xs mt-1 font-bold" style="color:#9a3412">⏳ ${tr('remaining')}: ${(t.totalLot - soldQty).toFixed(2)} / ${t.totalLot.toFixed(2)} ${tr('r_lot')}</p>` : '';
+                    ? `<p class="text-xs mt-1 font-bold" style="color:#9a3412">⏳ ${tr('remaining')}: ${porVender.toFixed(casas)} / ${t.totalLot.toFixed(2)} ${tr('r_lot')}</p>` : '';
                 const reviewLine = t.review
                     ? `<p class="text-xs mt-1 italic" style="color:#b45309">🔍 ${t.review}</p>` : '';
                 const reasonLine = t.status === 'nao_exec'
