@@ -1088,7 +1088,7 @@
         function setLang(l) {
             if (!LANGS.includes(l)) l = 'en';
             LANG = l;
-            localStorage.setItem(LANG_KEY, l);
+            localStorage.setItem(LANG_KEY, l); settingsChanged();
             document.querySelectorAll('#langSelector .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
             applyStaticTranslations();
             applyDocTitle();          // o título do separador segue o idioma
@@ -1361,6 +1361,7 @@
             if (!res) return;
             const name = res.name.trim();
             if (name) localStorage.setItem(OWNER_KEY, name); else localStorage.removeItem(OWNER_KEY);
+            settingsChanged();
             applyOwner();
         }
 
@@ -1635,6 +1636,13 @@
             }
         }
 
+        // Mudaste uma definição (carteira, metas, idioma, dono). Sem isto, a alteração
+        // ficava só no localStorage e só subia por acaso — e entretanto a nuvem podia
+        // empurrar o valor antigo por cima do novo.
+        function settingsChanged() {
+            if (window.RBCloud) RBCloud.onLocalChange();
+        }
+
         /* ---------------------- Trancar a carteira --------------------------- */
         // Persiste o valor e o estado de bloqueio. Trancada = não muda por engano.
         function setBalanceLockUI(locked) {
@@ -1654,19 +1662,19 @@
             setBalanceLockUI(locked);
             // Guarda o valor enquanto desbloqueada.
             input.addEventListener('input', () => {
-                if (!input.disabled) localStorage.setItem(BALANCE_KEY, input.value);
+                if (!input.disabled) { localStorage.setItem(BALANCE_KEY, input.value); settingsChanged(); }
             });
             btn.addEventListener('click', async () => {
                 if (input.disabled) {
                     if (await showConfirm(t('unlock_confirm'))) {
                         localStorage.setItem(BALANCE_LOCK_KEY, '0');
-                        setBalanceLockUI(false);
+                        setBalanceLockUI(false); settingsChanged();
                         input.focus();
                     }
                 } else {
                     localStorage.setItem(BALANCE_KEY, input.value);
                     localStorage.setItem(BALANCE_LOCK_KEY, '1');
-                    setBalanceLockUI(true);
+                    setBalanceLockUI(true); settingsChanged();
                     calculateTradeSummary({ keepOverride: true });
                 }
             });
@@ -1681,8 +1689,8 @@
             const savedWR = localStorage.getItem(WALLETRISK_KEY);
             if (savedRR !== null) rr.value = savedRR;
             if (savedWR !== null) wr.value = savedWR;
-            rr.addEventListener('input', () => localStorage.setItem(RRGOAL_KEY, rr.value));
-            wr.addEventListener('input', () => localStorage.setItem(WALLETRISK_KEY, wr.value));
+            rr.addEventListener('input', () => { localStorage.setItem(RRGOAL_KEY, rr.value); settingsChanged(); });
+            wr.addEventListener('input', () => { localStorage.setItem(WALLETRISK_KEY, wr.value); settingsChanged(); });
 
             // Trancar/destrancar as metas (mudam-se raramente — barreira anti-erro).
             function setUI(locked) {
@@ -1695,12 +1703,12 @@
                 if (rr.disabled) {
                     if (await showConfirm(t('goals_unlock_confirm'))) {
                         localStorage.setItem(GOALS_LOCK_KEY, '0');
-                        setUI(false);
+                        setUI(false); settingsChanged();
                         rr.focus();
                     }
                 } else {
                     localStorage.setItem(GOALS_LOCK_KEY, '1');
-                    setUI(true);
+                    setUI(true); settingsChanged();
                     calculateTradeSummary({ keepOverride: true });
                 }
             });
