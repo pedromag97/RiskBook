@@ -2025,9 +2025,15 @@
 
             // Número grande = lote TRADEABLE (2 casas). Linha pequena = valor EXATO (4 casas)
             // — ou, se afinaste o lote à mão, o valor que o cálculo dava.
+            // Cada parcela é afinável aqui mesmo, sem ter de subir ao bloco das entradas.
+            const parcelas = lots.map((q, i) =>
+                `<span onclick="event.stopPropagation();editEntryLot(${i})" title="${t('lot_entry_edit_title', { n: i + 1 })}"`
+                + ` class="cursor-pointer hover:opacity-60 transition"`
+                + ` style="text-decoration:underline dotted;text-underline-offset:3px;text-decoration-color:#6ee7b7">${formatLot(q)}</span>`
+            ).join(' + ');
             document.getElementById('quantityToTrade').innerHTML =
                 formatLot(totalQty)
-                + (trancheCount > 1 ? `  <span class="text-base font-semibold text-emerald-700">(${lots.map(formatLot).join(' + ')})</span>` : '')
+                + (trancheCount > 1 ? `  <span class="text-base font-semibold text-emerald-700">(${parcelas})</span>` : '')
                 + (tuned
                     ? `<span class="block text-xs font-medium mt-1" style="color:#b45309">${t('lot_calc_was')} ${formatLot(calcTotal)}</span>`
                     : `<span class="block text-xs font-medium text-emerald-700 mt-1">exato: ${formatLotExact(totalExact)}`
