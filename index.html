@@ -3726,6 +3726,12 @@
             }
             // O Firestore rejeita campos `undefined`; esta volta pelo JSON limpa-os.
             const clean = o => JSON.parse(JSON.stringify(o));
+            // Data + hora: só a hora não diz se foi hoje ou na semana passada.
+            const quando = () => {
+                const d = new Date(), p = n => String(n).padStart(2, '0');
+                return `${p(d.getDate())}/${p(d.getMonth() + 1)} ${p(d.getHours())}:${p(d.getMinutes())}`;
+            };
+            const porExtenso = () => new Date().toLocaleString();
 
             /* ---------------- Definições: carimbo local ---------------- */
             // Sobe o carimbo só quando as definições mudam mesmo.
@@ -3800,7 +3806,7 @@
                     }
                     if (n) await batch.commit();
                     dirty = false;
-                    setStatus('cloud_synced', new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), auth.currentUser ? auth.currentUser.email : '');
+                    setStatus('cloud_synced', quando(), (auth.currentUser ? auth.currentUser.email + ' · ' : '') + porExtenso());
                 } catch (e) {
                     console.warn('RiskBook sync (subida):', e);
                     const code = (e && (e.code || e.message)) || String(e);
@@ -3845,7 +3851,7 @@
                         else remoteTrades.set(id, d);
                     });
                     mergeDown();
-                    if (dirty) pushUp(); else setStatus('cloud_synced', new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), user.email || '');
+                    if (dirty) pushUp(); else setStatus('cloud_synced', quando(), (user.email ? user.email + ' · ' : '') + porExtenso());
                 }, e => {
                     console.warn('RiskBook sync (descida):', e);
                     const code = (e && (e.code || e.message)) || String(e);
