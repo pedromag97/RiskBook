@@ -2761,7 +2761,8 @@
             if (!p || Math.abs(p.totalLot - t.totalLot) < 1e-9) return '';
             return `<div class="text-xs mt-1" style="color:#b45309">📐 ${tr('plan_word')}: `
                 + `${formatLot(p.totalLot)} ${tr('r_lot')} · ${tr('r_mean')} ${formatPrice(p.avgEntry)} · ${tr('r_risk')} ${formatCurrency(p.plannedRisk)}`
-                + (p.plannedGain != null ? ` · ${tr('r_gain')} ${formatCurrency(p.plannedGain)}` : '') + `</div>`;
+                + (p.plannedGain != null ? ` · ${tr('r_gain')} ${formatCurrency(p.plannedGain)}` : '')
+                + (p.rr ? ` · ${tr('r_rr')} ${p.rr.toFixed(2)}` : '') + `</div>`;
         }
 
         // Badge de estado.
@@ -2907,7 +2908,7 @@
             t.isPlanOnly = !real;                  // o cartão marca-o como plano
             refreshCompletion(t);                  // o lote mudou: ainda está parcial?
             // Guarda o plano à parte, para comparares com o que realmente aconteceu.
-            t.planSnapshot = plan ? { totalLot: plan.totalLot, avgEntry: plan.avgEntry, plannedRisk: plan.plannedRisk, plannedGain: plan.plannedGain } : null;
+            t.planSnapshot = plan ? { totalLot: plan.totalLot, avgEntry: plan.avgEntry, plannedRisk: plan.plannedRisk, plannedGain: plan.plannedGain, rr: plan.rr } : null;
         }
         // Editar as entradas REAIS (lista livre: adicionar/remover/editar preço e lote).
         // A calculadora é só um guia — aqui regista-se o que realmente aconteceu.
