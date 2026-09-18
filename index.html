@@ -476,7 +476,7 @@
                 <button type="button" id="breakEvenToggle" onclick="toggleBreakEven()" class="be-switch w-full">
                     <span class="be-track"><span class="be-knob"></span></span>
                     <span class="flex-1 text-left">
-                        <span class="be-title">🛡️ <span data-i18n="be_label">Stop sem perda</span></span>
+                        <span class="be-title">🛡️ <span data-i18n="be_label">Break-even</span></span>
                         <span class="be-sub" data-i18n="be_help">Onde pôr o stop para não perder, a cada entrada que encher.</span>
                     </span>
                 </button>
@@ -781,8 +781,8 @@
                 contract_label: 'Contract Value (per 1.0 of price, per lot)', contract_hint: '— filled by asset type, editable',
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
-                be_label: 'Break-even stop', be_help: 'Where to put the stop to lose nothing, as each entry fills.',
-                be_line_label: 'Break-even stop', be_apply: 'move stop here', be_none: 'No filled entry yet.', be_warn: '{n} entry(ies) still to fill: when they do, this stop stops being risk-free — you would be risking {risk} again.',
+                be_label: 'Break-even', be_help: 'Where to put the stop to lose nothing, as each entry fills.',
+                be_line_label: 'Break-even', be_apply: 'move stop here', be_none: 'No filled entry yet.', be_warn: '{n} entry(ies) still to fill: when they do, the stop is no longer at break-even — you would be risking {risk} again.',
                 be_confirm: 'Move the stop to {price}? From there the trade cannot lose.',
                 th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
                 sym_forget: 'Remove from the list',
@@ -869,8 +869,8 @@
                 contract_label: 'Valeur du contrat (par 1.0 de prix, par lot)', contract_hint: '— rempli selon le type d\'actif, modifiable',
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
-                be_label: 'Stop sans perte', be_help: 'Où placer le stop pour ne rien perdre, à chaque entrée remplie.',
-                be_line_label: 'Stop sans perte', be_apply: 'déplacer le stop ici', be_none: 'Aucune entrée exécutée.', be_warn: '{n} entrée(s) encore à remplir : quand elles le seront, ce stop cesse d’être sans perte — tu risquerais de nouveau {risk}.',
+                be_label: 'Break-even', be_help: 'Où placer le stop pour ne rien perdre, à chaque entrée remplie.',
+                be_line_label: 'Break-even', be_apply: 'déplacer le stop ici', be_none: 'Aucune entrée exécutée.', be_warn: '{n} entrée(s) encore à remplir : quand elles le seront, le stop ne sera plus au break-even — tu risquerais de nouveau {risk}.',
                 be_confirm: 'Déplacer le stop à {price} ? À partir de là le trade ne peut plus perdre.',
                 th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
                 sym_forget: 'Retirer de la liste',
@@ -957,8 +957,8 @@
                 contract_label: 'Valor del Contrato (por 1.0 de precio, por lote)', contract_hint: '— rellenado por el tipo de activo, editable',
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
-                be_label: 'Stop sin pérdida', be_help: 'Dónde poner el stop para no perder, según se ejecuta cada entrada.',
-                be_line_label: 'Stop sin pérdida', be_apply: 'mover el stop aquí', be_none: 'Ninguna entrada ejecutada.', be_warn: 'Faltan {n} entrada(s): cuando se ejecuten, este stop deja de ser sin pérdida — volverías a arriesgar {risk}.',
+                be_label: 'Break-even', be_help: 'Dónde poner el stop para no perder, según se ejecuta cada entrada.',
+                be_line_label: 'Break-even', be_apply: 'mover el stop aquí', be_none: 'Ninguna entrada ejecutada.', be_warn: 'Faltan {n} entrada(s): cuando se ejecuten, el stop deja de estar en break-even — volverías a arriesgar {risk}.',
                 be_confirm: '¿Mover el stop a {price}? A partir de ahí la operación no puede perder.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
                 sym_forget: 'Quitar de la lista',
@@ -1046,8 +1046,8 @@
                 contract_label: 'Valor do Contrato (por 1.0 de preço, por lote)', contract_hint: '— preenchido pelo tipo de ativo, editável',
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
-                be_label: 'Stop sem perda', be_help: 'Onde pôr o stop para não perder, a cada entrada que encher.',
-                be_line_label: 'Stop sem perda', be_apply: 'mover o stop para aqui', be_none: 'Ainda não há nenhuma entrada executada.', be_warn: 'Faltam {n} entrada(s): quando encherem, este stop deixa de ser sem perda — voltarias a arriscar {risk}.',
+                be_label: 'Break-even', be_help: 'Onde pôr o stop para não perder, a cada entrada que encher.',
+                be_line_label: 'Break-even', be_apply: 'mover o stop para aqui', be_none: 'Ainda não há nenhuma entrada executada.', be_warn: 'Faltam {n} entrada(s): quando encherem, o stop deixa de estar em break-even — voltarias a arriscar {risk}.',
                 be_confirm: 'Mover o stop para {price}? A partir daí a trade não pode perder.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
                 sym_forget: 'Remover da lista',
