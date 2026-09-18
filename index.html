@@ -447,6 +447,15 @@
                 <input type="datetime-local" id="tradeDate" class="input-field w-full text-sm">
             </div>
 
+            <!-- Break-even: para onde o stop sem perda se move a cada entrada que enche -->
+            <div id="breakEvenRow" class="hidden pt-3">
+                <button type="button" id="breakEvenToggle" onclick="toggleBreakEven()" class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition">
+                    <span id="breakEvenBox" class="inline-flex items-center justify-center w-4 h-4 rounded border border-gray-300 bg-white text-[11px] font-bold leading-none"></span>
+                    <span data-i18n="be_label">Mostrar stop sem perda</span>
+                </button>
+                <p class="text-xs text-gray-400 mt-1" data-i18n="be_help">Onde pôr o stop para não perder, a cada entrada que encher.</p>
+            </div>
+
             <button onclick="calculateTradeSummary()" class="calculate-button w-full mt-2 flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600 transition">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><path d="M12 16h.01"/><path d="M16 16h.01"/><path d="M8 16h.01"/><path d="M12 20h.01"/><path d="M16 20h.01"/><path d="M8 20h.01"/></svg>
                 <span data-i18n="calc_btn">Calcular Resumo</span>
@@ -491,6 +500,7 @@
                     <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-2" data-i18n="entries_cumrisk">Entradas & Risco Acumulado</p>
                     <div id="trancheLines" class="space-y-1.5"></div>
                     <div id="cumRiskLine" class="mt-2.5 pt-2 border-t border-gray-200"></div>
+                    <div id="breakEvenLine" class="hidden mt-2 pt-2 border-t border-gray-200"></div>
                 </div>
 
                 <div id="results" class="space-y-3">
@@ -745,6 +755,9 @@
                 contract_label: 'Contract Value (per 1.0 of price, per lot)', contract_hint: '— filled by asset type, editable',
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
+                be_label: 'Show break-even stop', be_help: 'Where to put the stop to lose nothing, as each entry fills.',
+                be_line_label: 'Break-even stop', be_apply: 'move stop here', be_none: 'No filled entry yet.',
+                be_confirm: 'Move the stop to {price}? From there the trade cannot lose.',
                 th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
                 sym_forget: 'Remove from the list',
                 ve_title: 'Validate entry {n}', ve_ok: 'Save', ve_real_price: 'Price you actually got',
@@ -830,6 +843,9 @@
                 contract_label: 'Valeur du contrat (par 1.0 de prix, par lot)', contract_hint: '— rempli selon le type d\'actif, modifiable',
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
+                be_label: 'Afficher le stop sans perte', be_help: 'Où placer le stop pour ne rien perdre, à chaque entrée remplie.',
+                be_line_label: 'Stop sans perte', be_apply: 'déplacer le stop ici', be_none: 'Aucune entrée exécutée.',
+                be_confirm: 'Déplacer le stop à {price} ? À partir de là le trade ne peut plus perdre.',
                 th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
                 sym_forget: 'Retirer de la liste',
                 ve_title: 'Valider l’entrée {n}', ve_ok: 'Enregistrer', ve_real_price: 'Prix réellement obtenu',
@@ -915,6 +931,9 @@
                 contract_label: 'Valor del Contrato (por 1.0 de precio, por lote)', contract_hint: '— rellenado por el tipo de activo, editable',
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
+                be_label: 'Mostrar stop sin pérdida', be_help: 'Dónde poner el stop para no perder, según se ejecuta cada entrada.',
+                be_line_label: 'Stop sin pérdida', be_apply: 'mover el stop aquí', be_none: 'Ninguna entrada ejecutada.',
+                be_confirm: '¿Mover el stop a {price}? A partir de ahí la operación no puede perder.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
                 sym_forget: 'Quitar de la lista',
                 ve_title: 'Validar entrada {n}', ve_ok: 'Guardar', ve_real_price: 'Precio realmente obtenido',
@@ -1001,6 +1020,9 @@
                 contract_label: 'Valor do Contrato (por 1.0 de preço, por lote)', contract_hint: '— preenchido pelo tipo de ativo, editável',
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
+                be_label: 'Mostrar stop sem perda', be_help: 'Onde pôr o stop para não perder, a cada entrada que encher.',
+                be_line_label: 'Stop sem perda', be_apply: 'mover o stop para aqui', be_none: 'Ainda não há nenhuma entrada executada.',
+                be_confirm: 'Mover o stop para {price}? A partir daí a trade não pode perder.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
                 sym_forget: 'Remover da lista',
                 ve_title: 'Validar {n}ª entrada', ve_ok: 'Guardar', ve_real_price: 'Preço a que entraste mesmo',
@@ -1442,6 +1464,33 @@
         }
 
         function currentStep() { return ASSET_PRESETS[currentAssetType].step; }
+
+        // ---- Stop sem perda (break-even) ----------------------------------
+        // Com as entradas todas abertas, o stop que dá lucro zero é o preço médio
+        // ponderado: o que a 1ª ganha paga o que a 2ª perde. O que interessa não é
+        // o médio final — é para onde ele SE MOVE a cada entrada que enche.
+        //   após a 1ª:  E₁
+        //   após a 2ª:  (q₁E₁ + q₂E₂) / (q₁ + q₂)
+        //   após a 3ª:  (q₁E₁ + q₂E₂ + q₃E₃) / (q₁ + q₂ + q₃)
+        function breakevenSteps(entries, lots) {
+            const passos = []; let somaQE = 0, somaQ = 0;
+            for (let i = 0; i < entries.length; i++) {
+                const q = +lots[i] || 0;
+                if (q <= 0) { passos.push(null); continue; }   // entrada sem lote não move nada
+                somaQE += q * entries[i]; somaQ += q;
+                passos.push(somaQE / somaQ);
+            }
+            return passos;
+        }
+
+        const BREAKEVEN_KEY = 'riskcalc_breakeven';
+        let breakEvenOn = localStorage.getItem(BREAKEVEN_KEY) === '1';
+        function toggleBreakEven() {
+            breakEvenOn = !breakEvenOn;
+            localStorage.setItem(BREAKEVEN_KEY, breakEvenOn ? '1' : '0');
+            calculateTradeSummary({ keepOverride: true });
+            renderJournal();
+        }
 
         // ---- Afinação manual dos lotes ------------------------------------
         // null = usa os lotes calculados. Caso contrário é o array de lotes por
@@ -2025,6 +2074,24 @@
 
             // Número grande = lote TRADEABLE (2 casas). Linha pequena = valor EXATO (4 casas)
             // — ou, se afinaste o lote à mão, o valor que o cálculo dava.
+            // Stop sem perda, passo a passo (só faz sentido com entradas parceladas).
+            const beRow = document.getElementById('breakEvenRow');
+            const beLine = document.getElementById('breakEvenLine');
+            document.getElementById('breakEvenBox').textContent = breakEvenOn ? '✓' : '';
+            document.getElementById('breakEvenBox').style.background = breakEvenOn ? '#3b82f6' : '#fff';
+            document.getElementById('breakEvenBox').style.color = '#fff';
+            beRow.classList.toggle('hidden', trancheCount < 2);
+            if (breakEvenOn && trancheCount > 1) {
+                const passos = breakevenSteps(entries, lots);
+                const txt = passos.map((v, i) => v == null ? '' :
+                    `${labels[i]}: ${formatPrice(v)}`).filter(Boolean).join('  |  ');
+                beLine.innerHTML = `<span class="text-[10px] uppercase font-bold tracking-wider text-gray-400">${t('be_line_label')}</span>`
+                    + `<span class="block mt-0.5 text-[13px] font-bold" style="color:#2563eb">${txt}</span>`;
+                beLine.classList.remove('hidden');
+            } else {
+                beLine.classList.add('hidden');
+            }
+
             // Cada parcela é afinável aqui mesmo, sem ter de subir ao bloco das entradas.
             const parcelas = lots.map((q, i) =>
                 `<span onclick="event.stopPropagation();editEntryLot(${i})" title="${t('lot_entry_edit_title', { n: i + 1 })}"`
@@ -2688,6 +2755,45 @@
                     </div>`;
         }
 
+        // Stop sem perda na trade viva: onde está agora (com o que já encheu) e para
+        // onde se move quando as entradas à espera encherem.
+        function breakEvenLineLog(t) {
+            if (!breakEvenOn) return '';
+            if (CLOSED_ST.includes(t.status) || t.status === 'nao_exec') return '';
+            const st = entryStates(t);
+            const idx = t.entries.map((_, i) => i).filter(i => st[i] !== 'cancel');
+            if (idx.length < 2) return '';
+            const passos = breakevenSteps(idx.map(i => t.entries[i]), idx.map(i => t.lots[i]));
+            const ord = ['1ª', '2ª', '3ª', '4ª', '5ª'];
+            const txt = passos.map((v, k) => v == null ? '' :
+                `<span style="${st[idx[k]] === 'done' ? 'font-weight:800' : 'opacity:.7'}">${ord[k] || (k + 1)}: ${formatPrice(v)}</span>`
+            ).filter(Boolean).join('<span class="text-gray-300"> | </span>');
+            // Break-even de tudo o que JÁ encheu — é este que dá para aplicar já.
+            const feitos = t.entries.map((_, i) => i).filter(i => st[i] === 'done');
+            const agora = feitos.length
+                ? breakevenSteps(feitos.map(i => t.entries[i]), feitos.map(i => t.lots[i])).filter(v => v != null).pop()
+                : null;
+            const aplicar = (agora != null && Math.abs(agora - t.sl) > 1e-9)
+                ? ` <button onclick="event.stopPropagation();applyBreakEven(${t.id})" class="font-bold text-blue-600 hover:underline">${tr('be_apply')}</button>` : '';
+            return `<div class="text-xs mt-1" style="color:#2563eb">🛡️ ${tr('be_line_label')}: ${txt}${aplicar}</div>`;
+        }
+
+        // Põe o stop no break-even do que já encheu: a partir daí a trade não perde.
+        async function applyBreakEven(id) {
+            const journal = getJournal(); const t = journal.find(x => x.id === id); if (!t) return;
+            if (t.cValue == null) t.cValue = getCValue(t);
+            const st = entryStates(t);
+            const feitos = t.entries.map((_, i) => i).filter(i => st[i] === 'done');
+            if (!feitos.length) { showAlert(tr('be_none')); return; }
+            const be = breakevenSteps(feitos.map(i => t.entries[i]), feitos.map(i => t.lots[i])).filter(v => v != null).pop();
+            if (be == null) return;
+            if (!(await showConfirm(tr('be_confirm', { price: formatPrice(be) })))) return;
+            if (!t.initialSls) t.initialSls = t.entries.map((_, i) => slOfEntry(t, i));   // preserva o inicial
+            t.sls = t.entries.map((_, i) => st[i] === 'cancel' ? slOfEntry(t, i) : be);
+            recomputeTrade(t);
+            saveJournal(journal); renderJournal();
+        }
+
         // Orçamento de risco: quanto do plano original estás mesmo a usar.
         // Só informa — não mexe em lotes. A decisão de usar o que sobra é tua.
         function budgetLine(t) {
@@ -3200,7 +3306,7 @@
                             <span>${tr('r_gain')} <span class="font-semibold" style="color:#059669">${formatCurrency(t.plannedGain)}</span></span>
                             <span>${tr('r_rr')} ${t.rr.toFixed(2)}</span>
                         </div>
-                        ${planLine(t)}${budgetLine(t)}
+                        ${planLine(t)}${budgetLine(t)}${breakEvenLineLog(t)}
                         ${entriesToggle}
                         ${remainingLine}${exitsLine}${notes}${reviewLine}${reasonLine}
                         <div class="flex gap-2 mt-2 flex-wrap items-center">${actions.join('')}</div>
