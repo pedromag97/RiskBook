@@ -480,6 +480,12 @@
                         <span class="be-sub" data-i18n="be_help">Onde pôr o stop para não perder, a cada entrada que encher.</span>
                     </span>
                 </button>
+                <!-- Mesma ideia, mas admitindo uma perda controlada em vez de zero -->
+                <div id="maxLossRow" class="hidden mt-2 pl-3 flex items-center gap-2">
+                    <label for="maxLossPerPos" class="text-xs font-medium text-gray-600 shrink-0" data-i18n="ml_label">Perda aceite ($)</label>
+                    <input type="number" id="maxLossPerPos" min="0" step="any" placeholder="0" class="input-field text-sm py-1.5 px-2" style="width:92px">
+                    <span class="text-[11px] text-gray-400 leading-tight" data-i18n="ml_help">Em vez de zero, o stop que perde no máximo isto.</span>
+                </div>
             </div>
 
             <button onclick="calculateTradeSummary()" class="calculate-button w-full mt-2 flex items-center justify-center space-x-2 shadow-lg hover:bg-blue-600 transition">
@@ -781,7 +787,9 @@
                 contract_label: 'Contract Value (per 1.0 of price, per lot)', contract_hint: '— filled by asset type, editable',
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
-                be_label: 'Break-even', be_help: 'Where to put the stop to lose nothing, as each entry fills.',
+                be_label: 'Break-even', ml_label: 'Accepted loss ($)', ml_help: 'Instead of zero, the stop that loses at most this.',
+                ml_line_label: 'Max loss {amount}', ml_looser: '(your stop already loses less)',
+                ml_need_two: 'Two filled entries are needed.', ml_confirm: 'Move the stop to {price}? The position would lose at most {amount}.', be_help: 'Where to put the stop to lose nothing, as each entry fills.',
                 be_line_label: 'Break-even', be_apply: 'move stop here', be_none: 'No filled entry yet.', be_warn: '{n} entry(ies) still to fill: when they do, the stop is no longer at break-even — you would be risking {risk} again.',
                 be_confirm: 'Move the stop to {price}? From there the trade cannot lose.',
                 th_entry: 'Entry', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risk',
@@ -869,7 +877,10 @@
                 contract_label: 'Valeur du contrat (par 1.0 de prix, par lot)', contract_hint: '— rempli selon le type d\'actif, modifiable',
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
-                be_label: 'Break-even', be_help: 'Où placer le stop pour ne rien perdre, à chaque entrée remplie.',
+                be_label: 'Break-even', ml_label: 'Perte acceptée ($)', ml_help: 'Au lieu de zéro, le stop qui perd au maximum ceci.',
+                ml_line_label: 'Perte max {amount}', ml_looser: '(ton stop perd déjà moins)',
+                ml_need_two: 'Il faut deux entrées exécutées.', ml_confirm: 'Déplacer le stop à {price} ? La position perdrait au maximum {amount}.',
+                be_help: 'Où placer le stop pour ne rien perdre, à chaque entrée remplie.',
                 be_line_label: 'Break-even', be_apply: 'déplacer le stop ici', be_none: 'Aucune entrée exécutée.', be_warn: '{n} entrée(s) encore à remplir : quand elles le seront, le stop ne sera plus au break-even — tu risquerais de nouveau {risk}.',
                 be_confirm: 'Déplacer le stop à {price} ? À partir de là le trade ne peut plus perdre.',
                 th_entry: 'Entrée', th_tp: 'TP', th_lot: 'Lot', th_risk: 'Risque',
@@ -957,7 +968,10 @@
                 contract_label: 'Valor del Contrato (por 1.0 de precio, por lote)', contract_hint: '— rellenado por el tipo de activo, editable',
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
-                be_label: 'Break-even', be_help: 'Dónde poner el stop para no perder, según se ejecuta cada entrada.',
+                be_label: 'Break-even', ml_label: 'Pérdida aceptada ($)', ml_help: 'En vez de cero, el stop que pierde como máximo esto.',
+                ml_line_label: 'Pérdida máx {amount}', ml_looser: '(tu stop ya pierde menos)',
+                ml_need_two: 'Hacen falta dos entradas ejecutadas.', ml_confirm: '¿Mover el stop a {price}? La posición perdería como máximo {amount}.',
+                be_help: 'Dónde poner el stop para no perder, según se ejecuta cada entrada.',
                 be_line_label: 'Break-even', be_apply: 'mover el stop aquí', be_none: 'Ninguna entrada ejecutada.', be_warn: 'Faltan {n} entrada(s): cuando se ejecuten, el stop deja de estar en break-even — volverías a arriesgar {risk}.',
                 be_confirm: '¿Mover el stop a {price}? A partir de ahí la operación no puede perder.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Riesgo',
@@ -1046,7 +1060,10 @@
                 contract_label: 'Valor do Contrato (por 1.0 de preço, por lote)', contract_hint: '— preenchido pelo tipo de ativo, editável',
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
-                be_label: 'Break-even', be_help: 'Onde pôr o stop para não perder, a cada entrada que encher.',
+                be_label: 'Break-even', ml_label: 'Perda aceite ($)', ml_help: 'Em vez de zero, o stop que perde no máximo isto.',
+                ml_line_label: 'Perda máx {amount}', ml_looser: '(o teu stop já perde menos)',
+                ml_need_two: 'São precisas duas entradas executadas.', ml_confirm: 'Mover o stop para {price}? A posição perderia no máximo {amount}.',
+                be_help: 'Onde pôr o stop para não perder, a cada entrada que encher.',
                 be_line_label: 'Break-even', be_apply: 'mover o stop para aqui', be_none: 'Ainda não há nenhuma entrada executada.', be_warn: 'Faltam {n} entrada(s): quando encherem, o stop deixa de estar em break-even — voltarias a arriscar {risk}.',
                 be_confirm: 'Mover o stop para {price}? A partir daí a trade não pode perder.',
                 th_entry: 'Entrada', th_tp: 'TP', th_lot: 'Lote', th_risk: 'Risco',
@@ -1507,6 +1524,34 @@
                 passos.push(somaQE / somaQ);
             }
             return passos;
+        }
+
+        // Mesma ideia do break-even, mas admitindo uma perda L em vez de zero:
+        //     Σ qᵢ (S − Eᵢ) cv = −L   ⟹   S = break-even − L / (Σqᵢ · cv)
+        // Numa venda o sinal inverte-se (o stop fica ACIMA do break-even).
+        // Só a partir da 2ª entrada: antes disso não há ganho de nenhuma perna
+        // para abater, e o número seria só um stop mais apertado.
+        function maxLossSteps(entries, lots, cv, buy, L) {
+            const be = breakevenSteps(entries, lots);
+            let somaQ = 0;
+            return be.map((b, i) => {
+                somaQ += +lots[i] || 0;
+                if (i === 0 || b == null || somaQ <= 0) return null;   // 2ª em diante
+                const desloc = L / (somaQ * cv);
+                return buy ? b - desloc : b + desloc;
+            });
+        }
+        // Perda líquida da posição se for parada nos stops ATUAIS (positiva = perda).
+        function perdaNosStops(entries, lots, sls, cv, buy) {
+            return -entries.reduce((s, E, i) => s + (+lots[i] || 0)
+                * (buy ? (sls[i] - E) : (E - sls[i])) * cv, 0);
+        }
+
+        const MAXLOSS_KEY = 'riskcalc_maxloss_pos';
+        function maxLossValue() {
+            const el = document.getElementById('maxLossPerPos');
+            const v = parseFloat(el ? el.value : localStorage.getItem(MAXLOSS_KEY));
+            return (!isNaN(v) && v > 0) ? v : 0;
         }
 
         const BREAKEVEN_KEY = 'riskcalc_breakeven';
@@ -2105,12 +2150,29 @@
             const beLine = document.getElementById('breakEvenLine');
             document.getElementById('breakEvenToggle').classList.toggle('on', breakEvenOn);
             beRow.classList.toggle('hidden', trancheCount < 2);
+            document.getElementById('maxLossRow').classList.toggle('hidden', !breakEvenOn || trancheCount < 2);
             if (breakEvenOn && trancheCount > 1) {
                 const passos = breakevenSteps(entries, lots);
                 const txt = passos.map((v, i) => v == null ? '' :
                     `${labels[i]}: ${formatPrice(v)}`).filter(Boolean).join('  |  ');
-                beLine.innerHTML = `<span class="text-[10px] uppercase font-bold tracking-wider text-gray-400">${t('be_line_label')}</span>`
+                let html = `<span class="text-[10px] uppercase font-bold tracking-wider text-gray-400">${t('be_line_label')}</span>`
                     + `<span class="block mt-0.5 text-[13px] font-bold" style="color:#2563eb">${txt}</span>`;
+                // Stop de perda controlada, quando definiste um valor.
+                const L = maxLossValue();
+                if (L > 0) {
+                    const alvos = maxLossSteps(entries, lots, cValue, isBuy, L);
+                    const txtL = alvos.map((v, i) => v == null ? '' :
+                        `${labels[i]}: ${formatPrice(v)}`).filter(Boolean).join('  |  ');
+                    if (txtL) {
+                        // Se os stops que já tens perdem menos do que L, isto não aperta nada.
+                        const perdeAgora = perdaNosStops(entries, lots, sls, cValue, isBuy);
+                        const nota = perdeAgora <= L
+                            ? ` <span class="font-normal" style="color:#b45309">${t('ml_looser')}</span>` : '';
+                        html += `<span class="block mt-2 text-[10px] uppercase font-bold tracking-wider text-gray-400">${t('ml_line_label', { amount: formatCurrency(L) })}</span>`
+                            + `<span class="block mt-0.5 text-[13px] font-bold" style="color:#b45309">${txtL}${nota}</span>`;
+                    }
+                }
+                beLine.innerHTML = html;
                 beLine.classList.remove('hidden');
             } else {
                 beLine.classList.add('hidden');
@@ -2814,7 +2876,29 @@
                         + tr('be_warn', { n: porEncher.length, risk: formatCurrency(depois) }) + `</div>`;
                 }
             }
-            return `<div class="text-xs mt-1" style="color:#2563eb">🛡️ ${tr('be_line_label')}: ${txt}${aplicar}</div>${aviso}`;
+            // Perda controlada: mesma progressão, deslocada pelo valor que aceitas perder.
+            let linhaL = '';
+            const L = maxLossValue();
+            if (L > 0) {
+                const cv2 = getCValue(t), buy2 = t.direction === 'COMPRA';
+                const alvos = maxLossSteps(idx.map(i => t.entries[i]), idx.map(i => t.lots[i]), cv2, buy2, L);
+                const txtL = alvos.map((v, k) => v == null ? '' :
+                    `<span style="${st[idx[k]] === 'done' ? 'font-weight:800' : 'opacity:.7'}">${ord[k] || (k + 1)}: ${formatPrice(v)}</span>`
+                ).filter(Boolean).join('<span class="text-gray-300"> | </span>');
+                if (txtL) {
+                    const perdeAgora = perdaNosStops(idx.map(i => t.entries[i]), idx.map(i => t.lots[i]),
+                        idx.map(i => slOfEntry(t, i)), cv2, buy2);
+                    const nota = perdeAgora <= L ? ` <span class="font-normal">${tr('ml_looser')}</span>` : '';
+                    const feitos2 = t.entries.map((_, i) => i).filter(i => st[i] === 'done');
+                    const alvoAgora = feitos2.length > 1
+                        ? maxLossSteps(feitos2.map(i => t.entries[i]), feitos2.map(i => t.lots[i]), cv2, buy2, L).filter(v => v != null).pop()
+                        : null;
+                    const aplicarL = (alvoAgora != null && Math.abs(alvoAgora - t.sl) > 1e-9)
+                        ? ` <button onclick="event.stopPropagation();applyMaxLoss(${t.id})" class="font-bold text-blue-600 hover:underline">${tr('be_apply')}</button>` : '';
+                    linhaL = `<div class="text-xs mt-1" style="color:#b45309">🎚️ ${tr('ml_line_label', { amount: formatCurrency(L) })}: ${txtL}${nota}${aplicarL}</div>`;
+                }
+            }
+            return `<div class="text-xs mt-1" style="color:#2563eb">🛡️ ${tr('be_line_label')}: ${txt}${aplicar}</div>${linhaL}${aviso}`;
         }
 
         // Põe o stop no break-even do que já encheu: a partir daí a trade não perde.
@@ -2829,6 +2913,25 @@
             if (!(await showConfirm(tr('be_confirm', { price: formatPrice(be) })))) return;
             if (!t.initialSls) t.initialSls = t.entries.map((_, i) => slOfEntry(t, i));   // preserva o inicial
             t.sls = t.entries.map((_, i) => st[i] === 'cancel' ? slOfEntry(t, i) : be);
+            recomputeTrade(t);
+            saveJournal(journal); renderJournal();
+        }
+
+        // Põe o stop no nível que limita a perda da posição ao valor que aceitas.
+        async function applyMaxLoss(id) {
+            const journal = getJournal(); const t = journal.find(x => x.id === id); if (!t) return;
+            if (t.cValue == null) t.cValue = getCValue(t);
+            const L = maxLossValue(); if (L <= 0) return;
+            const st = entryStates(t);
+            const feitos = t.entries.map((_, i) => i).filter(i => st[i] === 'done');
+            if (feitos.length < 2) { showAlert(tr('ml_need_two')); return; }
+            const cv = getCValue(t), buy = t.direction === 'COMPRA';
+            const alvo = maxLossSteps(feitos.map(i => t.entries[i]), feitos.map(i => t.lots[i]), cv, buy, L)
+                .filter(v => v != null).pop();
+            if (alvo == null) return;
+            if (!(await showConfirm(tr('ml_confirm', { price: formatPrice(alvo), amount: formatCurrency(L) })))) return;
+            if (!t.initialSls) t.initialSls = t.entries.map((_, i) => slOfEntry(t, i));
+            t.sls = t.entries.map((_, i) => st[i] === 'cancel' ? slOfEntry(t, i) : alvo);
             recomputeTrade(t);
             saveJournal(journal); renderJournal();
         }
@@ -3774,6 +3877,11 @@
             document.getElementById('inputs').addEventListener('input', calculateTradeSummary);
             // Realça na lista o ativo que está escrito.
             document.getElementById('assetSymbol').addEventListener('input', () => renderSymbolChips());
+            // Perda aceite por posição: guarda e refresca o log (a calculadora já recalcula sozinha).
+            const ml = document.getElementById('maxLossPerPos');
+            const savedML = localStorage.getItem(MAXLOSS_KEY);
+            if (savedML !== null) ml.value = savedML;
+            ml.addEventListener('input', () => { localStorage.setItem(MAXLOSS_KEY, ml.value); renderJournal(); });
         }
 
         window.onload = () => {
