@@ -30,13 +30,17 @@ were the whole position. Mine solves for the total: three entries, three
 different stops, total risk lands exactly on your max loss.
 
 **2. They assume you get filled where you planned.** You don't. I plan entry 2
-at 195 with a stop at 180 — 11.61 lots, $174 of risk. I actually get 205. I'm
-now 25 points from my stop instead of 15, and if I keep that size I'm risking
-$290 on a leg I budgeted $174 for.
+at 195 with a stop at 180 — 11.61 lots, $174 of risk. By the time price gets
+there I'd be entering at 205 instead: 25 points from my stop rather than 15,
+and that same size now risks $290 on a leg I budgeted $174 for.
 
-So entries are things you *validate* after the fact. Mark entry 2 as filled at
-205 and the lot drops to 6.96 automatically — risk back to $174. Fill better
-than planned and it goes the other way.
+So while an entry is still *waiting*, you update the price you'd actually get
+and it tells you the size that keeps the risk — 6.96 instead of 11.61 — before
+you place the order. One click to accept it.
+
+Once an entry is **filled**, the quantity is a fact and nothing recalculates
+it. Your broker filled what it filled; a journal that quietly rewrites that is
+worse than no journal.
 
 Each entry is Planned / Filled / Cancelled. The ones that never fill drop out
 of the average price and the risk. What I didn't expect is that this turned
@@ -62,9 +66,9 @@ around how I trade — CFDs, prop firm rules, scaling in. No broker integration,
 you type your trades.
 
 Two things I'd like to know from anyone who scales in:
-- When you don't get your planned fill, do you re-size to keep the risk, or
-  keep the size and accept the bigger risk? I assumed the first — tell me if
-  that's wrong.
+- When price gets to your next entry at a worse level than you planned, do you
+  re-size to keep the risk, or send the original size and accept the bigger
+  risk? I built for the first but I'd like to know how common it is.
 - Do you use one stop for the whole position or one per leg? I built for
   per-leg and I'm not sure how common that is.
 

@@ -179,6 +179,13 @@
         }
         .sym-chip .sym-x:hover { color: #dc2626; }
 
+        /* Campo do lote à espera de confirmação da quantidade real */
+        .lot-confirm {
+            border-color: #f59e0b !important;
+            background: #fffbeb !important;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+        }
+
         /* Interruptor do stop sem perda */
         .be-switch {
             display: flex; align-items: center; gap: 10px;
@@ -787,7 +794,9 @@
                 contract_label: 'Contract Value (per 1.0 of price, per lot)', contract_hint: '— filled by asset type, editable',
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
-                be_label: 'Break-even', ml_label: 'Accepted loss ($)', ml_help: 'Instead of zero, the stop that loses at most this.',
+                be_label: 'Break-even', lot_confirm_hint: 'Confirm the quantity your broker actually filled.',
+                lot_suggest: 'Suggested {lot} to keep the planned risk of {risk}.', lot_suggest_apply: 'use',
+                ml_label: 'Accepted loss ($)', ml_help: 'Instead of zero, the stop that loses at most this.',
                 ml_line_label: 'Max loss {amount}', ml_looser: '(your stop already loses less)',
                 ml_need_two: 'Two filled entries are needed.', ml_confirm: 'Move the stop to {price}? The position would lose at most {amount}.', be_help: 'Where to put the stop to lose nothing, as each entry fills.',
                 be_line_label: 'Break-even', be_apply: 'move stop here', be_none: 'No filled entry yet.', be_warn: '{n} entry(ies) still to fill: when they do, the stop is no longer at break-even — you would be risking {risk} again.',
@@ -877,7 +886,9 @@
                 contract_label: 'Valeur du contrat (par 1.0 de prix, par lot)', contract_hint: '— rempli selon le type d\'actif, modifiable',
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
-                be_label: 'Break-even', ml_label: 'Perte acceptée ($)', ml_help: 'Au lieu de zéro, le stop qui perd au maximum ceci.',
+                be_label: 'Break-even', lot_confirm_hint: 'Confirme la quantité réellement exécutée par ton courtier.',
+                lot_suggest: '{lot} suggéré pour garder le risque prévu de {risk}.', lot_suggest_apply: 'utiliser',
+                ml_label: 'Perte acceptée ($)', ml_help: 'Au lieu de zéro, le stop qui perd au maximum ceci.',
                 ml_line_label: 'Perte max {amount}', ml_looser: '(ton stop perd déjà moins)',
                 ml_need_two: 'Il faut deux entrées exécutées.', ml_confirm: 'Déplacer le stop à {price} ? La position perdrait au maximum {amount}.',
                 be_help: 'Où placer le stop pour ne rien perdre, à chaque entrée remplie.',
@@ -968,7 +979,9 @@
                 contract_label: 'Valor del Contrato (por 1.0 de precio, por lote)', contract_hint: '— rellenado por el tipo de activo, editable',
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
-                be_label: 'Break-even', ml_label: 'Pérdida aceptada ($)', ml_help: 'En vez de cero, el stop que pierde como máximo esto.',
+                be_label: 'Break-even', lot_confirm_hint: 'Confirma la cantidad que tu bróker ejecutó realmente.',
+                lot_suggest: 'Sugerido {lot} para mantener el riesgo previsto de {risk}.', lot_suggest_apply: 'usar',
+                ml_label: 'Pérdida aceptada ($)', ml_help: 'En vez de cero, el stop que pierde como máximo esto.',
                 ml_line_label: 'Pérdida máx {amount}', ml_looser: '(tu stop ya pierde menos)',
                 ml_need_two: 'Hacen falta dos entradas ejecutadas.', ml_confirm: '¿Mover el stop a {price}? La posición perdería como máximo {amount}.',
                 be_help: 'Dónde poner el stop para no perder, según se ejecuta cada entrada.',
@@ -1060,7 +1073,9 @@
                 contract_label: 'Valor do Contrato (por 1.0 de preço, por lote)', contract_hint: '— preenchido pelo tipo de ativo, editável',
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
-                be_label: 'Break-even', ml_label: 'Perda aceite ($)', ml_help: 'Em vez de zero, o stop que perde no máximo isto.',
+                be_label: 'Break-even', lot_confirm_hint: 'Confirma a quantidade que a corretora encheu mesmo.',
+                lot_suggest: 'Sugerido {lot} para manter o risco planeado de {risk}.', lot_suggest_apply: 'usar',
+                ml_label: 'Perda aceite ($)', ml_help: 'Em vez de zero, o stop que perde no máximo isto.',
                 ml_line_label: 'Perda máx {amount}', ml_looser: '(o teu stop já perde menos)',
                 ml_need_two: 'São precisas duas entradas executadas.', ml_confirm: 'Mover o stop para {price}? A posição perderia no máximo {amount}.',
                 be_help: 'Onde pôr o stop para não perder, a cada entrada que encher.',
@@ -1288,8 +1303,12 @@
                                 const paintState = () => { lab.textContent = ST_MARK[e.st]; lab.title = `${i + 1}: ${tr(ST_KEY[e.st])}`; };
                                 paintState();
                                 lab.onclick = () => {
+                                    const antes = e.st;
                                     e.st = e.st === 'done' ? 'plan' : e.st === 'plan' ? 'cancel' : 'done';
-                                    paintState();
+                                    // Acabou de passar a executada: pede confirmação da quantidade
+                                    // que a corretora encheu mesmo.
+                                    e.confirmar = (e.st === 'done' && antes !== 'done');
+                                    renderRows();
                                 };
                                 const mk = (val, ph, on) => {
                                     const el = document.createElement('input');
@@ -1298,13 +1317,54 @@
                                 };
                                 const price = mk(e.price, tr('m_price'), function () { e.price = this.value; });
                                 const sl = mk(e.sl, tr('sl_short'), function () { e.sl = this.value; });
-                                const lot = mk(e.lot, tr('r_lot'), function () { e.lot = this.value; });
+                                const lot = mk(e.lot, tr('r_lot'), function () {
+                                    e.lot = this.value;
+                                    e.confirmar = false;          // confirmaste: tira o realce
+                                    lot.classList.remove('lot-confirm');
+                                    const n = row.nextSibling;
+                                    if (n && n.dataset && n.dataset.hint === 'confirm') n.remove();
+                                });
+                                if (e.confirmar) lot.classList.add('lot-confirm');
                                 const rm = document.createElement('button');
                                 rm.type = 'button'; rm.textContent = '✕'; rm.title = tr('btn_delete');
                                 rm.className = 'text-gray-400 hover:text-red-500 px-1 text-sm'; rm.style.width = '22px';
                                 rm.onclick = () => { arr.splice(i, 1); if (!arr.length) arr.push({ price: '', sl: '', lot: '', st: 'done' }); renderRows(); };
                                 row.append(lab, price, sl, lot, rm);
                                 list.appendChild(row);
+
+                                // Acabou de passar a executada: lembra que a quantidade é a real.
+                                if (e.confirmar) {
+                                    const h = document.createElement('div');
+                                    h.dataset.hint = 'confirm';
+                                    h.className = 'text-[11px] font-semibold pl-9';
+                                    h.style.color = '#b45309';
+                                    h.textContent = '✎ ' + tr('lot_confirm_hint');
+                                    list.appendChild(h);
+                                }
+
+                                // À espera e com o preço mudado: sugere o lote que mantém o
+                                // risco planeado. Só sugere — aplicar é um clique teu.
+                                const num = v => parseFloat(String(v).replace(',', '.'));
+                                if (e.st === 'plan' && e.planPrice != null && e.planLot != null) {
+                                    const P = num(e.price), S = num(e.sl), cvv = e.cv || 1, passo = e.step || 0.01;
+                                    if (!isNaN(P) && !isNaN(S) && Math.abs(P - S) > 1e-12 && Math.abs(P - e.planPrice) > 1e-9) {
+                                        const risco = e.planLot * Math.abs(e.planPrice - S) * cvv;
+                                        const sug = Math.max(passo, floorToStep(risco / (Math.abs(P - S) * cvv), passo));
+                                        if (Math.abs(sug - num(e.lot)) > 1e-9) {
+                                            const h = document.createElement('div');
+                                            h.className = 'flex items-center gap-2 text-[11px] pl-9';
+                                            h.style.color = '#2563eb';
+                                            const txt = document.createElement('span');
+                                            txt.textContent = tr('lot_suggest', { lot: formatLot(sug), risk: formatCurrency(risco) });
+                                            const btn = document.createElement('button');
+                                            btn.type = 'button'; btn.className = 'font-bold hover:underline';
+                                            btn.textContent = tr('lot_suggest_apply');
+                                            btn.onclick = () => { e.lot = String(sug); renderRows(); };
+                                            h.append(txt, btn);
+                                            list.appendChild(h);
+                                        }
+                                    }
+                                }
                             });
                         };
                         renderRows();
@@ -3167,9 +3227,15 @@
             if (!t.initialSls) t.initialSls = t.entries.map((_, i) => slOfEntry(t, i));
             const slOf = i => (t.sls && t.sls[i] != null) ? t.sls[i] : t.sl;
             const st0 = entryStates(t);
+            // planPrice/planLot/step viajam com cada linha para o editor poder sugerir
+            // o lote que mantém o risco, sem precisar de conhecer a trade.
+            const cvT = getCValue(t), passo = lotStep(t);
             const initial = t.entries.map((p, i) => ({
                 price: String(p), sl: String(slOf(i) != null ? slOf(i) : ''),
-                lot: String(t.lots[i] != null ? t.lots[i] : ''), st: st0[i]
+                lot: String(t.lots[i] != null ? t.lots[i] : ''), st: st0[i],
+                planPrice: (t.plannedEntries && t.plannedEntries[i] != null) ? t.plannedEntries[i] : null,
+                planLot: (t.plannedLots && t.plannedLots[i] != null) ? t.plannedLots[i] : null,
+                cv: cvT, step: passo
             }));
             const res = await showModal({
                 title: `${t.symbol} · ${tr('edit_entries')}`, okText: tr('m_save'),
@@ -3195,23 +3261,9 @@
                 .filter(r => !isNaN(r.price) && !isNaN(r.sl) && !isNaN(r.lot) && r.lot > 0);
             if (!rows.length) { showAlert(tr('invalid_value')); return; }
 
-            // Se marcaste uma entrada como executada a um preço diferente do planeado
-            // e NÃO mexeste no lote, ajustamo-lo para o risco dessa entrada se manter.
-            // Se escreveste um lote, respeitamos o que escreveste.
-            rows.forEach(r => {
-                const i = r.src;
-                const planP = (t.plannedEntries && t.plannedEntries[i] != null) ? t.plannedEntries[i] : null;
-                const planLot = (t.plannedLots && t.plannedLots[i] != null) ? t.plannedLots[i] : null;
-                const loteIntacto = t.lots[i] != null && Math.abs(r.lot - t.lots[i]) < 1e-9;
-                if (r.st === 'done' && planP != null && planLot != null && loteIntacto
-                    && Math.abs(r.price - planP) > 1e-9 && Math.abs(r.price - r.sl) > 1e-12) {
-                    const planRisk = planLot * Math.abs(planP - r.sl) * cv;
-                    const novo = planRisk / (Math.abs(r.price - r.sl) * cv);
-                    const step = currentStep();
-                    r.lot = Math.max(step, floorToStep(novo, step));
-                }
-            });
-
+            // A app NÃO mexe em lotes. Uma entrada executada é um facto — a quantidade
+            // é a que a corretora encheu, não uma conta nossa. Nas entradas à espera a
+            // sugestão aparece no editor com um botão, e só se aplica se clicares.
             t.entries = rows.map(r => r.price);
             t.sls = rows.map(r => r.sl);
             t.lots = rows.map(r => r.lot);
