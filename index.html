@@ -332,6 +332,7 @@
                 <datalist id="symbolHistory"></datalist>
                 <!-- Ativos já usados: clicar preenche; o ✕ remove da lista -->
                 <div id="symbolChips" class="flex flex-wrap items-center gap-1 mt-1.5"></div>
+                <button type="button" onclick="editNickname()" class="text-xs font-bold text-blue-600 hover:underline mt-1" data-i18n="nick_edit">✎ Alcunha deste ativo</button>
             </div>
 
             <!-- Tipo de ativo: preenche o valor do contrato / lot step por defeito -->
@@ -348,6 +349,14 @@
 
             <!-- Prioridade (confiança) e estilo (day/swing) — guardados no log -->
             <div class="space-y-4">
+                <!-- Conta: só uma etiqueta na trade, para separar estatísticas -->
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-sm font-medium text-gray-700" data-i18n="acc_label">Conta</label>
+                        <button type="button" onclick="manageAccounts()" class="text-xs font-bold text-blue-600 hover:underline" data-i18n="acc_manage">Gerir</button>
+                    </div>
+                    <div id="accountSelector" class="flex flex-wrap gap-2"></div>
+                </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="priority_label">Prioridade / Confiança</label>
                     <div id="prioritySelector" class="grid grid-cols-3 gap-2">
@@ -623,6 +632,11 @@
             </div>
 
             <div id="journalBody">
+                <!-- Conta a ver: tudo abaixo (meses, estatísticas, gráficos, lista) segue isto -->
+                <div id="accountFilterRow" class="flex items-center gap-2 mb-2">
+                    <label for="accountFilter" class="text-xs font-bold text-gray-400 uppercase tracking-wider shrink-0" data-i18n="acc_label">Conta</label>
+                    <select id="accountFilter" onchange="onAccountFilterChange()" class="input-field text-sm py-1.5 px-2 flex-1 font-semibold"></select>
+                </div>
                 <!-- Navegador de mês -->
                 <div class="flex items-center gap-2 mb-2">
                     <button onclick="stepMonth(1)" data-i18n-title="month_prev" class="seg-btn px-3 py-2">‹</button>
@@ -798,7 +812,13 @@
                 contract_label: 'Contract Value (per 1.0 of price, per lot)', contract_hint: '— filled by asset type, editable',
                 tranches_label: 'Scaled Entries (Tranches)', tc_1: '1 Entry', tc_2: '2 Entries', tc_3: '3 Entries',
                 pct_help: 'Set the <b>% of total lot</b> at each entry — lots are computed so the total risk (avg price → stop) hits Max Loss.',
-                be_label: 'Break-even', lot_confirm_hint: 'Confirm the quantity your broker actually filled.',
+                be_label: 'Break-even', acc_label: 'Account', acc_manage: 'Manage', acc_all: 'All accounts', acc_active: 'Active', acc_passive: 'Passive',
+                acc_manage_title: 'Accounts', acc_manage_help: 'One per line. Renaming a line moves its trades along with it; deleting one sends its trades to the first account.',
+                acc_one_per_line: 'Accounts', acc_need_one: 'Keep at least one account.', acc_cycle: 'Click to change account',
+                nick_edit: '✎ Nickname for this asset', nick_title: 'Nickname', nick_field: 'Nickname',
+                nick_help: 'Shown as "Palladium (XPDUSD)" everywhere, including reports and CSV.',
+                nick_need_symbol: 'Type a symbol first.',
+                lot_confirm_hint: 'Confirm the quantity your broker actually filled.',
                 lot_suggest: 'Suggested {lot} to keep the planned risk of {risk}.', lot_suggest_apply: 'use',
                 ml_label: 'Accepted loss ($)', ml_help: 'Instead of zero, the stop that loses at most this.',
                 ml_line_label: 'Max loss {amount}', ml_looser: '(your stop already loses less)',
@@ -890,7 +910,13 @@
                 contract_label: 'Valeur du contrat (par 1.0 de prix, par lot)', contract_hint: '— rempli selon le type d\'actif, modifiable',
                 tranches_label: 'Entrées échelonnées (Tranches)', tc_1: '1 Entrée', tc_2: '2 Entrées', tc_3: '3 Entrées',
                 pct_help: 'Définis le <b>% du lot total</b> à chaque entrée — les lots sont calculés pour que le risque total (prix moyen → stop) atteigne la Perte Max.',
-                be_label: 'Break-even', lot_confirm_hint: 'Confirme la quantité réellement exécutée par ton courtier.',
+                be_label: 'Break-even', acc_label: 'Compte', acc_manage: 'Gérer', acc_all: 'Tous les comptes', acc_active: 'Actif', acc_passive: 'Passif',
+                acc_manage_title: 'Comptes', acc_manage_help: 'Un par ligne. Renommer une ligne déplace ses trades avec elle ; en supprimer une envoie ses trades au premier compte.',
+                acc_one_per_line: 'Comptes', acc_need_one: 'Garde au moins un compte.', acc_cycle: 'Cliquer pour changer de compte',
+                nick_edit: '✎ Surnom de cet actif', nick_title: 'Surnom', nick_field: 'Surnom',
+                nick_help: 'Affiché comme « Palladium (XPDUSD) » partout, y compris rapports et CSV.',
+                nick_need_symbol: 'Saisis d’abord un symbole.',
+                lot_confirm_hint: 'Confirme la quantité réellement exécutée par ton courtier.',
                 lot_suggest: '{lot} suggéré pour garder le risque prévu de {risk}.', lot_suggest_apply: 'utiliser',
                 ml_label: 'Perte acceptée ($)', ml_help: 'Au lieu de zéro, le stop qui perd au maximum ceci.',
                 ml_line_label: 'Perte max {amount}', ml_looser: '(ton stop perd déjà moins)',
@@ -983,7 +1009,13 @@
                 contract_label: 'Valor del Contrato (por 1.0 de precio, por lote)', contract_hint: '— rellenado por el tipo de activo, editable',
                 tranches_label: 'Entradas Parciales (Tramos)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Define el <b>% del lote total</b> en cada entrada — los lotes se calculan para que el riesgo total (precio medio → stop) alcance la Pérdida Máx.',
-                be_label: 'Break-even', lot_confirm_hint: 'Confirma la cantidad que tu bróker ejecutó realmente.',
+                be_label: 'Break-even', acc_label: 'Cuenta', acc_manage: 'Gestionar', acc_all: 'Todas las cuentas', acc_active: 'Activa', acc_passive: 'Pasiva',
+                acc_manage_title: 'Cuentas', acc_manage_help: 'Una por línea. Renombrar una línea lleva sus trades consigo; borrar una envía sus trades a la primera cuenta.',
+                acc_one_per_line: 'Cuentas', acc_need_one: 'Deja al menos una cuenta.', acc_cycle: 'Clic para cambiar de cuenta',
+                nick_edit: '✎ Apodo de este activo', nick_title: 'Apodo', nick_field: 'Apodo',
+                nick_help: 'Se muestra como "Paladio (XPDUSD)" en todas partes, informes y CSV incluidos.',
+                nick_need_symbol: 'Escribe primero un símbolo.',
+                lot_confirm_hint: 'Confirma la cantidad que tu bróker ejecutó realmente.',
                 lot_suggest: 'Sugerido {lot} para mantener el riesgo previsto de {risk}.', lot_suggest_apply: 'usar',
                 ml_label: 'Pérdida aceptada ($)', ml_help: 'En vez de cero, el stop que pierde como máximo esto.',
                 ml_line_label: 'Pérdida máx {amount}', ml_looser: '(tu stop ya pierde menos)',
@@ -1077,7 +1109,13 @@
                 contract_label: 'Valor do Contrato (por 1.0 de preço, por lote)', contract_hint: '— preenchido pelo tipo de ativo, editável',
                 tranches_label: 'Entradas Parceladas (Tranches)', tc_1: '1 Entrada', tc_2: '2 Entradas', tc_3: '3 Entradas',
                 pct_help: 'Defines a <b>% do lote total</b> em cada entrada — os lotes são calculados para que o risco total (preço médio → stop) bata na Perda Máx.',
-                be_label: 'Break-even', lot_confirm_hint: 'Confirma a quantidade que a corretora encheu mesmo.',
+                be_label: 'Break-even', acc_label: 'Conta', acc_manage: 'Gerir', acc_all: 'Todas as contas', acc_active: 'Ativo', acc_passive: 'Passivo',
+                acc_manage_title: 'Contas', acc_manage_help: 'Uma por linha. Renomear uma linha leva as trades dela atrás; apagar uma manda as trades para a primeira conta.',
+                acc_one_per_line: 'Contas', acc_need_one: 'Tem de ficar pelo menos uma conta.', acc_cycle: 'Clicar para mudar de conta',
+                nick_edit: '✎ Alcunha deste ativo', nick_title: 'Alcunha', nick_field: 'Alcunha',
+                nick_help: 'Aparece como "Paládio (XPDUSD)" em todo o lado, incluindo relatórios e CSV.',
+                nick_need_symbol: 'Escreve primeiro um símbolo.',
+                lot_confirm_hint: 'Confirma a quantidade que a corretora encheu mesmo.',
                 lot_suggest: 'Sugerido {lot} para manter o risco planeado de {risk}.', lot_suggest_apply: 'usar',
                 ml_label: 'Perda aceite ($)', ml_help: 'Em vez de zero, o stop que perde no máximo isto.',
                 ml_line_label: 'Perda máx {amount}', ml_looser: '(o teu stop já perde menos)',
@@ -1720,6 +1758,125 @@
         }
 
         /* ----------------------- Histórico de símbolos ----------------------- */
+        /* ------------------ Contas e alcunhas dos ativos --------------------- */
+        // A conta é só uma etiqueta na trade: as definições (carteira, metas) são
+        // partilhadas. Serve para separar estatísticas de estilos diferentes.
+        const ACCOUNTS_KEY = 'riskcalc_accounts';
+        const ACCOUNT_CUR_KEY = 'riskcalc_account_current';
+        const NICKNAMES_KEY = 'riskcalc_nicknames';
+
+        function getAccounts() {
+            try {
+                const a = JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || 'null');
+                if (Array.isArray(a) && a.length) return a;
+            } catch (e) { }
+            // Grava já: as contas são dados do utilizador, não podem mudar de nome
+            // só porque se trocou de idioma.
+            const def = [tr('acc_active'), tr('acc_passive')];
+            localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(def));
+            return def;
+        }
+        function saveAccounts(list) {
+            localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(list));
+            settingsChanged();
+        }
+        function currentAccount() {
+            const list = getAccounts();
+            const cur = localStorage.getItem(ACCOUNT_CUR_KEY);
+            return list.includes(cur) ? cur : list[0];
+        }
+        function setCurrentAccount(name) {
+            localStorage.setItem(ACCOUNT_CUR_KEY, name);
+            settingsChanged();
+            renderAccountSelector();
+        }
+        // A conta de uma trade; as antigas (sem conta) pertencem à primeira.
+        function accountOf(t) {
+            const list = getAccounts();
+            return (t.account && list.includes(t.account)) ? t.account : list[0];
+        }
+
+        // Alcunhas: "XPDUSD" -> "Paládio". Mostradas como "Paládio (XPDUSD)".
+        function getNicknames() {
+            try { return JSON.parse(localStorage.getItem(NICKNAMES_KEY) || '{}'); } catch (e) { return {}; }
+        }
+        function nicknameOf(sym) {
+            const n = getNicknames()[String(sym || '').toUpperCase().trim()];
+            return (n && n.trim()) ? n.trim() : '';
+        }
+        // Nome a mostrar: alcunha com o símbolo ao lado, ou só o símbolo.
+        function symbolLabel(sym) {
+            const n = nicknameOf(sym);
+            return n ? `${n} (${sym})` : String(sym || '');
+        }
+        // Versão curta para sítios apertados (chips, eixos dos gráficos).
+        function symbolShort(sym) { return nicknameOf(sym) || String(sym || ''); }
+
+        function renderAccountSelector() {
+            const box = document.getElementById('accountSelector');
+            if (!box) return;
+            const cur = currentAccount();
+            box.innerHTML = getAccounts().map(a =>
+                `<button type="button" class="seg-btn${a === cur ? ' active' : ''}" style="flex:1 1 auto;min-width:88px"
+                    onclick="setCurrentAccount('${a.replace(/'/g, "\\'")}')">${escapeHtml(a)}</button>`).join('');
+        }
+
+        // Gerir contas: acrescentar, renomear (arrasta as trades atrás) e apagar.
+        async function manageAccounts() {
+            const list = getAccounts();
+            const res = await showModal({
+                title: tr('acc_manage_title'), okText: tr('m_save'),
+                subtitle: tr('acc_manage_help'),
+                fields: [{ key: 'nomes', type: 'textarea', value: list.join('\n'), label: tr('acc_one_per_line') }]
+            });
+            if (!res) return;
+            const novos = String(res.nomes || '').split('\n').map(s => s.trim()).filter(Boolean);
+            // Sem duplicados e pelo menos uma.
+            const unicos = [...new Set(novos)];
+            if (!unicos.length) { showAlert(tr('acc_need_one')); return; }
+
+            // Renomear = mesma posição com nome diferente: leva as trades consigo.
+            const journal = getJournal();
+            let mexeu = false;
+            if (unicos.length === list.length) {
+                list.forEach((antigo, i) => {
+                    if (unicos[i] !== antigo) {
+                        journal.forEach(t => { if (accountOf(t) === antigo) { t.account = unicos[i]; mexeu = true; } });
+                    }
+                });
+            }
+            // Contas apagadas: as trades passam para a primeira.
+            journal.forEach(t => {
+                if (!unicos.includes(accountOf(t))) { t.account = unicos[0]; mexeu = true; }
+            });
+            if (mexeu) saveJournal(journal);
+            saveAccounts(unicos);
+            if (!unicos.includes(currentAccount())) localStorage.setItem(ACCOUNT_CUR_KEY, unicos[0]);
+            renderAccountSelector();
+            renderAccountFilter();
+            renderJournal();
+        }
+
+        // Alcunha do ativo que está no campo do símbolo.
+        async function editNickname() {
+            const sym = (document.getElementById('assetSymbol').value || '').toUpperCase().trim();
+            if (!sym) { showAlert(tr('nick_need_symbol')); return; }
+            const res = await showModal({
+                title: `${sym} · ${tr('nick_title')}`, okText: tr('m_save'),
+                subtitle: tr('nick_help'),
+                fields: [{ key: 'nick', type: 'text', label: tr('nick_field'), value: nicknameOf(sym) }]
+            });
+            if (!res) return;
+            const nicks = getNicknames();
+            const v = String(res.nick || '').trim();
+            if (v) nicks[sym] = v; else delete nicks[sym];
+            localStorage.setItem(NICKNAMES_KEY, JSON.stringify(nicks));
+            settingsChanged();
+            loadSymbolHistory();
+            calculateTradeSummary({ keepOverride: true });
+            renderJournal();
+        }
+
         function getSymbolHistory() {
             try { return JSON.parse(localStorage.getItem(SYMBOL_STORAGE_KEY) || "[]"); } catch (e) { return []; }
         }
@@ -1745,8 +1902,8 @@
             const atual = (document.getElementById('assetSymbol').value || '').toUpperCase().trim();
             box.innerHTML = list.map(s => {
                 const on = s === atual;
-                return `<span class="sym-chip${on ? ' on' : ''}">
-                    <button type="button" onclick="pickSymbol('${s.replace(/'/g, "\\'")}')">${s}</button>
+                return `<span class="sym-chip${on ? ' on' : ''}" title="${escapeHtml(symbolLabel(s))}">
+                    <button type="button" onclick="pickSymbol('${s.replace(/'/g, "\\'")}')">${escapeHtml(symbolShort(s))}</button>
                     <button type="button" class="sym-x" onclick="forgetSymbol('${s.replace(/'/g, "\\'")}')" title="${t('sym_forget')}">✕</button>
                 </span>`;
             }).join('');
@@ -2160,7 +2317,7 @@
             badge.textContent = t(isBuy ? 'buy' : 'sell');
             badge.className = `text-xs font-bold uppercase px-3 py-1 rounded-full border ${isBuy ? 'badge-buy' : 'badge-sell'}`;
 
-            document.getElementById('resSymbolDisplay').textContent = symbol.toUpperCase();
+            document.getElementById('resSymbolDisplay').textContent = symbolLabel(symbol.toUpperCase());
             document.getElementById('resEntry').textContent = formatPrice(avgEntry);
             document.getElementById('resSL').textContent = slDisplay;
             document.getElementById('resTP').textContent = formatPrice(tp);
@@ -2385,7 +2542,8 @@
         }
 
         // Definições sincronizáveis (carteira, metas, idioma, nome do dono).
-        const SYNCED_SETTING_KEYS = [BALANCE_KEY, BALANCE_LOCK_KEY, RRGOAL_KEY, WALLETRISK_KEY, GOALS_LOCK_KEY, OWNER_KEY, LANG_KEY, SYMBOL_STORAGE_KEY];
+        const SYNCED_SETTING_KEYS = [BALANCE_KEY, BALANCE_LOCK_KEY, RRGOAL_KEY, WALLETRISK_KEY, GOALS_LOCK_KEY, OWNER_KEY, LANG_KEY, SYMBOL_STORAGE_KEY,
+            ACCOUNTS_KEY, ACCOUNT_CUR_KEY, NICKNAMES_KEY];
         function getSettingsSnapshot() {
             const o = {};
             SYNCED_SETTING_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) o[k] = v; });
@@ -2400,6 +2558,8 @@
             if (o[LANG_KEY] && o[LANG_KEY] !== LANG) setLang(o[LANG_KEY]);
             applyOwner();
             loadSymbolHistory();
+            renderAccountSelector();
+            renderAccountFilter();
             setupBalanceLock();
             setupGoals();
             calculateTradeSummary();
@@ -2435,9 +2595,33 @@
         function availableMonths(journal) {
             return Array.from(new Set(journal.map(t => monthKey(t.ts)))).sort().reverse();
         }
-        // Trades do mês selecionado (ou todas se 'all').
-        function getMonthTrades() {
+        // Conta a ver no log: nome de uma conta ou 'all'. O filtro da conta aplica-se
+        // ANTES do mês, para a lista de meses e as estatísticas serem só dessa conta.
+        let selectedAccount = 'all';
+        function journalOfAccount() {
             const journal = getJournal();
+            return selectedAccount === 'all' ? journal : journal.filter(t => accountOf(t) === selectedAccount);
+        }
+        function renderAccountFilter() {
+            const sel = document.getElementById('accountFilter');
+            const row = document.getElementById('accountFilterRow');
+            if (!sel) return;
+            const list = getAccounts();
+            // Com uma conta só, o seletor não acrescenta nada.
+            if (row) row.classList.toggle('hidden', list.length < 2);
+            if (!list.includes(selectedAccount)) selectedAccount = 'all';
+            sel.innerHTML = `<option value="all">${t('acc_all')}</option>`
+                + list.map(a => `<option value="${escapeHtml(a)}">${escapeHtml(a)}</option>`).join('');
+            sel.value = selectedAccount;
+        }
+        function onAccountFilterChange() {
+            selectedAccount = document.getElementById('accountFilter').value;
+            renderJournal();
+        }
+
+        // Trades do mês selecionado (ou todas se 'all'), já dentro da conta escolhida.
+        function getMonthTrades() {
+            const journal = journalOfAccount();
             return selectedMonth === 'all' ? journal : journal.filter(t => monthKey(t.ts) === selectedMonth);
         }
         // (Re)constrói o seletor de mês preservando a escolha atual.
@@ -2528,6 +2712,7 @@
                 rr: lastCalc.rr,
                 riskPct: lastCalc.riskPct,
                 cValue: lastCalc.cValue,     // valor do contrato (recalcular entradas reais)
+                account: currentAccount(),   // etiqueta para separar estatísticas
                 priority: currentPriority,   // 1..3 (confiança)
                 style: currentStyle,         // 'day' | 'swing'
                 resultUSD: null,             // P&L realizado total (soma das saídas)
@@ -2823,7 +3008,7 @@
             const pts = trades.filter(t => typeof t.resultUSD === 'number')
                 .sort((a, b) => (a.ts || a.id || 0) - (b.ts || b.id || 0));
             if (!pts.length) return chartEmpty();
-            return svgBars(pts.map(t => ({ v: t.resultUSD, label: t.symbol || '' })), true);
+            return svgBars(pts.map(t => ({ v: t.resultUSD, label: symbolShort(t.symbol) || '' })), true);
         }
         // Barras de P&L por mês (todo o histórico, últimos 12 meses).
         function svgPerMonth(journal) {
@@ -3106,6 +3291,20 @@
             return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full"${edit}color:${fg};background:${bg}">${tr(PRIO_KEY[t.priority] || 'prio_med')}</span>`;
         }
 
+        // Badge da conta. Só aparece com mais do que uma conta; clicar cicla.
+        function accountBadge(t) {
+            const list = getAccounts();
+            if (list.length < 2) return '';
+            return `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:#5b21b6;background:#ede9fe;cursor:pointer"
+                onclick="event.stopPropagation();cycleAccount(${t.id})" title="${tr('acc_cycle')}">${escapeHtml(accountOf(t))}</span>`;
+        }
+        function cycleAccount(id) {
+            const journal = getJournal(); const t = journal.find(x => x.id === id); if (!t) return;
+            const list = getAccounts();
+            t.account = list[(list.indexOf(accountOf(t)) + 1) % list.length];
+            saveJournal(journal); renderJournal();
+        }
+
         // Badge de estilo (Day / Swing). editable=true torna-o clicável (alterna).
         function styleBadge(t, editable) {
             if (!t.style) return '';
@@ -3322,7 +3521,9 @@
         }
 
         function renderJournal() {
-            const journal = getJournal();
+            renderAccountFilter();
+            // Tudo o que se segue é só da conta escolhida (ou de todas).
+            const journal = journalOfAccount();
             const filter = document.getElementById('journalFilter').value;
             const listEl = document.getElementById('journalList');
             const emptyEl = document.getElementById('journalEmpty');
@@ -3469,7 +3670,7 @@
                     <div onclick="toggleTradeDetails(${t.id}, this)" class="p-3 flex items-center justify-between gap-2 cursor-pointer select-none rounded-lg hover:bg-gray-50 transition">
                         <div class="flex items-center gap-2 min-w-0">
                             <span class="chev text-gray-400 text-xs transition-transform shrink-0" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>
-                            <span class="font-bold text-gray-800 truncate">${t.symbol}</span>
+                            <span class="font-bold text-gray-800 truncate" title="${escapeHtml(symbolLabel(t.symbol))}">${escapeHtml(symbolShort(t.symbol))}</span>
                             <span class="text-[10px] font-bold shrink-0" style="color:${dirColor}">${dirLabel(t.direction)}</span>
                             ${t.status === 'aberto' || t.status === 'parcial'
                                 ? `<span class="text-[10px] font-bold shrink-0 hidden sm:inline" style="color:#059669" title="${tr('r_tp')}">🎯 ${formatPrice(t.tp)}</span>` : ''}
@@ -3478,7 +3679,7 @@
                     </div>
                     <div id="td-${t.id}" class="px-3 pb-3 ${open ? '' : 'hidden'}">
                         <div class="flex items-center gap-2 flex-wrap mb-2">
-                            ${statusBadge(t)}${priorityBadge(t, true)}${styleBadge(t, true)}${t.isPlanOnly ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:#b45309;background:#fef3c7">${tr('badge_plan')}</span>` : ''}
+                            ${statusBadge(t)}${priorityBadge(t, true)}${styleBadge(t, true)}${accountBadge(t)}${t.isPlanOnly ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="color:#b45309;background:#fef3c7">${tr('badge_plan')}</span>` : ''}
                             <span class="text-xs text-gray-400">🕒 ${fmtTime(t.ts)}</span>
                         </div>
                         <!-- Níveis de preço em destaque: é o que se consulta a meio da trade -->
@@ -3554,7 +3755,7 @@
             const trades = getMonthTrades();
             if (!trades.length) { showAlert(tr('csv_empty')); return; }
             const cols = ['data', 'simbolo', 'tipo', 'direcao', 'prioridade', 'estilo',
-                'entradas', 'distribuicao', 'modo_distribuicao', 'preco_medio',
+                'alcunha', 'conta', 'entradas', 'distribuicao', 'modo_distribuicao', 'preco_medio',
                 'stop_inicial', 'risco_atual',
                 'stop', 'take_profit', 'lote_total', 'risco_plan', 'ganho_plan', 'rr', 'risco_pct',
                 'estado', 'resultado_usd', 'tipo_saida', 'saidas_parciais', 'motivo_nao_exec', 'revisao', 'notas'];
@@ -3563,6 +3764,7 @@
             const rows = trades.map(t => [
                 fmtDate(t.ts), t.symbol, t.assetType, t.direction,
                 t.priority ? 'P' + t.priority : '', t.style || '',
+                nicknameOf(t.symbol), accountOf(t),
                 t.entries.join(' '), t.pcts.join(' '), (t.sizingMode === 'amt' ? '$' : '%'), t.avgEntry,
                 (t.initialSls && t.initialSls.length ? t.initialSls.join(' ') : (t.initialSl != null ? t.initialSl : t.sl)),
                 (t.currentRisk != null ? t.currentRisk.toFixed(2) : ''),
@@ -3592,7 +3794,7 @@
             return `<div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px">
                 <div style="display:flex;justify-content:space-between;align-items:center">
                     <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-                        <span style="font-weight:700;color:#1f2937">${t.symbol}</span>
+                        <span style="font-weight:700;color:#1f2937">${escapeHtml(symbolLabel(t.symbol))}</span>
                         <span style="font-size:10px;font-weight:700;color:${dirColor}">${dirLabel(t.direction)}</span>
                         ${statusBadge(t)}${priorityBadge(t)}${styleBadge(t)}
                     </div>
@@ -3962,6 +4164,7 @@
             applyStyle('day');
             applyTrancheCount(3);
             applySizingMode(sizingMode, true);   // repõe o modo guardado (sem semear valores)
+            renderAccountSelector();
             saveSymbolToHistory(document.getElementById('assetSymbol').value.trim() || '');
             calculateTradeSummary();
             // Arranca no mês mais recente com trades (ou "Todos" se vazio).
