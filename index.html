@@ -1809,8 +1809,7 @@
             const n = nicknameOf(sym);
             return n ? `${n} (${sym})` : String(sym || '');
         }
-        // Versão curta para sítios apertados (chips, eixos dos gráficos).
-        function symbolShort(sym) { return nicknameOf(sym) || String(sym || ''); }
+
 
         function renderAccountSelector() {
             const box = document.getElementById('accountSelector');
@@ -1903,7 +1902,7 @@
             box.innerHTML = list.map(s => {
                 const on = s === atual;
                 return `<span class="sym-chip${on ? ' on' : ''}" title="${escapeHtml(symbolLabel(s))}">
-                    <button type="button" onclick="pickSymbol('${s.replace(/'/g, "\\'")}')">${escapeHtml(symbolShort(s))}</button>
+                    <button type="button" onclick="pickSymbol('${s.replace(/'/g, "\\'")}')">${escapeHtml(symbolLabel(s))}</button>
                     <button type="button" class="sym-x" onclick="forgetSymbol('${s.replace(/'/g, "\\'")}')" title="${t('sym_forget')}">✕</button>
                 </span>`;
             }).join('');
@@ -3008,7 +3007,7 @@
             const pts = trades.filter(t => typeof t.resultUSD === 'number')
                 .sort((a, b) => (a.ts || a.id || 0) - (b.ts || b.id || 0));
             if (!pts.length) return chartEmpty();
-            return svgBars(pts.map(t => ({ v: t.resultUSD, label: symbolShort(t.symbol) || '' })), true);
+            return svgBars(pts.map(t => ({ v: t.resultUSD, label: t.symbol || '', full: symbolLabel(t.symbol) })), true);
         }
         // Barras de P&L por mês (todo o histórico, últimos 12 meses).
         function svgPerMonth(journal) {
@@ -3034,7 +3033,7 @@
             items.forEach((d, i) => {
                 const cx = pL + gap * i + gap / 2, col = d.v >= 0 ? '#059669' : '#dc2626';
                 const top = Math.min(zeroY, y(d.v)), h = Math.max(1, Math.abs(y(d.v) - zeroY));
-                bars += `<rect x="${(cx - bw / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="1" fill="${col}"><title>${esc(d.label)}: ${formatSigned(d.v)}</title></rect>`;
+                bars += `<rect x="${(cx - bw / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="1" fill="${col}"><title>${esc(d.full || d.label)}: ${formatSigned(d.v)}</title></rect>`;
                 if (showLabels) bars += `<text x="${cx.toFixed(1)}" y="${H - 6}" font-size="9" fill="#9ca3af" text-anchor="middle">${esc(String(d.label).slice(0, 4))}</text>`;
             });
             return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-height:150px" preserveAspectRatio="xMidYMid meet">
@@ -3670,7 +3669,7 @@
                     <div onclick="toggleTradeDetails(${t.id}, this)" class="p-3 flex items-center justify-between gap-2 cursor-pointer select-none rounded-lg hover:bg-gray-50 transition">
                         <div class="flex items-center gap-2 min-w-0">
                             <span class="chev text-gray-400 text-xs transition-transform shrink-0" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>
-                            <span class="font-bold text-gray-800 truncate" title="${escapeHtml(symbolLabel(t.symbol))}">${escapeHtml(symbolShort(t.symbol))}</span>
+                            <span class="font-bold text-gray-800 truncate" title="${escapeHtml(symbolLabel(t.symbol))}">${escapeHtml(symbolLabel(t.symbol))}</span>
                             <span class="text-[10px] font-bold shrink-0" style="color:${dirColor}">${dirLabel(t.direction)}</span>
                             ${t.status === 'aberto' || t.status === 'parcial'
                                 ? `<span class="text-[10px] font-bold shrink-0 hidden sm:inline" style="color:#059669" title="${tr('r_tp')}">🎯 ${formatPrice(t.tp)}</span>` : ''}
