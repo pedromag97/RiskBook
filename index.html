@@ -1817,6 +1817,20 @@
             if (!n) return s;
             return `${escapeHtml(n)} <span style="font-size:${size || 11}px">(${s})</span>`;
         }
+        // No cartão o espaço é curto: quando não cabe tudo, corta-se a alcunha
+        // (tem reticências) e o símbolo real fica sempre inteiro.
+        function symbolCardHTML(sym) {
+            const n = nicknameOf(sym);
+            const s = escapeHtml(String(sym || ''));
+            const title = escapeHtml(symbolLabel(sym));
+            if (!n) return `<span class="font-bold text-gray-800 truncate" title="${title}">${s}</span>`;
+            // Em ecrã estreito o símbolo desce para uma segunda linha — assim
+            // aparecem os dois inteiros em vez de um deles cortado a meio.
+            return `<span class="flex flex-col sm:flex-row sm:items-baseline sm:gap-1 min-w-0" title="${title}">
+                        <span class="font-bold text-gray-800 truncate leading-tight">${escapeHtml(n)}</span>
+                        <span class="font-bold text-gray-800 text-[11px] truncate leading-tight sm:shrink-0">(${s})</span>
+                    </span>`;
+        }
 
 
         function renderAccountSelector() {
@@ -3015,7 +3029,7 @@
             const pts = trades.filter(t => typeof t.resultUSD === 'number')
                 .sort((a, b) => (a.ts || a.id || 0) - (b.ts || b.id || 0));
             if (!pts.length) return chartEmpty();
-            return svgBars(pts.map(t => ({ v: t.resultUSD, label: t.symbol || '', full: symbolLabel(t.symbol) })), true);
+            return svgBars(pts.map(t => ({ v: t.resultUSD, label: t.symbol || '', nick: nicknameOf(t.symbol), full: symbolLabel(t.symbol) })), true);
         }
         // Barras de P&L por mês (todo o histórico, últimos 12 meses).
         function svgPerMonth(journal) {
@@ -3029,20 +3043,37 @@
         }
         // Gerador genérico de gráfico de barras centrado no zero. showLabels=false esconde eixo x quando há muitas barras.
         function svgBars(items, hideLabelsIfMany) {
-            const W = 320, H = 130, pT = 14, pB = 20, pL = 6, pR = 6;
-            const n = items.length, iw = W - pL - pR, ih = H - pT - pB;
+            const W = 320, pT = 14, pL = 6, pR = 6, ih = 96;
+            const n = items.length, iw = W - pL - pR;
+            const showLabels = !(hideLabelsIfMany && n > 12);
+            // Com alcunhas, o eixo leva duas linhas: alcunha em cima, símbolo
+            // real por baixo em letra mais pequena. A área do gráfico não muda.
+            // Abaixo de 30px por barra não cabem as duas sem ficarem ilegíveis:
+            // aí fica só o símbolo real, que é o que identifica o ativo.
+            const twoLine = showLabels && iw / n >= 30 && items.some(d => d.nick);
+            const pB = twoLine ? 32 : 20, H = pT + ih + pB;
             let lo = Math.min(0, ...items.map(d => d.v)), hi = Math.max(0, ...items.map(d => d.v));
             if (lo === hi) { hi += 1; }
             const y = v => pT + ih * (1 - (v - lo) / (hi - lo));
             const zeroY = y(0);
             const bw = Math.max(1, iw / n * 0.7), gap = iw / n;
-            const showLabels = !(hideLabelsIfMany && n > 12);
+            // Quantos carateres cabem na largura de uma barra (0.58em por caráter).
+            const budget = (px, extra) => Math.max(2, Math.floor(gap / (px * 0.58)) - (extra || 0));
+            // Símbolos são códigos: corta-se a direito, cada letra conta.
+            const cut = (s, px, extra) => { const m = budget(px, extra); return s.length > m ? s.slice(0, m) : s; };
+            // Alcunhas são palavras: leva reticências, que se percebe que falta texto.
+            const cutWord = (s, px) => { const m = budget(px); return s.length > m ? s.slice(0, m - 1).trim() + '…' : s; };
             let bars = '';
             items.forEach((d, i) => {
                 const cx = pL + gap * i + gap / 2, col = d.v >= 0 ? '#059669' : '#dc2626';
                 const top = Math.min(zeroY, y(d.v)), h = Math.max(1, Math.abs(y(d.v) - zeroY));
                 bars += `<rect x="${(cx - bw / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="1" fill="${col}"><title>${esc(d.full || d.label)}: ${formatSigned(d.v)}</title></rect>`;
-                if (showLabels) bars += `<text x="${cx.toFixed(1)}" y="${H - 6}" font-size="9" fill="#9ca3af" text-anchor="middle">${esc(String(d.label).slice(0, 4))}</text>`;
+                if (showLabels) {
+                    const sym = String(d.label || '');
+                    const lbl = twoLine && d.nick ? cutWord(d.nick, 9) : cut(sym, 9);
+                    bars += `<text x="${cx.toFixed(1)}" y="${twoLine ? H - 18 : H - 6}" font-size="9" fill="#9ca3af" text-anchor="middle">${esc(lbl)}</text>`;
+                    if (twoLine && d.nick) bars += `<text x="${cx.toFixed(1)}" y="${H - 7}" font-size="7" fill="#c7cbd1" text-anchor="middle">(${esc(cut(sym, 7, 2))})</text>`;
+                }
             });
             return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-height:150px" preserveAspectRatio="xMidYMid meet">
                 <line x1="${pL}" y1="${zeroY.toFixed(1)}" x2="${W - pR}" y2="${zeroY.toFixed(1)}" stroke="#e5e7eb" stroke-width="1"/>
@@ -3677,7 +3708,7 @@
                     <div onclick="toggleTradeDetails(${t.id}, this)" class="p-3 flex items-center justify-between gap-2 cursor-pointer select-none rounded-lg hover:bg-gray-50 transition">
                         <div class="flex items-center gap-2 min-w-0">
                             <span class="chev text-gray-400 text-xs transition-transform shrink-0" style="${open ? 'transform:rotate(90deg)' : ''}">▶</span>
-                            <span class="font-bold text-gray-800 truncate" title="${escapeHtml(symbolLabel(t.symbol))}">${escapeHtml(symbolLabel(t.symbol))}</span>
+                            ${symbolCardHTML(t.symbol)}
                             <span class="text-[10px] font-bold shrink-0" style="color:${dirColor}">${dirLabel(t.direction)}</span>
                             ${t.status === 'aberto' || t.status === 'parcial'
                                 ? `<span class="text-[10px] font-bold shrink-0 hidden sm:inline" style="color:#059669" title="${tr('r_tp')}">🎯 ${formatPrice(t.tp)}</span>` : ''}
